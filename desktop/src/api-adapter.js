@@ -11,7 +11,7 @@
 const API_CONFIG = {
     CLOUD_BASE_URL: 'https://pal-backend-production.up.railway.app',
     USE_CLOUD_FALLBACK: true,
-    DEBUG: true
+    DEBUG: false  // Set to true only for development
 };
 
 // Detect if running in Tauri

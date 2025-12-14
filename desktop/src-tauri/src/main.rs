@@ -9,6 +9,7 @@
 )]
 
 mod ollama;
+mod piper;
 
 use serde::{Deserialize, Serialize};
 use tauri::State;
@@ -16,6 +17,7 @@ use std::sync::Mutex;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use ollama::OllamaClient;
+use piper::{PiperClient, PiperVoice, VoiceGender};
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
@@ -272,6 +274,184 @@ async fn list_models() -> Result<ModelsResult, String> {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// PIPER TTS COMMANDS
+// ═══════════════════════════════════════════════════════════════
+
+#[derive(Serialize, Deserialize)]
+struct TTSStatus {
+    available: bool,
+    current_voice: String,
+    current_gender: String,
+    installed_voices: Vec<String>,
+    message: String,
+}
+
+/// Check Piper TTS status
+#[tauri::command]
+async fn check_tts() -> Result<TTSStatus, String> {
+    let client = PiperClient::new();
+    let available = client.is_available();
+    let current = client.get_current_voice().await;
+    let installed = client.get_installed_voices();
+
+    let message = if available {
+        format!("Piper TTS ready. Current voice: {}", current.name)
+    } else {
+        "Piper TTS not installed. Install with: brew install piper-tts".to_string()
+    };
+
+    Ok(TTSStatus {
+        available,
+        current_voice: current.name,
+        current_gender: match current.gender {
+            VoiceGender::Male => "male".to_string(),
+            VoiceGender::Female => "female".to_string(),
+        },
+        installed_voices: installed.iter().map(|v| v.name.clone()).collect(),
+        message,
+    })
+}
+
+#[derive(Serialize, Deserialize)]
+struct VoiceInfo {
+    id: String,
+    name: String,
+    gender: String,
+    quality: String,
+    installed: bool,
+}
+
+/// List available TTS voices
+#[tauri::command]
+async fn list_voices() -> Result<Vec<VoiceInfo>, String> {
+    let client = PiperClient::new();
+    let voices: Vec<VoiceInfo> = PiperVoice::all_voices()
+        .iter()
+        .map(|v| VoiceInfo {
+            id: v.id.clone(),
+            name: v.name.clone(),
+            gender: match v.gender {
+                VoiceGender::Male => "male".to_string(),
+                VoiceGender::Female => "female".to_string(),
+            },
+            quality: format!("{:?}", v.quality),
+            installed: client.is_voice_installed(v),
+        })
+        .collect();
+
+    Ok(voices)
+}
+
+/// Set TTS voice by gender
+#[tauri::command]
+async fn set_tts_voice(gender: String) -> Result<String, String> {
+    let client = PiperClient::new();
+
+    let voice_gender = match gender.to_lowercase().as_str() {
+        "male" => VoiceGender::Male,
+        "female" => VoiceGender::Female,
+        _ => return Err("Invalid gender. Use 'male' or 'female'.".to_string()),
+    };
+
+    client.set_voice_by_gender(voice_gender).await?;
+    let current = client.get_current_voice().await;
+
+    Ok(format!("Voice set to: {} ({})", current.name, gender))
+}
+
+/// Set TTS voice by ID
+#[tauri::command]
+async fn set_tts_voice_by_id(voice_id: String) -> Result<String, String> {
+    let client = PiperClient::new();
+
+    let voice = PiperVoice::all_voices()
+        .into_iter()
+        .find(|v| v.id == voice_id)
+        .ok_or_else(|| format!("Voice not found: {}", voice_id))?;
+
+    client.set_voice(voice.clone()).await?;
+
+    Ok(format!("Voice set to: {}", voice.name))
+}
+
+#[derive(Serialize, Deserialize)]
+struct SpeakResult {
+    success: bool,
+    voice: String,
+    text_length: usize,
+    message: String,
+}
+
+/// Speak text using Piper TTS (plays audio locally)
+#[tauri::command]
+async fn speak(text: String) -> Result<SpeakResult, String> {
+    let client = PiperClient::new();
+
+    if !client.is_available() {
+        return Err("Piper TTS not installed. Run: brew install piper-tts".to_string());
+    }
+
+    let voice = client.get_current_voice().await;
+    let text_len = text.len();
+
+    client.speak(&text).await?;
+
+    Ok(SpeakResult {
+        success: true,
+        voice: voice.name,
+        text_length: text_len,
+        message: "Speaking...".to_string(),
+    })
+}
+
+#[derive(Serialize, Deserialize)]
+struct SynthesizeResult {
+    success: bool,
+    audio_base64: String,
+    voice: String,
+    sample_rate: u32,
+    duration_ms: u64,
+}
+
+/// Synthesize text to audio (returns base64 WAV)
+#[tauri::command]
+async fn synthesize(text: String) -> Result<SynthesizeResult, String> {
+    let client = PiperClient::new();
+
+    if !client.is_available() {
+        return Err("Piper TTS not installed. Run: brew install piper-tts".to_string());
+    }
+
+    let start = std::time::Instant::now();
+    let voice = client.get_current_voice().await;
+
+    let wav_bytes = client.synthesize(&text).await?;
+    let audio_base64 = base64::Engine::encode(
+        &base64::engine::general_purpose::STANDARD,
+        &wav_bytes
+    );
+
+    Ok(SynthesizeResult {
+        success: true,
+        audio_base64,
+        voice: voice.name,
+        sample_rate: voice.sample_rate,
+        duration_ms: start.elapsed().as_millis() as u64,
+    })
+}
+
+/// Download default voices (male & female)
+#[tauri::command]
+async fn download_voices() -> Result<String, String> {
+    let client = PiperClient::new();
+
+    println!("[Piper] Downloading default voices...");
+    client.ensure_default_voices().await?;
+
+    Ok("Default voices downloaded: Ryan (male), Amy (female)".to_string())
+}
+
+// ═══════════════════════════════════════════════════════════════
 // MAIN
 // ═══════════════════════════════════════════════════════════════
 
@@ -287,6 +467,14 @@ fn main() {
             get_genesis_hash,
             check_ollama,
             list_models,
+            // Piper TTS commands
+            check_tts,
+            list_voices,
+            set_tts_voice,
+            set_tts_voice_by_id,
+            speak,
+            synthesize,
+            download_voices,
         ])
         .setup(|_app| {
             // Print startup banner

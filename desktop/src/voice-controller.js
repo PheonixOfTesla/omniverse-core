@@ -7,6 +7,10 @@
 (function() {
     'use strict';
 
+    // Debug mode - set to true only for development
+    const DEBUG_MODE = false;
+    const log = (...args) => DEBUG_MODE && console.log(...args);
+
     // Mode constants
     const VOICE_MODE = 'voice';
     const MANUAL_MODE = 'manual';
@@ -53,7 +57,7 @@
                 oscillator.stop(audioContext.currentTime + 0.2);
             }
         } catch (e) {
-            console.log('Audio not supported:', e);
+            log('Audio not supported:', e);
         }
     }
 
@@ -61,7 +65,7 @@
     function saveMode(mode) {
         try {
             localStorage.setItem(STORAGE_KEY, mode);
-            console.log(`✅ Mode saved: ${mode}`);
+            log(`✅ Mode saved: ${mode}`);
         } catch (e) {
             console.warn('localStorage not available:', e);
         }
@@ -104,11 +108,11 @@
             // Hide manual mode button on mobile
             if (isMobile) {
                 manualBtn.style.display = 'none';
-                console.log('📱 Manual mode button hidden on mobile');
+                log('📱 Manual mode button hidden on mobile');
             }
         }
 
-        console.log(`🎨 UI Mode: ${mode.toUpperCase()}`);
+        log(`🎨 UI Mode: ${mode.toUpperCase()}`);
     }
 
     // Wake word management
@@ -116,13 +120,13 @@
         // In voice mode, enable wake word detection
         // In manual mode, disable wake word to save battery
         if (mode === VOICE_MODE) {
-            console.log('🎤 Wake word detection: ENABLED');
+            log('🎤 Wake word detection: ENABLED');
             // Enable wake word if available
             if (window.enableWakeWordAI && typeof window.enableWakeWordAI === 'function') {
                 // Wake word will be enabled by user action if not already
             }
         } else {
-            console.log('🔇 Wake word detection: DISABLED (battery optimization)');
+            log('🔇 Wake word detection: DISABLED (battery optimization)');
             // Disable wake word to save battery
             if (window.disableWakeWordAI && typeof window.disableWakeWordAI === 'function') {
                 window.disableWakeWordAI();
@@ -132,7 +136,7 @@
 
     // Switch to Voice Mode
     window.switchToVoiceMode = function() {
-        console.log('🎤 Switching to VOICE mode...');
+        log('🎤 Switching to VOICE mode...');
         applyMode(VOICE_MODE);
         saveMode(VOICE_MODE);
         playModeTransitionSound(true);
@@ -151,7 +155,7 @@
 
         // On mobile, VOICE MODE ONLY - cannot switch to manual
         if (isMobile) {
-            console.log('📱 Manual mode not available on mobile - VOICE ONLY');
+            log('📱 Manual mode not available on mobile - VOICE ONLY');
             showModeNotification('Voice Only Mode', 'Mobile devices use voice mode exclusively');
             // Force back to voice mode
             applyMode(VOICE_MODE);
@@ -159,7 +163,7 @@
             return;
         }
 
-        console.log('👆 Switching to MANUAL mode...');
+        log('👆 Switching to MANUAL mode...');
         applyMode(MANUAL_MODE);
         saveMode(MANUAL_MODE);
         playModeTransitionSound(false);
@@ -171,7 +175,7 @@
 
     // Open Phoenix Desk (Business Management Workspace)
     window.openPhoenixDesk = function() {
-        console.log('💼 Opening Phoenix Desk...');
+        log('💼 Opening Phoenix Desk...');
 
         const token = localStorage.getItem('phoenixToken');
         if (!token) {
@@ -188,7 +192,7 @@
 
     // Switch to Genesis Mode (Natural Language Widget Creation)
     window.switchToGenesisMode = function() {
-        console.log('🧬 Switching to GENESIS mode...');
+        log('🧬 Switching to GENESIS mode...');
 
         const GENESIS_MODE = 'genesis';
         applyMode(GENESIS_MODE);
@@ -214,7 +218,7 @@
         // Show notification
         showModeNotification('Genesis Mode Active', 'Create custom widgets with natural language');
 
-        console.log('✅ Genesis Mode activated');
+        log('✅ Genesis Mode activated');
     };
 
     // Show Desk Panel with Google Workspace features
@@ -289,7 +293,7 @@
             });
             const data = await res.json();
 
-            console.log(`Desk ${action}:`, data);
+            log(`Desk ${action}:`, data);
 
             // Trigger widget display with data
             if (window.showDynamicWidget) {
@@ -535,7 +539,7 @@
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Voice Mode Controller initialized');
+        log('🚀 Voice Mode Controller initialized');
 
         // Load saved mode or default to voice
         const savedMode = loadMode();
@@ -558,11 +562,11 @@
             // Hide manual button on mobile - VOICE ONLY MODE
             if (isMobile) {
                 manualBtn.style.display = 'none';
-                console.log('📱 Manual mode DISABLED on mobile - showing VOICE ONLY');
+                log('📱 Manual mode DISABLED on mobile - showing VOICE ONLY');
             }
         }
 
-        console.log(`📍 Initial mode: ${savedMode.toUpperCase()}`);
+        log(`📍 Initial mode: ${savedMode.toUpperCase()}`);
     });
 
     // Listen for page visibility changes (tab switching)
@@ -571,7 +575,7 @@
             // Page hidden - pause wake word if in voice mode to save battery
             const currentMode = document.body.getAttribute('data-mode');
             if (currentMode === VOICE_MODE) {
-                console.log('📴 Page hidden - pausing wake word');
+                log('📴 Page hidden - pausing wake word');
                 if (window.pauseWakeWord && typeof window.pauseWakeWord === 'function') {
                     window.pauseWakeWord();
                 }
@@ -580,7 +584,7 @@
             // Page visible - resume wake word if in voice mode
             const currentMode = document.body.getAttribute('data-mode');
             if (currentMode === VOICE_MODE) {
-                console.log('🔊 Page visible - resuming wake word');
+                log('🔊 Page visible - resuming wake word');
                 if (window.resumeWakeWord && typeof window.resumeWakeWord === 'function') {
                     window.resumeWakeWord();
                 }
@@ -593,5 +597,5 @@
         return document.body.getAttribute('data-mode');
     };
 
-    console.log('✅ Voice/Manual Mode Controller loaded');
+    log('✅ Voice/Manual Mode Controller loaded');
 })();

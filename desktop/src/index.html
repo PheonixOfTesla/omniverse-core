@@ -191,12 +191,18 @@
                 <span>Activate Voice</span>
             </button>
             <select class="voice-selector" id="voiceSelector">
-                <option value="nova">Phoenix (Nova)</option>
-                <option value="alloy">Alloy</option>
-                <option value="echo">Echo</option>
-                <option value="fable">Fable</option>
-                <option value="onyx">Onyx</option>
-                <option value="shimmer">Shimmer</option>
+                <optgroup label="Local (Piper TTS)">
+                    <option value="piper-female">Amy (Female)</option>
+                    <option value="piper-male">Ryan (Male)</option>
+                </optgroup>
+                <optgroup label="Cloud (OpenAI)">
+                    <option value="nova">Phoenix (Nova)</option>
+                    <option value="alloy">Alloy</option>
+                    <option value="echo">Echo</option>
+                    <option value="fable">Fable</option>
+                    <option value="onyx">Onyx</option>
+                    <option value="shimmer">Shimmer</option>
+                </optgroup>
             </select>
         </div>
 
@@ -346,6 +352,7 @@
         // Load Phoenix JavaScript modules
         function loadPhoenixModules() {
             const scripts = [
+                'piper-tts.js',
                 'phoenix-orb.js',
                 'widget-manager.js',
                 'voice-controller.js',
@@ -400,6 +407,39 @@
         // Attach mode toggle handlers
         document.getElementById('voice-mode-btn')?.addEventListener('click', switchToVoiceMode);
         document.getElementById('manual-mode-btn')?.addEventListener('click', switchToManualMode);
+
+        // Voice selector handler
+        document.getElementById('voiceSelector')?.addEventListener('change', async (e) => {
+            const voice = e.target.value;
+            console.log('[Omniverse] Voice selected:', voice);
+
+            if (voice.startsWith('piper-')) {
+                // Local Piper TTS
+                if (window.PiperTTS) {
+                    const gender = voice === 'piper-male' ? 'male' : 'female';
+                    await window.PiperTTS.setVoiceByGender(gender);
+                    localStorage.setItem('omniverse_voice', voice);
+                    localStorage.setItem('omniverse_tts_mode', 'local');
+                }
+            } else {
+                // Cloud TTS
+                localStorage.setItem('omniverse_voice', voice);
+                localStorage.setItem('omniverse_tts_mode', 'cloud');
+            }
+        });
+
+        // Global speak function
+        window.omniverseSpeak = async function(text) {
+            const mode = localStorage.getItem('omniverse_tts_mode') || 'local';
+            const voice = localStorage.getItem('omniverse_voice') || 'piper-female';
+
+            if (mode === 'local' && window.PiperTTS) {
+                return await window.PiperTTS.speak(text);
+            } else {
+                // Fallback to cloud or Web Speech API
+                return window.OmniverseAPI?.synthesizeSpeech(text, voice);
+            }
+        };
 
         // Check initialization on load
         window.addEventListener('DOMContentLoaded', () => {
