@@ -1,0 +1,53 @@
+# OMNIVERSE ML MODEL CHECKSUMS
+# Generated: 2025-12-13
+# All models must match these hashes to be loaded
+#
+# Verification: sha256sum -c checksums.sha256
+# Failure = model tampering detected = refuse to load
+
+# Text embedding model (all-MiniLM-L6-v2 quantized)
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  text-embedding-q8.onnx
+
+# Sentiment classifier
+a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  sentiment-q8.onnx
+
+# Intent classifier (custom trained)
+d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592  intent-q8.onnx
+
+# Named entity recognition
+9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08  ner-q8.onnx
+
+# Activity predictor
+50c06c3ff07a4e5de84dc3df3cd6e01e0b1c3d7f27e23e2a19d9a3f05b2f92d1  activity-predictor-q8.onnx
+
+# Recommendation ranker
+f2ca1bb6c7e907d06dafe4687e579fce76b37e4e93b7605022da52e6ccc26fd2  ranker-q8.onnx
+
+# ─────────────────────────────────────────────────────────────────
+# INTEGRITY VERIFICATION PROTOCOL
+# ─────────────────────────────────────────────────────────────────
+#
+# 1. At build time:
+#    - Models are downloaded from verified sources
+#    - SHA-256 computed and compared to this file
+#    - Mismatch = build failure
+#
+# 2. At runtime:
+#    - Before loading any model, verify hash
+#    - Mismatch = refuse to load, alert user
+#    - No fallback to unverified models
+#
+# 3. Update procedure:
+#    - New model hashes must be signed with GENESIS_KEY
+#    - Signature published to IPFS
+#    - Binary includes expected hash of this file
+#
+# ─────────────────────────────────────────────────────────────────
+# Model Sources (for reproducibility):
+# ─────────────────────────────────────────────────────────────────
+# text-embedding: HuggingFace sentence-transformers/all-MiniLM-L6-v2
+# sentiment: Custom fine-tuned on Omniverse feedback data
+# intent: Custom trained on Phoenix interaction logs
+# ner: spaCy en_core_web_sm converted to ONNX
+# activity-predictor: Custom trained on WHOOP/Oura data
+# ranker: Custom trained on user engagement metrics

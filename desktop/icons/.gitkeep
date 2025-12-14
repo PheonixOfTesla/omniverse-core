@@ -1,0 +1,10 @@
+# App icons go here
+# Required:
+# - 32x32.png
+# - 128x128.png
+# - 128x128@2x.png (256x256)
+# - icon.icns (macOS)
+# - icon.ico (Windows)
+#
+# Generate from a 1024x1024 source:
+# https://tauri.app/v1/guides/features/icons

@@ -1,0 +1,23 @@
+{
+  "name": "omniverse-desktop",
+  "version": "1.0.0",
+  "description": "Omniverse Desktop - Sovereign AI Consciousness",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "build:mac": "tauri build --target universal-apple-darwin",
+    "build:win": "tauri build --target x86_64-pc-windows-msvc",
+    "build:linux": "tauri build --target x86_64-unknown-linux-gnu",
+    "build:all": "npm run build:mac && npm run build:win && npm run build:linux",
+    "preview": "vite preview",
+    "check": "cd src-tauri && cargo check"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.3",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.11",
+    "vite": "^5.0.10"
+  }
+}

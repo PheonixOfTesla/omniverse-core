@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omniverse</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #2a2a3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            -webkit-app-region: drag;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 13px;
+            -webkit-app-region: no-drag;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .status-dot.offline {
+            background: var(--warning);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Setup Screen */
+        .setup-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+        }
+
+        .setup-screen h1 {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .setup-screen p {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 500px;
+        }
+
+        .setup-form {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .chat-container.active {
+            display: flex;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.ai {
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .message-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .message-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .message-text {
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .message-text.user {
+            color: var(--text-primary);
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 16px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 15px;
+            padding: 8px 12px;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+        }
+
+        .send-btn {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .genesis-hash {
+            font-family: monospace;
+            background: var(--bg-tertiary);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">Ω</div>
+            <span class="logo-text">Omniverse</span>
+        </div>
+        <div class="status-badge">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Local Mode</span>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Setup Screen -->
+        <div class="setup-screen" id="setupScreen">
+            <h1>Welcome to Omniverse</h1>
+            <p>Your sovereign AI consciousness. All data stays on this device, encrypted with your passphrase.</p>
+
+            <form class="setup-form" id="setupForm">
+                <div class="input-group">
+                    <label for="passphrase">Encryption Passphrase</label>
+                    <input type="password" id="passphrase" placeholder="Enter a strong passphrase" required>
+                </div>
+                <div class="input-group">
+                    <label for="confirmPassphrase">Confirm Passphrase</label>
+                    <input type="password" id="confirmPassphrase" placeholder="Confirm your passphrase" required>
+                </div>
+                <button type="submit" class="btn" id="setupBtn">Initialize Omniverse</button>
+            </form>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-container" id="chatContainer">
+            <div class="messages" id="messages">
+                <div class="message">
+                    <div class="message-avatar ai">Ω</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-name">Omniverse</span>
+                            <span class="message-meta">Local AI</span>
+                        </div>
+                        <div class="message-text">
+                            Welcome back. I'm running entirely on your device. Your data never leaves this machine. How can I help you today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input type="text" id="queryInput" placeholder="Ask anything..." autofocus>
+                    <button class="send-btn" id="sendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div>
+            Genesis: <span class="genesis-hash" id="genesisHash">Loading...</span>
+        </div>
+        <div>
+            <a href="#" id="verifyLink">Verify Build</a> ·
+            <a href="#" id="exportLink">Export Data</a>
+        </div>
+    </footer>
+
+    <script type="module">
+        const { invoke } = window.__TAURI__.tauri;
+
+        // Elements
+        const setupScreen = document.getElementById('setupScreen');
+        const chatContainer = document.getElementById('chatContainer');
+        const setupForm = document.getElementById('setupForm');
+        const setupBtn = document.getElementById('setupBtn');
+        const passphrase = document.getElementById('passphrase');
+        const confirmPassphrase = document.getElementById('confirmPassphrase');
+        const messages = document.getElementById('messages');
+        const queryInput = document.getElementById('queryInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const genesisHash = document.getElementById('genesisHash');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+
+        // Check initial state
+        async function checkHealth() {
+            try {
+                const health = await invoke('health');
+                genesisHash.textContent = health.genesis_hash || 'Not initialized';
+
+                if (health.initialized) {
+                    setupScreen.style.display = 'none';
+                    chatContainer.classList.add('active');
+                }
+            } catch (e) {
+                console.error('Health check failed:', e);
+            }
+        }
+
+        // Initialize
+        setupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (passphrase.value !== confirmPassphrase.value) {
+                alert('Passphrases do not match');
+                return;
+            }
+
+            setupBtn.disabled = true;
+            setupBtn.textContent = 'Initializing...';
+
+            try {
+                const result = await invoke('initialize', { passphrase: passphrase.value });
+
+                if (result.success) {
+                    setupScreen.style.display = 'none';
+                    chatContainer.classList.add('active');
+                    genesisHash.textContent = result.genesis_hash;
+                } else {
+                    alert('Initialization failed: ' + result.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e);
+            } finally {
+                setupBtn.disabled = false;
+                setupBtn.textContent = 'Initialize Omniverse';
+            }
+        });
+
+        // Send query
+        async function sendQuery() {
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            // Add user message
+            addMessage('You', query, false);
+            queryInput.value = '';
+
+            // Add loading message
+            const loadingId = addMessage('Omniverse', 'Thinking...', true, true);
+
+            try {
+                const result = await invoke('query', { prompt: query });
+
+                // Remove loading and add response
+                document.getElementById(loadingId)?.remove();
+                addMessage('Omniverse', result.response, true, false, `${result.latency_ms}ms · ${result.model}`);
+            } catch (e) {
+                document.getElementById(loadingId)?.remove();
+                addMessage('Omniverse', 'Error: ' + e, true);
+            }
+        }
+
+        function addMessage(name, text, isAI, isLoading = false, meta = '') {
+            const id = 'msg-' + Date.now();
+            const html = `
+                <div class="message" id="${id}">
+                    <div class="message-avatar ${isAI ? 'ai' : ''}">${isAI ? 'Ω' : 'Y'}</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-name">${name}</span>
+                            <span class="message-meta">${meta || (isAI ? 'Local AI' : '')}</span>
+                        </div>
+                        <div class="message-text ${isLoading ? 'loading' : ''} ${!isAI ? 'user' : ''}">${text}</div>
+                    </div>
+                </div>
+            `;
+            messages.insertAdjacentHTML('beforeend', html);
+            messages.scrollTop = messages.scrollHeight;
+            return id;
+        }
+
+        sendBtn.addEventListener('click', sendQuery);
+        queryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendQuery();
+        });
+
+        // Verify link
+        document.getElementById('verifyLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const result = await invoke('verify_genesis');
+                alert(result.valid ? '✅ Genesis verified!' : '❌ Verification failed!');
+            } catch (e) {
+                alert('Error: ' + e);
+            }
+        });
+
+        // Export link
+        document.getElementById('exportLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const { save } = window.__TAURI__.dialog;
+            const path = await save({
+                filters: [{ name: 'JSON', extensions: ['json'] }]
+            });
+            if (path) {
+                try {
+                    const result = await invoke('export_data', { path });
+                    alert(result);
+                } catch (e) {
+                    alert('Error: ' + e);
+                }
+            }
+        });
+
+        // Get genesis hash
+        async function loadGenesisHash() {
+            try {
+                const hash = await invoke('get_genesis_hash');
+                genesisHash.textContent = hash;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Init
+        checkHealth();
+        loadGenesisHash();
+    </script>
+</body>
+</html>

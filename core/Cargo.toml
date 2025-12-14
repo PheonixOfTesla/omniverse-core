@@ -1,0 +1,95 @@
+[package]
+name = "omniverse"
+version = "1.0.0"
+edition = "2021"
+authors = ["Omniverse Foundation"]
+description = "Sovereign AI consciousness core - reproducible, verifiable, trustless"
+license = "MIT"
+repository = "https://github.com/omniverse/core"
+keywords = ["ai", "consciousness", "sovereign", "reproducible", "privacy"]
+categories = ["command-line-utilities", "cryptography", "database"]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Cryptography
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+sha2 = "0.10"
+rand = "0.8"
+aes-gcm = "0.10"
+argon2 = "0.5"
+
+# Database (SQLCipher wrapper)
+rusqlite = { version = "0.31", features = ["bundled-sqlcipher"] }
+
+# ML Runtime (ONNX) - using RC until 2.0 stable
+ort = { version = "2.0.0-rc.10", default-features = false }
+ndarray = "0.15"
+
+# IPFS
+ipfs-api-backend-hyper = "0.6"
+
+# Protobuf
+prost = "0.12"
+prost-types = "0.12"
+
+# CLI
+clap = { version = "4.4", features = ["derive"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# HTTP (for optional cloud sync)
+reqwest = { version = "0.11", features = ["json", "rustls-tls"], optional = true }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Hex encoding
+hex = "0.4"
+
+# Base64
+base64 = "0.21"
+
+# Shell expansion
+shellexpand = "3.1"
+
+[dev-dependencies]
+tempfile = "3.8"
+
+[build-dependencies]
+prost-build = "0.12"
+
+[features]
+default = ["local-only"]
+local-only = []
+cloud-sync = ["reqwest"]
+all-features = ["cloud-sync"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# Reproducibility settings
+[profile.release.build-override]
+opt-level = 0
+
+[[bin]]
+name = "omniverse"
+path = "src/main.rs"

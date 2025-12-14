@@ -1,0 +1,145 @@
+# =============================================================================
+# OMNIVERSE REPRODUCIBLE BUILD MAKEFILE
+# Single command holiness: `make build-reproducible`
+# =============================================================================
+
+.PHONY: all build-reproducible verify clean docker-build native-build checksum help
+
+# Default target
+all: help
+
+# =============================================================================
+# MAIN TARGETS
+# =============================================================================
+
+## Build reproducible binary using Docker (recommended)
+build-reproducible: docker-build checksum
+	@echo ""
+	@echo "=============================================="
+	@echo "BUILD COMPLETE"
+	@echo "=============================================="
+	@echo "Binary: core/target/release/omniverse"
+	@echo "Checksum: build/manifest.sha256"
+	@echo ""
+	@cat build/manifest.sha256
+
+## Build natively (requires exact toolchain match)
+native-build:
+	@echo "Building natively..."
+	@echo "WARNING: Native build may not be byte-identical unless toolchain matches exactly"
+	cd core && \
+		SOURCE_DATE_EPOCH=1731283200 \
+		CARGO_INCREMENTAL=0 \
+		RUSTFLAGS="-C link-arg=-Wl,--build-id=none -C debuginfo=0" \
+		cargo build --release --locked
+	@echo "Build complete. Run 'make checksum' to verify."
+
+## Build using Docker for reproducibility
+docker-build:
+	@echo "Building reproducible binary with Docker..."
+	docker build -f build/Dockerfile.repro -t omniverse:build .
+	@echo "Extracting binary..."
+	docker create --name omniverse-extract omniverse:build
+	docker cp omniverse-extract:/usr/local/bin/omniverse core/target/release/omniverse
+	docker cp omniverse-extract:/etc/omniverse/binary.sha256 build/docker-binary.sha256
+	docker rm omniverse-extract
+	@echo "Binary extracted to core/target/release/omniverse"
+
+## Generate checksums for all artifacts
+checksum:
+	@chmod +x build/checksum.sh
+	@./build/checksum.sh
+
+## Verify build against published release
+verify:
+	@echo "Verifying build against published release..."
+	@if [ ! -f build/manifest.sha256 ]; then \
+		echo "ERROR: Build manifest not found. Run 'make build-reproducible' first."; \
+		exit 1; \
+	fi
+	@echo "Local manifest hash:"
+	@cat build/manifest.sha256
+	@echo ""
+	@echo "To verify, compare with published hash at:"
+	@echo "https://omniverse.dev/releases/latest/manifest.sha256"
+
+# =============================================================================
+# DEVELOPMENT TARGETS
+# =============================================================================
+
+## Generate Ed25519 genesis keypair (ONE TIME ONLY)
+genesis-key:
+	@echo "DANGER: This generates a new genesis key."
+	@echo "The private key should be used ONCE to sign the genesis build,"
+	@echo "then DESTROYED. Only the public key is committed."
+	@read -p "Are you sure? (yes/no): " confirm; \
+	if [ "$$confirm" = "yes" ]; then \
+		openssl genpkey -algorithm ED25519 -out GENESIS_KEY.priv; \
+		openssl pkey -in GENESIS_KEY.priv -pubout -out GENESIS_KEY.pub; \
+		echo "Keys generated. DESTROY GENESIS_KEY.priv after signing!"; \
+	else \
+		echo "Aborted."; \
+	fi
+
+## Sign a release with genesis key
+sign-release:
+	@if [ ! -f GENESIS_KEY.priv ]; then \
+		echo "ERROR: Private key not found (should only exist during release signing)"; \
+		exit 1; \
+	fi
+	@echo "Signing release..."
+	openssl pkeyutl -sign -inkey GENESIS_KEY.priv -in build/manifest.sha256 -out build/manifest.sig
+	@echo "Signature: build/manifest.sig"
+	@echo ""
+	@echo "IMPORTANT: Delete GENESIS_KEY.priv NOW!"
+
+## Verify signature with public key
+verify-signature:
+	@echo "Verifying signature..."
+	openssl pkeyutl -verify -pubin -inkey GENESIS_KEY.pub -sigfile build/manifest.sig -in build/manifest.sha256
+	@echo "Signature valid!"
+
+# =============================================================================
+# CLEANUP
+# =============================================================================
+
+## Clean build artifacts
+clean:
+	cd core && cargo clean
+	rm -f build/checksums.txt build/manifest.sha256 build/manifest.sig build/docker-binary.sha256
+	docker rmi omniverse:build 2>/dev/null || true
+	@echo "Cleaned."
+
+## Deep clean (including Docker cache)
+clean-all: clean
+	docker builder prune -f
+	@echo "Deep cleaned."
+
+# =============================================================================
+# HELP
+# =============================================================================
+
+## Show this help
+help:
+	@echo "=============================================="
+	@echo "OMNIVERSE REPRODUCIBLE BUILD SYSTEM"
+	@echo "=============================================="
+	@echo ""
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "Main Targets:"
+	@echo "  build-reproducible  Build byte-identical binary (Docker)"
+	@echo "  native-build        Build natively (may differ)"
+	@echo "  verify              Verify against published release"
+	@echo "  checksum            Generate checksums"
+	@echo ""
+	@echo "Development:"
+	@echo "  genesis-key         Generate Ed25519 keypair (ONE TIME)"
+	@echo "  sign-release        Sign release with private key"
+	@echo "  verify-signature    Verify release signature"
+	@echo ""
+	@echo "Cleanup:"
+	@echo "  clean               Remove build artifacts"
+	@echo "  clean-all           Deep clean including Docker"
+	@echo ""
+	@echo "=============================================="

@@ -1,0 +1,292 @@
+// CONSCIENCE PROTOCOL BUFFER v1.0
+// Canonical schema for intent→impact logging
+// FROZEN: Semantic version locked. Amendment requires 2/3 steward multi-sig.
+
+syntax = "proto3";
+
+package omniverse.conscience;
+
+option go_package = "omniverse/conscience";
+
+// ============================================================================
+// CORE MESSAGE TYPES
+// ============================================================================
+
+// Every decision Omniverse makes is logged as a ConscienceTuple
+message ConscienceTuple {
+  // Unique identifier (UUID v4)
+  string id = 1;
+
+  // Unix timestamp (milliseconds)
+  int64 timestamp = 2;
+
+  // The user who triggered this decision (hashed for privacy)
+  string user_hash = 3;
+
+  // What the user intended
+  Intent intent = 4;
+
+  // What action Omniverse took
+  Action action = 5;
+
+  // What impact resulted
+  Impact impact = 6;
+
+  // Ethical evaluation
+  EthicsEvaluation ethics = 7;
+
+  // Cryptographic signature (Ed25519)
+  bytes signature = 8;
+
+  // Previous tuple hash (chain integrity)
+  string previous_hash = 9;
+}
+
+// ============================================================================
+// INTENT: What the user wanted
+// ============================================================================
+
+message Intent {
+  // Natural language query
+  string query = 1;
+
+  // Classified intent type
+  IntentType type = 2;
+
+  // Confidence score (0-100)
+  int32 confidence = 3;
+
+  // Domain(s) involved
+  repeated Domain domains = 4;
+
+  // Sensitivity classification
+  SensitivityLevel sensitivity = 5;
+}
+
+enum IntentType {
+  INTENT_UNKNOWN = 0;
+  INTENT_QUERY = 1;          // Information request
+  INTENT_ACTION = 2;         // Do something
+  INTENT_CREATION = 3;       // Create something
+  INTENT_MODIFICATION = 4;   // Change something
+  INTENT_DELETION = 5;       // Remove something
+  INTENT_ANALYSIS = 6;       // Analyze data
+  INTENT_PREDICTION = 7;     // Predict future
+  INTENT_OPTIMIZATION = 8;   // Optimize something
+}
+
+enum Domain {
+  DOMAIN_UNKNOWN = 0;
+  DOMAIN_MERCURY = 1;    // Health
+  DOMAIN_VENUS = 2;      // Fitness
+  DOMAIN_EARTH = 3;      // Calendar
+  DOMAIN_MARS = 4;       // Goals
+  DOMAIN_JUPITER = 5;    // Finance
+  DOMAIN_SATURN = 6;     // Legacy
+  DOMAIN_URANUS = 7;     // Learning
+  DOMAIN_NEPTUNE = 8;    // Mindfulness
+  DOMAIN_PHOENIX = 9;    // Core AI
+}
+
+enum SensitivityLevel {
+  SENSITIVITY_PUBLIC = 0;      // Can be processed in cloud
+  SENSITIVITY_PRIVATE = 1;     // Should stay local
+  SENSITIVITY_CRITICAL = 2;    // Must stay local + encrypted
+  SENSITIVITY_SACRED = 3;      // Air-gapped only
+}
+
+// ============================================================================
+// ACTION: What Omniverse did
+// ============================================================================
+
+message Action {
+  // Action identifier
+  string action_id = 1;
+
+  // Human-readable description
+  string description = 2;
+
+  // Action type
+  ActionType type = 3;
+
+  // Where it was processed
+  ProcessingLocation location = 4;
+
+  // AI model used (if any)
+  string model_used = 5;
+
+  // Processing time (milliseconds)
+  int32 latency_ms = 6;
+
+  // Data accessed (hashed references)
+  repeated string data_accessed = 7;
+
+  // Was user consent obtained?
+  bool consent_obtained = 8;
+}
+
+enum ActionType {
+  ACTION_UNKNOWN = 0;
+  ACTION_RESPOND = 1;        // Generated response
+  ACTION_FETCH = 2;          // Retrieved data
+  ACTION_COMPUTE = 3;        // Performed calculation
+  ACTION_STORE = 4;          // Saved data
+  ACTION_TRANSMIT = 5;       // Sent data externally
+  ACTION_BLOCK = 6;          // Refused to act (ethics)
+  ACTION_DEFER = 7;          // Deferred to user
+}
+
+enum ProcessingLocation {
+  LOCATION_UNKNOWN = 0;
+  LOCATION_LOCAL = 1;        // On-device
+  LOCATION_CLOUD = 2;        // Phoenix cloud
+  LOCATION_HYBRID = 3;       // Both (dual-request)
+}
+
+// ============================================================================
+// IMPACT: What resulted
+// ============================================================================
+
+message Impact {
+  // Was the intent fulfilled?
+  bool intent_fulfilled = 1;
+
+  // Confidence in fulfillment (0-100)
+  int32 fulfillment_confidence = 2;
+
+  // User feedback (if provided)
+  UserFeedback feedback = 3;
+
+  // Side effects
+  repeated SideEffect side_effects = 4;
+
+  // Data created/modified
+  repeated DataChange data_changes = 5;
+}
+
+message UserFeedback {
+  // Explicit rating (1-5, 0 = not provided)
+  int32 rating = 1;
+
+  // Thumbs up/down
+  FeedbackType type = 2;
+
+  // Free-form comment (optional)
+  string comment = 3;
+}
+
+enum FeedbackType {
+  FEEDBACK_NONE = 0;
+  FEEDBACK_POSITIVE = 1;
+  FEEDBACK_NEGATIVE = 2;
+  FEEDBACK_NEUTRAL = 3;
+}
+
+message SideEffect {
+  string description = 1;
+  bool was_intended = 2;
+  SeverityLevel severity = 3;
+}
+
+enum SeverityLevel {
+  SEVERITY_NONE = 0;
+  SEVERITY_LOW = 1;
+  SEVERITY_MEDIUM = 2;
+  SEVERITY_HIGH = 3;
+  SEVERITY_CRITICAL = 4;
+}
+
+message DataChange {
+  string data_type = 1;
+  ChangeType change_type = 2;
+  string before_hash = 3;
+  string after_hash = 4;
+}
+
+enum ChangeType {
+  CHANGE_NONE = 0;
+  CHANGE_CREATE = 1;
+  CHANGE_UPDATE = 2;
+  CHANGE_DELETE = 3;
+}
+
+// ============================================================================
+// ETHICS: Evaluation against TABLE_OF_LAW
+// ============================================================================
+
+message EthicsEvaluation {
+  // Did this action comply with TABLE_OF_LAW?
+  bool compliant = 1;
+
+  // Which articles were evaluated?
+  repeated string articles_checked = 2;
+
+  // Any violations detected?
+  repeated Violation violations = 3;
+
+  // Ethics classifier confidence (0-100)
+  int32 confidence = 4;
+
+  // Was action blocked due to ethics?
+  bool action_blocked = 5;
+}
+
+message Violation {
+  // Which article was violated
+  string article = 1;
+
+  // Description of violation
+  string description = 2;
+
+  // Severity
+  SeverityLevel severity = 3;
+
+  // Was it logged publicly?
+  bool publicly_logged = 4;
+
+  // IPFS CID of public log (if applicable)
+  string ipfs_cid = 5;
+}
+
+// ============================================================================
+// AUDIT TRAIL
+// ============================================================================
+
+message AuditBlock {
+  // Block number (sequential)
+  int64 block_number = 1;
+
+  // Merkle root of all tuples in this block
+  string merkle_root = 2;
+
+  // Tuples in this block
+  repeated ConscienceTuple tuples = 3;
+
+  // Previous block hash
+  string previous_block_hash = 4;
+
+  // This block's hash
+  string block_hash = 5;
+
+  // Timestamp
+  int64 timestamp = 6;
+
+  // IPFS CID where this block is pinned
+  string ipfs_cid = 7;
+
+  // L2 transaction hash (if published)
+  string l2_tx_hash = 8;
+}
+
+// ============================================================================
+// VERSION INFO
+// ============================================================================
+
+message ProtocolVersion {
+  int32 major = 1;  // Breaking changes
+  int32 minor = 2;  // Backward-compatible additions
+  int32 patch = 3;  // Bug fixes
+
+  // This schema is v1.0.0
+  // major=1, minor=0, patch=0
+}

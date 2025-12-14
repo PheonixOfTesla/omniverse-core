@@ -1,0 +1,85 @@
+{
+  "name": "omniverse-core",
+  "version": "1.0.0",
+  "description": "Reproducible build manifest for Omniverse sovereign AI core",
+  "genesis_version": "1.0.0",
+
+  "build_environment": {
+    "base_image": "debian:bookworm-20241111-slim",
+    "snapshot_date": "2024-11-11T00:00:00Z",
+    "rust_version": "1.83.0",
+    "rust_profile": "minimal",
+    "source_date_epoch": 1731283200
+  },
+
+  "dependencies": {
+    "system": {
+      "ca-certificates": "20230311",
+      "curl": "7.88.1-10+deb12u8",
+      "build-essential": "12.9",
+      "pkg-config": "1.8.1-1",
+      "libssl-dev": "3.0.15-1~deb12u1",
+      "libsqlite3-dev": "3.40.1-2+deb12u1",
+      "protobuf-compiler": "3.21.12-3",
+      "git": "1:2.39.5-0+deb12u1"
+    },
+    "rust": {
+      "note": "See Cargo.lock for exact crate versions"
+    }
+  },
+
+  "build_flags": {
+    "CARGO_INCREMENTAL": "0",
+    "RUSTFLAGS": "-C link-arg=-Wl,--build-id=none -C debuginfo=0"
+  },
+
+  "artifacts": {
+    "binary": {
+      "path": "core/target/release/omniverse",
+      "expected_hash": "COMPUTED_AT_BUILD"
+    },
+    "table_of_law": {
+      "path": "TABLE_OF_LAW.md",
+      "expected_hash": "COMPUTED_AT_BUILD"
+    },
+    "genesis_key": {
+      "path": "GENESIS_KEY.pub",
+      "expected_hash": "COMPUTED_AT_BUILD"
+    },
+    "protobuf_schema": {
+      "path": "CONSCIENCE_PROTOBUF_1_0.proto",
+      "expected_hash": "COMPUTED_AT_BUILD"
+    }
+  },
+
+  "verification": {
+    "method": "sha256",
+    "steps": [
+      "Clone repository at specified tag",
+      "Run: docker build -f build/Dockerfile.repro -t omniverse:verify .",
+      "Run: ./build/checksum.sh",
+      "Compare manifest hash with published release",
+      "Hash mismatch = supply chain compromise"
+    ]
+  },
+
+  "security": {
+    "signing_key": "GENESIS_KEY.pub",
+    "signing_algorithm": "Ed25519",
+    "audit_trail": "IPFS + Ethereum L2",
+    "multi_sig_required": "2/3 stewards for amendments"
+  },
+
+  "ci": {
+    "provider": "GitHub Actions",
+    "workflow": ".github/workflows/reproducible-build.yml",
+    "attestation": "Sigstore/Rekor"
+  },
+
+  "metadata": {
+    "created": "2024-12-13T00:00:00Z",
+    "maintainer": "Omniverse Foundation",
+    "license": "MIT",
+    "repository": "https://github.com/omniverse/core"
+  }
+}

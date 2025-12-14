@@ -1,0 +1,126 @@
+# OMNIVERSE REPRODUCIBLE BUILD DOCKERFILE
+# Produces byte-identical binaries on any machine
+# Based on Debian snapshot for deterministic package versions
+
+# =============================================================================
+# STAGE 1: Build Environment
+# =============================================================================
+FROM debian:bookworm-20241111-slim AS builder
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Use snapshot.debian.org for reproducible package versions
+# Locked to November 11, 2024 snapshot
+RUN echo "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20241111T000000Z bookworm main" > /etc/apt/sources.list && \
+    echo "deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20241111T000000Z bookworm-security main" >> /etc/apt/sources.list
+
+# Install build dependencies with exact versions
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates=20230311 \
+    curl=7.88.1-10+deb12u8 \
+    build-essential=12.9 \
+    pkg-config=1.8.1-1 \
+    libssl-dev=3.0.15-1~deb12u1 \
+    libsqlite3-dev=3.40.1-2+deb12u1 \
+    protobuf-compiler=3.21.12-3 \
+    git=1:2.39.5-0+deb12u1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust with exact version
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.83.0
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+    sh -s -- -y --default-toolchain ${RUST_VERSION} --profile minimal && \
+    rustup component add rustfmt clippy
+
+# Set reproducible build flags
+ENV SOURCE_DATE_EPOCH=1731283200
+ENV CARGO_INCREMENTAL=0
+ENV RUSTFLAGS="-C link-arg=-Wl,--build-id=none -C debuginfo=0"
+
+# Create build directory
+WORKDIR /build
+
+# Copy source files
+COPY core/ ./core/
+COPY TABLE_OF_LAW.md ./
+COPY GENESIS_KEY.pub ./
+COPY CONSCIENCE_PROTOBUF_1_0.proto ./
+COPY build/repro-manifest.json ./build/
+
+# Verify source integrity
+RUN sha256sum TABLE_OF_LAW.md && \
+    sha256sum GENESIS_KEY.pub && \
+    sha256sum CONSCIENCE_PROTOBUF_1_0.proto
+
+# Build the binary
+WORKDIR /build/core
+RUN cargo build --release --locked
+
+# Compute and embed genesis hash
+RUN GENESIS_HASH=$(sha256sum ../TABLE_OF_LAW.md | cut -d' ' -f1) && \
+    echo "Genesis Hash: $GENESIS_HASH" && \
+    # Embed hash in binary (via environment at compile time)
+    GENESIS_HASH=$GENESIS_HASH cargo build --release --locked
+
+# Strip binary deterministically
+RUN strip --strip-all target/release/omniverse
+
+# Compute final binary hash
+RUN sha256sum target/release/omniverse > /build/binary.sha256
+
+# =============================================================================
+# STAGE 2: Runtime Environment
+# =============================================================================
+FROM debian:bookworm-20241111-slim AS runtime
+
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates=20230311 \
+    libssl3=3.0.15-1~deb12u1 \
+    libsqlite3-0=3.40.1-2+deb12u1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -s /bin/bash omniverse
+
+# Copy binary and artifacts
+COPY --from=builder /build/core/target/release/omniverse /usr/local/bin/
+COPY --from=builder /build/TABLE_OF_LAW.md /etc/omniverse/
+COPY --from=builder /build/binary.sha256 /etc/omniverse/
+
+# Set permissions
+RUN chmod 755 /usr/local/bin/omniverse && \
+    chown -R omniverse:omniverse /etc/omniverse
+
+# Switch to non-root user
+USER omniverse
+WORKDIR /home/omniverse
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD omniverse --health || exit 1
+
+# Default command: print genesis hash and start
+ENTRYPOINT ["/usr/local/bin/omniverse"]
+CMD ["--print-genesis-hash"]
+
+# =============================================================================
+# BUILD INSTRUCTIONS
+# =============================================================================
+#
+# To build reproducibly:
+#   docker build -f Dockerfile.repro -t omniverse:local .
+#
+# To extract binary hash:
+#   docker run --rm omniverse:local cat /etc/omniverse/binary.sha256
+#
+# To verify against published hash:
+#   curl -s https://omniverse.dev/releases/v1.0.0/binary.sha256 | diff - <(docker run --rm omniverse:local cat /etc/omniverse/binary.sha256)
+#
+# Hash mismatch = build is not reproducible or source was tampered
+# =============================================================================
