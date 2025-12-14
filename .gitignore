@@ -62,3 +62,4 @@ __pycache__/
 tmp/
 temp/
 *.tmp
+desktop/src-tauri/target/

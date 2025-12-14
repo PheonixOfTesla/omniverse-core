@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Phoenix - The 30-Second Miracle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ============================================
+           PHOENIX CINEMATIC ONBOARDING
+           The 30-Second Miracle - Jobs/Einstein Simplicity
+           Show Magic First, Ask Questions Later
+           ============================================ */
+
+        :root {
+            --cyan: #00D9FF;
+            --cyan-glow: rgba(0, 217, 255, 0.8);
+            --cyan-dim: rgba(0, 217, 255, 0.4);
+            --cyan-bg: rgba(0, 217, 255, 0.1);
+
+            --gold: #FFD700;
+            --gold-glow: rgba(255, 215, 0, 0.8);
+
+            --green: #00FF88;
+
+            --bg-dark: #000;
+            --bg-panel: rgba(0, 10, 20, 0.95);
+
+            --font: 'SF Mono', 'Monaco', 'Courier New', monospace;
+
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-dark);
+            color: var(--cyan);
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Starfield Background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        /* Phase System - Only show active phase */
+        .phase {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .phase.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Phoenix Orb */
+        .phoenix-orb {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--cyan-bg), transparent);
+            border: 3px solid var(--cyan-dim);
+            box-shadow: 0 0 40px var(--cyan-glow), inset 0 0 30px var(--cyan-dim);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .phoenix-orb::before {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--cyan-glow), transparent);
+            animation: orbPulse 2s ease-in-out infinite;
+        }
+
+        /* Orb States */
+        .phoenix-orb.listening {
+            border-color: var(--cyan);
+            box-shadow: 0 0 60px var(--cyan-glow), inset 0 0 40px var(--cyan-dim);
+            animation: orbListening 1.5s ease-in-out infinite;
+        }
+
+        .phoenix-orb.processing {
+            border-color: var(--gold);
+            box-shadow: 0 0 60px var(--gold-glow);
+            animation: orbSpin 2s linear infinite;
+        }
+
+        .phoenix-orb.speaking {
+            animation: orbSpeak 0.8s ease-in-out infinite;
+        }
+
+        @keyframes orbPulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        @keyframes orbListening {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes orbSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes orbSpeak {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px var(--cyan-glow); }
+            50% { transform: scale(1.08); box-shadow: 0 0 60px var(--cyan-glow); }
+        }
+
+        /* DNA Helix Animation (for building) */
+        .dna-helix {
+            display: none;
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .dna-helix.active {
+            display: block;
+        }
+
+        .dna-strand {
+            position: absolute;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--cyan), var(--gold));
+            border-radius: 2px;
+            animation: dnaRotate 2s linear infinite;
+        }
+
+        .dna-strand:nth-child(1) { left: 20px; }
+        .dna-strand:nth-child(2) { right: 20px; animation-delay: -1s; }
+
+        @keyframes dnaRotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        /* Typography */
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--cyan);
+            text-shadow: 0 0 30px var(--cyan-glow);
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        .message {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--cyan);
+            margin: 30px 0;
+            opacity: 0.9;
+        }
+
+        .message.large {
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .status {
+            font-size: 14px;
+            color: var(--cyan-dim);
+            margin: 20px 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Input Fields */
+        .input-container {
+            margin: 30px 0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--bg-panel);
+            border: 2px solid var(--cyan-dim);
+            border-radius: 12px;
+            color: var(--cyan);
+            font-family: var(--font);
+            font-size: 16px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        input::placeholder {
+            color: var(--cyan-dim);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 15px 40px;
+            background: var(--cyan-bg);
+            border: 2px solid var(--cyan);
+            border-radius: 12px;
+            color: var(--cyan);
+            font-family: var(--font);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn:hover {
+            background: var(--cyan-dim);
+            box-shadow: 0 0 30px var(--cyan-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--cyan);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: var(--cyan-glow);
+            box-shadow: 0 0 40px var(--cyan-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: var(--cyan-dim);
+            color: var(--cyan-dim);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        /* Icon Dock (Demo) */
+        .demo-dock {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            background: var(--bg-panel);
+            border: 2px solid var(--gold);
+            border-radius: 25px;
+            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+
+        .demo-dock.active {
+            display: flex;
+            animation: dockSlideUp 0.5s ease-out;
+        }
+
+        @keyframes dockSlideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .dock-icon {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 70px;
+            padding: 12px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dock-icon:hover {
+            background: rgba(0, 217, 255, 0.15);
+            border-color: var(--cyan);
+            transform: translateY(-5px);
+        }
+
+        .dock-icon i {
+            font-size: 32px;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+
+        .dock-icon .label {
+            font-size: 10px;
+            color: var(--cyan);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .ready-arrow {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            opacity: 0;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .ready-arrow.blink {
+            animation: arrowBlink 1s ease-in-out infinite;
+        }
+
+        .ready-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--gold);
+        }
+
+        @keyframes arrowBlink {
+            0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            50% { opacity: 0.4; transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* Demo Widget */
+        .demo-widget {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 480px;
+            max-width: 45vw;
+            height: 600px;
+            max-height: calc(100vh - 40px);
+            background: var(--bg-panel);
+            border: 2px solid var(--cyan);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.4);
+            backdrop-filter: blur(30px);
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+            opacity: 0;
+        }
+
+        /* Music Widget (Left Side) */
+        .music-widget {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 420px;
+            max-width: 40vw;
+            height: 500px;
+            max-height: calc(100vh - 40px);
+            background: var(--bg-panel);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.4);
+            backdrop-filter: blur(30px);
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+            opacity: 0;
+        }
+
+        .music-widget.active {
+            display: flex;
+            animation: musicWidgetSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        @keyframes musicWidgetSlideIn {
+            from { opacity: 0; transform: translateX(-100px) scale(0.8); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        .demo-widget.active {
+            display: flex;
+            animation: widgetPopIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        @keyframes widgetPopIn {
+            from { opacity: 0; transform: translateX(100px) scale(0.8); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        .widget-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--cyan-dim);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--cyan);
+        }
+
+        .widget-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .widget-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .widget-btn.minimize { background: var(--gold); }
+        .widget-btn.close { background: #ff4444; }
+
+        /* Widget minimized state */
+        .demo-widget.minimized,
+        .music-widget.minimized {
+            display: none !important;
+        }
+
+        /* Minimized tabs bar */
+        .minimized-tabs {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 3000;
+        }
+
+        .minimized-tab {
+            padding: 12px 20px;
+            background: var(--bg-panel);
+            border: 2px solid var(--cyan);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .minimized-tab.gold-border {
+            border-color: var(--gold);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .minimized-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 217, 255, 0.5);
+        }
+
+        .minimized-tab.gold-border:hover {
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Resize handles */
+        .resize-handle {
+            position: absolute;
+            background: transparent;
+            z-index: 10;
+        }
+
+        /* Edge handles */
+        .resize-handle.top {
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            cursor: ns-resize;
+        }
+
+        .resize-handle.right {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: ew-resize;
+        }
+
+        .resize-handle.bottom {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            cursor: ns-resize;
+        }
+
+        .resize-handle.left {
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: ew-resize;
+        }
+
+        /* Corner handles */
+        .resize-handle.top-left {
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            cursor: nwse-resize;
+        }
+
+        .resize-handle.top-right {
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            cursor: nesw-resize;
+        }
+
+        .resize-handle.bottom-left {
+            bottom: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            cursor: nesw-resize;
+        }
+
+        .resize-handle.bottom-right {
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            cursor: nwse-resize;
+        }
+
+        .widget-content {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        .widget-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+            margin: auto;
+        }
+
+        /* For iframe widgets, center them */
+        .widget-content:has(iframe) {
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Voice Button */
+        .voice-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--cyan-bg);
+            border: 3px solid var(--cyan);
+            color: var(--cyan);
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-btn:hover {
+            background: var(--cyan-dim);
+            box-shadow: 0 0 30px var(--cyan-glow);
+            transform: scale(1.1);
+        }
+
+        .voice-btn.listening {
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--cyan-glow); }
+            50% { transform: scale(1.15); box-shadow: 0 0 40px var(--cyan-glow); }
+        }
+
+        /* Options Container */
+        .options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .title { font-size: 36px; }
+            .message { font-size: 16px; }
+            .message.large { font-size: 18px; }
+            .phoenix-orb { width: 120px; height: 120px; }
+            .demo-widget { width: 95vw; height: 400px; }
+        }
+
+        /* Hide scrollbar */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Background -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- PHASE 1: INTRO (3 seconds) -->
+        <div id="phase-intro" class="phase active">
+            <div class="phoenix-orb" id="orb"></div>
+            <div class="title">PHOENIX</div>
+            <div class="subtitle" style="margin-top: 20px; font-size: 14px; color: rgba(0, 217, 255, 0.6); letter-spacing: 1px;">
+                DEMONSTRATION MODE
+            </div>
+            <button class="btn btn-primary" id="startBtn" onclick="beginDemo()" style="margin-top: 40px; padding: 18px 50px; font-size: 18px;">
+                START →
+            </button>
+        </div>
+
+        <!-- PHASE 2: HOOK (3 seconds) -->
+        <div id="phase-hook" class="phase">
+            <div class="phoenix-orb processing" id="orb-hook"></div>
+            <div class="message large">
+                Watch this.
+            </div>
+        </div>
+
+        <!-- PHASE 3: MIRACLE (15 seconds) -->
+        <div id="phase-miracle" class="phase">
+            <div class="phoenix-orb processing" id="orb-miracle"></div>
+            <div class="dna-helix active">
+                <div class="dna-strand"></div>
+                <div class="dna-strand"></div>
+            </div>
+            <div class="status" id="buildStatus">Creating music player and business plan...</div>
+        </div>
+
+        <!-- PHASE 4: REALIZATION (10 seconds) -->
+        <div id="phase-realization" class="phase">
+            <div class="phoenix-orb" id="orb-realization"></div>
+            <div class="message">
+                I can create anything.<br>
+                That business plan took 2.5 seconds.<br><br>
+                Music players, weather dashboards, maps,<br>
+                or anything custom you describe.<br><br>
+                I learn from everything you do.<br>
+                I'll track your health, workouts, goals.<br>
+                I'll plan your day, manage your life.<br><br>
+                I'm your companion. For life.<br><br>
+                What's your name?
+            </div>
+        </div>
+
+        <!-- PHASE 5: NAME (20 seconds) -->
+        <div id="phase-name" class="phase">
+            <div class="phoenix-orb speaking" id="orb-name"></div>
+            <div class="message">What's your name?</div>
+            <div class="input-container">
+                <input type="text" id="nameInput" placeholder="Your name..." autofocus />
+            </div>
+            <button class="btn btn-primary" onclick="submitName()">NEXT</button>
+        </div>
+
+        <!-- PHASE 6: ACCOUNT CHOICE (30 seconds) -->
+        <div id="phase-account-choice" class="phase">
+            <div class="phoenix-orb" id="orb-choice"></div>
+            <div class="message" id="greetingMessage">
+                Hello, <span id="userName"></span>.<br><br>
+                I'm going to learn everything about you.<br>
+                The more I know, the better I serve.<br><br>
+                Create an account and I'll remember everything.<br>
+                Or start now and explore.
+            </div>
+            <div class="options">
+                <button class="btn btn-primary" onclick="showAccountForm()">CREATE ACCOUNT</button>
+            </div>
+        </div>
+
+        <!-- PHASE 7: ACCOUNT FORM (optional) -->
+        <div id="phase-account-form" class="phase">
+            <div class="phoenix-orb" id="orb-account"></div>
+            <div class="message">Just your email or phone.<br>That's all I need.</div>
+            <div class="input-container">
+                <input type="email" id="emailInput" placeholder="Email or phone..." />
+                <input type="password" id="passwordInput" placeholder="Password..." />
+            </div>
+            <button class="btn btn-primary" onclick="createAccount()">CREATE ACCOUNT</button>
+            <div class="status" id="accountStatus"></div>
+        </div>
+
+        <!-- PHASE 8: SUCCESS -->
+        <div id="phase-success" class="phase">
+            <div class="phoenix-orb speaking" id="orb-success"></div>
+            <div class="message large">
+                Perfect. I'll never forget you.<br><br>
+                <span id="successMessage">Launching Phoenix...</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Demo Dock (appears in Phase 3) -->
+    <div class="demo-dock" id="demoDock">
+        <div class="dock-icon" id="dockIcon" onclick="openDemoWidget()">
+            <div class="ready-arrow" id="readyArrow">← Ready!</div>
+            <i class="fa-solid fa-music"></i>
+            <div class="label">Music</div>
+        </div>
+    </div>
+
+    <!-- Demo Widget (Business Plan - Right Side) -->
+    <div class="demo-widget" id="demoWidget">
+        <!-- Resize handles -->
+        <div class="resize-handle top" data-direction="top"></div>
+        <div class="resize-handle right" data-direction="right"></div>
+        <div class="resize-handle bottom" data-direction="bottom"></div>
+        <div class="resize-handle left" data-direction="left"></div>
+        <div class="resize-handle top-left" data-direction="top-left"></div>
+        <div class="resize-handle top-right" data-direction="top-right"></div>
+        <div class="resize-handle bottom-left" data-direction="bottom-left"></div>
+        <div class="resize-handle bottom-right" data-direction="bottom-right"></div>
+
+        <div class="widget-header" id="demoWidgetHeader">
+            <div class="widget-title">Business Plan</div>
+            <div class="widget-controls">
+                <div class="widget-btn minimize" onclick="minimizeWidget('demoWidget')"></div>
+                <div class="widget-btn close" onclick="closeWidget('demoWidget')"></div>
+            </div>
+        </div>
+        <div class="widget-content">
+            <!-- Content dynamically inserted -->
+        </div>
+    </div>
+
+    <!-- Music Widget (Left Side) -->
+    <div class="music-widget" id="musicWidget">
+        <!-- Resize handles -->
+        <div class="resize-handle top" data-direction="top"></div>
+        <div class="resize-handle right" data-direction="right"></div>
+        <div class="resize-handle bottom" data-direction="bottom"></div>
+        <div class="resize-handle left" data-direction="left"></div>
+        <div class="resize-handle top-left" data-direction="top-left"></div>
+        <div class="resize-handle top-right" data-direction="top-right"></div>
+        <div class="resize-handle bottom-left" data-direction="bottom-left"></div>
+        <div class="resize-handle bottom-right" data-direction="bottom-right"></div>
+
+        <div class="widget-header" id="musicWidgetHeader">
+            <div class="widget-title" style="color: #FFD700;">🎵 Music Player</div>
+            <div class="widget-controls">
+                <div class="widget-btn minimize" onclick="minimizeWidget('musicWidget')"></div>
+                <div class="widget-btn close" onclick="closeWidget('musicWidget')"></div>
+            </div>
+        </div>
+        <div class="widget-content">
+            <iframe src="https://www.youtube.com/embed/videoseries?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI" width="100%" height="100%" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Minimized Tabs Bar -->
+    <div class="minimized-tabs" id="minimizedTabs"></div>
+
+    <script>
+        console.log('🚀 Phoenix Cinematic Onboarding - The 30-Second Miracle');
+
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const API_BASE_URL = 'https://pal-backend-production.up.railway.app/api';
+
+        let userData = {
+            name: '',
+            email: '',
+            password: '',
+            skipAccount: true,
+            authToken: null
+        };
+
+        let currentPhase = 0;
+        let ttsAudio = null;
+        let selectedWidgets = null; // Store random widget selection
+
+        // ============================================
+        // WIDGET TYPE DETECTION
+        // ============================================
+        function detectWidgetFromInput(userInput) {
+            const input = userInput.toLowerCase().trim();
+
+            // Business / Finance - Multiple types
+            if (input.includes('business') || input.includes('company') || input.includes('startup') || input.includes('plan')) {
+                // Detect specific business type
+                if (input.includes('athletic') || input.includes('clothing') || input.includes('apparel') || input.includes('fitness brand')) {
+                    return {
+                        type: 'business',
+                        icon: 'fa-solid fa-briefcase',
+                        title: 'Business Plan',
+                        description: 'your business plan',
+                        content: createAthleticBrandPlan()
+                    };
+                } else if (input.includes('bartending') || input.includes('mixology') || input.includes('mobile bar') || input.includes('miami')) {
+                    return {
+                        type: 'business',
+                        icon: 'fa-solid fa-briefcase',
+                        title: 'Business Plan',
+                        description: 'your business plan',
+                        content: createMobileBartendingPlan()
+                    };
+                } else {
+                    // Default to NutriFit
+                    return {
+                        type: 'business',
+                        icon: 'fa-solid fa-briefcase',
+                        title: 'Business Plan',
+                        description: 'your business plan',
+                        content: createBusinessPlanWidget()
+                    };
+                }
+            }
+
+            // Music
+            if (input.includes('music') || input.includes('spotify') || input.includes('song') || input.includes('playlist')) {
+                return {
+                    type: 'music',
+                    icon: 'fa-solid fa-music',
+                    title: 'Music Player',
+                    description: 'your music player',
+                    content: '<iframe src="https://www.youtube.com/embed/videoseries?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI" width="100%" height="100%" frameborder="0" allow="autoplay" allowfullscreen></iframe>'
+                };
+            }
+
+            // Video / YouTube
+            if (input.includes('video') || input.includes('youtube') || input.includes('watch') || input.includes('movie')) {
+                return {
+                    type: 'video',
+                    icon: 'fa-solid fa-video',
+                    title: 'Video Player',
+                    description: 'your video player',
+                    content: '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="100%" height="100%" frameborder="0" allow="autoplay" allowfullscreen></iframe>'
+                };
+            }
+
+            // Weather
+            if (input.includes('weather') || input.includes('forecast') || input.includes('temperature')) {
+                return {
+                    type: 'weather',
+                    icon: 'fa-solid fa-cloud-sun',
+                    title: 'Weather',
+                    description: 'your weather dashboard',
+                    content: createWeatherWidget()
+                };
+            }
+
+            // Maps
+            if (input.includes('map') || input.includes('location') || input.includes('navigate') || input.includes('directions')) {
+                return {
+                    type: 'map',
+                    icon: 'fa-solid fa-map-location-dot',
+                    title: 'Maps',
+                    description: 'your map',
+                    content: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387190.279909073!2d-74.25986568241216!3d40.697663747405195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY!5e0!3m2!1sen!2sus!4v1639000000000!5m2!1sen!2sus" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>'
+                };
+            }
+
+            // Default to music player
+            return {
+                type: 'music',
+                icon: 'fa-solid fa-music',
+                title: 'Music Player',
+                description: 'your music player',
+                content: '<iframe src="https://www.youtube.com/embed/videoseries?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI" width="100%" height="100%" frameborder="0" allow="autoplay" allowfullscreen></iframe>'
+            };
+        }
+
+        function createBusinessPlanWidget() {
+            return `
+                <div style="padding: 30px; color: rgba(0, 217, 255, 0.9); font-family: 'SF Mono', monospace; font-size: 14px; line-height: 1.7; width: 100%; height: auto; min-height: 100%; text-align: left;">
+                    <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 20px; text-align: left;">📊 NUTRIFIT AI - BUSINESS PLAN</h2>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Executive Summary:</strong><br>
+                        <span style="font-size: 13px;">NutriFit AI is an AI-powered meal planning and nutrition tracking app that creates personalized meal plans based on dietary goals, preferences, and health data. Users get custom recipes, shopping lists, and macro tracking - all automated.</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Market Opportunity:</strong><br>
+                        <span style="font-size: 13px;">• Global meal kit market: $20B+ (growing 13% annually)<br>
+                        • Nutrition app market: $6.4B by 2027<br>
+                        • Target: Health-conscious millennials/Gen Z (25-45)<br>
+                        • 73% of users willing to pay for personalized nutrition</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Product Features:</strong><br>
+                        <span style="font-size: 13px;">• AI meal plans (keto, vegan, paleo, custom macros)<br>
+                        • Smart grocery lists with price comparison<br>
+                        • Recipe video library (10,000+ meals)<br>
+                        • Wearable integration (Apple Health, WHOOP, Oura)<br>
+                        • Meal prep scheduling and reminders</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Revenue Model:</strong><br>
+                        <span style="font-size: 13px;">• Free: Basic meal logging + 3 AI plans/month<br>
+                        • Premium: $14.99/month (unlimited plans, grocery integration)<br>
+                        • Family: $24.99/month (up to 4 users)<br>
+                        • Affiliate: 5% commission on grocery delivery partnerships</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Go-to-Market Strategy:</strong><br>
+                        <span style="font-size: 13px;">1. Launch on Product Hunt (target 500+ upvotes)<br>
+                        2. Partner with fitness influencers (100K+ followers)<br>
+                        3. TikTok/Instagram "meal prep Sunday" viral content<br>
+                        4. Gym/CrossFit partnerships (in-app QR codes)<br>
+                        5. App Store Optimization (target: "meal planning" top 10)</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Competitive Advantage:</strong><br>
+                        <span style="font-size: 13px;">• 10x faster meal planning (AI vs manual entry)<br>
+                        • Real-time price optimization across 5+ grocery stores<br>
+                        • Wearable data integration (adjust based on workout intensity)<br>
+                        • Voice-activated meal logging</span>
+                    </div>
+
+                    <div>
+                        <strong style="color: #00D9FF;">Financial Projections:</strong><br>
+                        <span style="font-size: 13px;">Month 6: 5,000 users • $45K MRR • 60% paid conversion<br>
+                        Month 12: 25,000 users • $280K MRR<br>
+                        Month 18: 75,000 users • $840K MRR</span><br>
+                        <strong style="color: #FFD700; font-size: 15px;">→ $10M ARR by year 3 • Exit potential: $80-120M</strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createAthleticBrandPlan() {
+            return `
+                <div style="padding: 30px; color: rgba(0, 217, 255, 0.9); font-family: 'SF Mono', monospace; font-size: 14px; line-height: 1.7; width: 100%; height: auto; min-height: 100%; text-align: left;">
+                    <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 20px; text-align: left;">👟 APEX ATHLETICS - BUSINESS PLAN</h2>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Executive Summary:</strong><br>
+                        <span style="font-size: 13px;">Apex Athletics is a premium fitness apparel brand targeting serious athletes and gym-goers. Using performance fabrics and data-driven fit technology, we create workout gear that enhances performance while looking elite.</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Market Opportunity:</strong><br>
+                        <span style="font-size: 13px;">• Global activewear market: $353B by 2028 (8.9% CAGR)<br>
+                        • Premium segment growing 2x faster than mass market<br>
+                        • Target: Fitness enthusiasts 18-40, income $75K+<br>
+                        • 67% willing to pay premium for performance + style</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Product Line:</strong><br>
+                        <span style="font-size: 13px;">• Performance tees ($45-65) - moisture-wicking, anti-odor<br>
+                        • Training shorts ($55-85) - 4-way stretch, phone pocket<br>
+                        • Compression gear ($70-120) - recovery enhancement<br>
+                        • Limited edition drops - collab with athletes<br>
+                        • Smart fabric integration - track movement patterns</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Revenue Model:</strong><br>
+                        <span style="font-size: 13px;">• DTC Website: 70% of sales (60% margin)<br>
+                        • Amazon: 20% of sales (35% margin)<br>
+                        • Gym partnerships: 10% of sales (wholesale)<br>
+                        • Subscription box: $89/month (2 items + exclusive drops)</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Go-to-Market Strategy:</strong><br>
+                        <span style="font-size: 13px;">1. Seed 50 fitness influencers (50K-500K followers)<br>
+                        2. Gym takeovers: Free samples at F45, CrossFit boxes<br>
+                        3. Instagram Reels + TikTok (workout transformation content)<br>
+                        4. Referral program: $20 off for referrer + referee<br>
+                        5. Pop-up shops at major fitness expos</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Competitive Advantage:</strong><br>
+                        <span style="font-size: 13px;">• Proprietary fabric blend (lighter + more durable)<br>
+                        • Athlete-tested fit (not just fashion brand)<br>
+                        • Built-in wearable tech compatibility<br>
+                        • Lifetime warranty on defects</span>
+                    </div>
+
+                    <div>
+                        <strong style="color: #00D9FF;">Financial Projections:</strong><br>
+                        <span style="font-size: 13px;">Month 6: $120K revenue • 2,400 units sold<br>
+                        Month 12: $680K revenue • 40% repeat customer rate<br>
+                        Month 18: $1.8M revenue • Breakeven + profitability</span><br>
+                        <strong style="color: #FFD700; font-size: 15px;">→ $8M ARR by year 3 • Exit potential: $50-80M</strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createMobileBartendingPlan() {
+            return `
+                <div style="padding: 30px; color: rgba(0, 217, 255, 0.9); font-family: 'SF Mono', monospace; font-size: 14px; line-height: 1.7; width: 100%; height: auto; min-height: 100%; text-align: left;">
+                    <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 20px; text-align: left;">🍹 MIAMI MIXOLOGY - BUSINESS PLAN</h2>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Executive Summary:</strong><br>
+                        <span style="font-size: 13px;">Miami Mixology provides premium mobile bartending for private events, yacht parties, and corporate functions across South Florida. Full-service cocktails, professional bartenders, and Instagram-worthy bar setups.</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Market Opportunity:</strong><br>
+                        <span style="font-size: 13px;">• Miami event services market: $450M annually<br>
+                        • 35,000+ private events per year in Miami metro<br>
+                        • Target: Corporate events, weddings, yacht parties<br>
+                        • Average spend: $2,500-8,000 per event</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Service Packages:</strong><br>
+                        <span style="font-size: 13px;">• Basic: 2 bartenders + standard bar ($1,200/4hrs)<br>
+                        • Premium: LED bar setup + signature cocktails ($2,800/4hrs)<br>
+                        • Luxury: Full mixology experience + ice sculptures ($5,500/4hrs)<br>
+                        • Add-ons: Flair bartending, liquid nitrogen cocktails<br>
+                        • Monthly retainers for corporate clients</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Revenue Model:</strong><br>
+                        <span style="font-size: 13px;">• Private events: 60% of bookings<br>
+                        • Corporate: 25% of bookings (higher margins)<br>
+                        • Weddings: 15% of bookings (premium packages)<br>
+                        • Alcohol markup: 3x cost (optional full-service)</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Go-to-Market Strategy:</strong><br>
+                        <span style="font-size: 13px;">1. Partner with 20 event planners (10% referral fee)<br>
+                        2. Instagram/TikTok: Viral cocktail videos<br>
+                        3. Marina partnerships: On-site at yacht clubs<br>
+                        4. Corporate happy hour demos at WeWork/tech startups<br>
+                        5. Wedding expos: South Florida bridal shows</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <strong style="color: #00D9FF;">Competitive Advantage:</strong><br>
+                        <span style="font-size: 13px;">• Certified mixologists (not just bartenders)<br>
+                        • 24/7 booking via app + instant quotes<br>
+                        • Bilingual staff (English/Spanish for Miami market)<br>
+                        • Full liability insurance + bartender certification</span>
+                    </div>
+
+                    <div>
+                        <strong style="color: #00D9FF;">Financial Projections:</strong><br>
+                        <span style="font-size: 13px;">Month 6: 40 events • $85K revenue • 3 staff<br>
+                        Month 12: 120 events • $340K revenue • 8 staff<br>
+                        Month 18: 200 events • $720K revenue • 12 staff</span><br>
+                        <strong style="color: #FFD700; font-size: 15px;">→ $2.5M ARR by year 3 • Scale to Fort Lauderdale + Palm Beach</strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createWeatherWidget() {
+            return `
+                <div style="padding: 40px; text-align: center; color: rgba(0, 217, 255, 0.9); height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="font-size: 72px; margin-bottom: 20px;">⛅</div>
+                    <div style="font-size: 48px; font-weight: 700; color: #FFD700; margin-bottom: 10px;">72°F</div>
+                    <div style="font-size: 24px; margin-bottom: 30px;">Partly Cloudy</div>
+                    <div style="display: flex; gap: 30px; margin-top: 20px;">
+                        <div>
+                            <div style="font-size: 14px; color: rgba(0, 217, 255, 0.6);">HIGH</div>
+                            <div style="font-size: 20px; font-weight: 600;">78°</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; color: rgba(0, 217, 255, 0.6);">LOW</div>
+                            <div style="font-size: 20px; font-weight: 600;">65°</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; color: rgba(0, 217, 255, 0.6);">HUMIDITY</div>
+                            <div style="font-size: 20px; font-weight: 600;">45%</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // STARFIELD BACKGROUND
+        // ============================================
+        function initStarfield() {
+            const canvas = document.getElementById('starfield');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    alpha: Math.random()
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                stars.forEach(star => {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0, 217, 255, ${star.alpha})`;
+                    ctx.fill();
+
+                    star.alpha += (Math.random() - 0.5) * 0.02;
+                    star.alpha = Math.max(0.1, Math.min(0.9, star.alpha));
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // ============================================
+        // TEXT-TO-SPEECH (OpenAI)
+        // ============================================
+        async function speak(text) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tts/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        voice: 'nova',
+                        speed: 1.0,
+                        format: 'base64'
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn('TTS unavailable, continuing silently');
+                    return;
+                }
+
+                const data = await response.json();
+
+                // Convert base64 to audio
+                const audioData = atob(data.audio || data.data);
+                const audioArray = new Uint8Array(audioData.length);
+                for (let i = 0; i < audioData.length; i++) {
+                    audioArray[i] = audioData.charCodeAt(i);
+                }
+                const audioBlob = new Blob([audioArray], { type: 'audio/mpeg' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                // Play audio
+                if (ttsAudio) {
+                    ttsAudio.pause();
+                    ttsAudio = null;
+                }
+
+                ttsAudio = new Audio(audioUrl);
+                ttsAudio.volume = 0.8;
+                ttsAudio.playbackRate = 1.0; // Explicitly set to normal playback
+
+                return new Promise((resolve) => {
+                    ttsAudio.onended = () => {
+                        URL.revokeObjectURL(audioUrl);
+                        resolve();
+                    };
+                    ttsAudio.onerror = () => {
+                        console.warn('Audio playback error');
+                        resolve();
+                    };
+                    ttsAudio.play().catch(() => resolve());
+                });
+            } catch (error) {
+                console.error('TTS error:', error);
+            }
+        }
+
+        // ============================================
+        // PHASE NAVIGATION
+        // ============================================
+        function goToPhase(phaseId) {
+            console.log(`📍 Moving to ${phaseId}`);
+
+            // Hide all phases
+            document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+
+            // Show target phase
+            const phase = document.getElementById(phaseId);
+            if (phase) {
+                phase.classList.add('active');
+            }
+        }
+
+        // ============================================
+        // ONBOARDING FLOW
+        // ============================================
+
+        // Random widget selector - picks 1 music video and 1 business plan
+        function getRandomWidgets() {
+            const musicVideos = [
+                { id: 'videoseries?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI', title: 'Workout Mix' },
+                { id: 'GhlK-r2GKt0', title: 'We Belong Together' }, // Mariah Carey
+                { id: 'cimoNqiulUE', title: 'Headlines' } // Drake
+            ];
+
+            const businessPlans = ['nutrifit', 'athletic', 'bartending'];
+
+            return {
+                music: musicVideos[Math.floor(Math.random() * musicVideos.length)],
+                business: businessPlans[Math.floor(Math.random() * businessPlans.length)]
+            };
+        }
+
+        async function startOnboarding() {
+            initStarfield();
+
+            // Select random widgets at start
+            selectedWidgets = getRandomWidgets();
+            console.log('🎲 Random selection:', selectedWidgets);
+
+            // Update music widget iframe with random video
+            const musicIframe = document.querySelector('#musicWidget .widget-content iframe');
+            if (musicIframe) {
+                musicIframe.src = `https://www.youtube.com/embed/${selectedWidgets.music.id}`;
+            }
+
+            // PHASE 1: INTRO (3 seconds)
+            await speak("Hello.");
+            await sleep(2000);
+
+            // PHASE 2: HOOK (3 seconds) - Pure Jobs/Einstein: Show, don't tell
+            goToPhase('phase-hook');
+            await speak("Watch this.");
+            await sleep(1000);
+
+            // Auto-create business plan with random type
+            const businessInput = `${selectedWidgets.business} business plan`;
+            handleCreateRequest(businessInput);
+        }
+
+        async function handleCreateRequest(userInput) {
+            console.log('🎯 User requested:', userInput);
+
+            // Detect widget type from user input
+            const widget = detectWidgetFromInput(userInput);
+            console.log('📦 Creating:', widget.type);
+
+            // PHASE 3: MIRACLE (15 seconds)
+            goToPhase('phase-miracle');
+
+            // Update building status text dynamically
+            const buildStatus = document.getElementById('buildStatus');
+            buildStatus.textContent = `Creating music player and business plan...`;
+
+            await speak(`Creating music player and business plan...`);
+
+            // Building animation (2.5 seconds)
+            await sleep(2500);
+
+            // Update dock icon dynamically
+            const dockIcon = document.getElementById('dockIcon');
+            const dockIconElement = dockIcon.querySelector('i');
+            dockIconElement.className = widget.icon;
+
+            const dockLabel = dockIcon.querySelector('.label');
+            dockLabel.textContent = widget.title;
+
+            // Update widget title and content
+            const widgetTitle = document.getElementById('demoWidget').querySelector('.widget-title');
+            widgetTitle.textContent = widget.title;
+
+            const widgetContent = document.getElementById('demoWidget').querySelector('.widget-content');
+            widgetContent.innerHTML = widget.content;
+
+            // For business plan, auto-open widget immediately (no dock needed)
+            if (widget.type === 'business') {
+                await speak("Done.");
+                await sleep(500);
+                openDemoWidget();
+            } else {
+                // For other widgets, show dock with icon
+                const dock = document.getElementById('demoDock');
+                const arrow = document.getElementById('readyArrow');
+                dock.classList.add('active');
+
+                await sleep(500);
+
+                // Blink arrow
+                arrow.classList.add('blink');
+                await speak("Done. Click it.");
+
+                // Wait for user to click icon (auto-click after 5s for demo)
+                setTimeout(() => {
+                    if (!document.getElementById('demoWidget').classList.contains('active')) {
+                        openDemoWidget();
+                    }
+                }, 5000);
+            }
+        }
+
+        function openDemoWidget() {
+            document.getElementById('readyArrow').classList.remove('blink');
+
+            // Open both widgets simultaneously
+            document.getElementById('demoWidget').classList.add('active');
+            document.getElementById('musicWidget').classList.add('active');
+
+            // After 3 seconds, continue to realization
+            setTimeout(async () => {
+                goToPhase('phase-realization');
+                await speak("I can create anything. That business plan and music player took 2.5 seconds. Weather dashboards, maps, or anything custom you describe. I learn from everything you do. I'll track your health, workouts, goals. I'll plan your day, manage your life. I'm your companion. For life. What's your name?");
+
+                // Move to name phase
+                setTimeout(() => {
+                    goToPhase('phase-name');
+                    document.getElementById('nameInput').focus();
+                }, 3000);
+            }, 3000);
+        }
+
+        // ============================================
+        // WIDGET DRAG & MINIMIZE FUNCTIONALITY
+        // ============================================
+
+        // Make widgets draggable
+        function makeDraggable(widgetId, headerId) {
+            const widget = document.getElementById(widgetId);
+            const header = document.getElementById(headerId);
+
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+
+            header.addEventListener('mousedown', dragStart);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', dragEnd);
+
+            function dragStart(e) {
+                if (e.target.classList.contains('widget-btn')) return; // Don't drag when clicking buttons
+
+                initialX = e.clientX - (widget.offsetLeft || 0);
+                initialY = e.clientY - (widget.offsetTop || 0);
+
+                isDragging = true;
+                widget.style.transition = 'none';
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                widget.style.left = currentX + 'px';
+                widget.style.top = currentY + 'px';
+                widget.style.right = 'auto';
+                widget.style.transform = 'none';
+            }
+
+            function dragEnd() {
+                isDragging = false;
+                widget.style.transition = '';
+            }
+        }
+
+        // Make widgets resizable
+        function makeResizable(widgetId) {
+            const widget = document.getElementById(widgetId);
+            const handles = widget.querySelectorAll('.resize-handle');
+
+            handles.forEach(handle => {
+                let isResizing = false;
+                let direction = handle.dataset.direction;
+                let startX, startY, startWidth, startHeight, startLeft, startTop;
+
+                handle.addEventListener('mousedown', resizeStart);
+
+                function resizeStart(e) {
+                    e.stopPropagation(); // Prevent dragging while resizing
+                    isResizing = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startWidth = parseInt(getComputedStyle(widget).width, 10);
+                    startHeight = parseInt(getComputedStyle(widget).height, 10);
+                    startLeft = widget.offsetLeft;
+                    startTop = widget.offsetTop;
+
+                    widget.style.transition = 'none';
+
+                    document.addEventListener('mousemove', resize);
+                    document.addEventListener('mouseup', resizeEnd);
+                }
+
+                function resize(e) {
+                    if (!isResizing) return;
+
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+
+                    // Handle different resize directions
+                    if (direction.includes('right')) {
+                        widget.style.width = (startWidth + dx) + 'px';
+                    }
+                    if (direction.includes('left')) {
+                        widget.style.width = (startWidth - dx) + 'px';
+                        widget.style.left = (startLeft + dx) + 'px';
+                    }
+                    if (direction.includes('bottom')) {
+                        widget.style.height = (startHeight + dy) + 'px';
+                    }
+                    if (direction.includes('top')) {
+                        widget.style.height = (startHeight - dy) + 'px';
+                        widget.style.top = (startTop + dy) + 'px';
+                    }
+
+                    // Clear max constraints during resize
+                    widget.style.maxWidth = 'none';
+                    widget.style.maxHeight = 'none';
+                }
+
+                function resizeEnd() {
+                    isResizing = false;
+                    widget.style.transition = '';
+                    document.removeEventListener('mousemove', resize);
+                    document.removeEventListener('mouseup', resizeEnd);
+                }
+            });
+        }
+
+        // Initialize dragging and resizing for both widgets
+        setTimeout(() => {
+            makeDraggable('demoWidget', 'demoWidgetHeader');
+            makeDraggable('musicWidget', 'musicWidgetHeader');
+            makeResizable('demoWidget');
+            makeResizable('musicWidget');
+        }, 1000);
+
+        // Minimize widget to tab bar
+        function minimizeWidget(widgetId) {
+            const widget = document.getElementById(widgetId);
+            const tabsContainer = document.getElementById('minimizedTabs');
+
+            // Hide widget
+            widget.classList.add('minimized');
+
+            // Get widget title and color
+            const titleEl = widget.querySelector('.widget-title');
+            const title = titleEl.textContent;
+            const isGold = widgetId === 'musicWidget';
+
+            // Create minimized tab if it doesn't exist
+            if (!document.getElementById(`tab-${widgetId}`)) {
+                const tab = document.createElement('div');
+                tab.id = `tab-${widgetId}`;
+                tab.className = `minimized-tab ${isGold ? 'gold-border' : ''}`;
+                tab.textContent = title;
+                tab.style.color = isGold ? '#FFD700' : '#00D9FF';
+                tab.onclick = () => restoreWidget(widgetId);
+                tabsContainer.appendChild(tab);
+            }
+        }
+
+        // Restore widget from minimized
+        function restoreWidget(widgetId) {
+            const widget = document.getElementById(widgetId);
+            const tab = document.getElementById(`tab-${widgetId}`);
+
+            // Show widget
+            widget.classList.remove('minimized');
+
+            // Remove tab
+            if (tab) tab.remove();
+        }
+
+        // Close widget completely
+        function closeWidget(widgetId) {
+            const widget = document.getElementById(widgetId);
+            const tab = document.getElementById(`tab-${widgetId}`);
+
+            widget.classList.remove('active');
+            widget.classList.remove('minimized');
+            if (tab) tab.remove();
+        }
+
+        async function submitName() {
+            const nameInput = document.getElementById('nameInput');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+
+            userData.name = name;
+            document.getElementById('userName').textContent = name;
+
+            // Move to account choice
+            goToPhase('phase-account-choice');
+            await speak(`Hello, ${name}. I'm going to learn everything about you. The more I know, the better I serve. Create an account and I'll remember everything. Or start now and explore.`);
+        }
+
+        function showAccountForm() {
+            userData.skipAccount = false;
+            goToPhase('phase-account-form');
+            document.getElementById('emailInput').focus();
+        }
+
+        async function createAccount() {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            const statusEl = document.getElementById('accountStatus');
+
+            if (!email || !password) {
+                statusEl.textContent = 'Email and password required';
+                statusEl.style.color = '#ff4444';
+                return;
+            }
+
+            userData.email = email;
+            userData.password = password;
+            userData.skipAccount = false;
+
+            statusEl.textContent = 'Creating account...';
+            statusEl.style.color = 'var(--cyan)';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: userData.name,
+                        email: userData.email,
+                        password: userData.password,
+                        voice: 'nova',
+                        language: 'en'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    userData.authToken = data.token;
+                    localStorage.setItem('phoenixToken', data.token);
+                    localStorage.setItem('phoenixName', userData.name);
+
+                    goToPhase('phase-success');
+                    document.getElementById('successMessage').textContent = 'Account created successfully!';
+                    await speak("Perfect. I'll never forget you. Launching Phoenix...");
+
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                } else {
+                    statusEl.textContent = data.message || 'Account creation failed';
+                    statusEl.style.color = '#ff4444';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                statusEl.textContent = 'Network error. Try again.';
+                statusEl.style.color = '#ff4444';
+            }
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        // Begin demo when user clicks START button
+        async function beginDemo() {
+            // Hide start button
+            document.getElementById('startBtn').style.display = 'none';
+            document.querySelector('#phase-intro .subtitle').style.display = 'none';
+
+            // Start onboarding sequence
+            await startOnboarding();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ Onboarding loaded');
+            initStarfield();
+            // Wait for user to click START button (beginDemo)
+        });
+    </script>
+</body>
+</html>

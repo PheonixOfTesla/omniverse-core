@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix - You're Leaving 80% On The Table</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Scanlines effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 2px,
+                rgba(0, 0, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .truth-bomb {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pain-point {
+            font-size: 24px;
+            line-height: 1.8;
+            margin: 30px 0;
+            color: rgba(0, 217, 255, 0.8);
+        }
+
+        .pain-point.highlight {
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 28px;
+        }
+
+        .reveal {
+            font-size: 20px;
+            margin: 40px 0;
+            padding: 30px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            background: rgba(0, 20, 40, 0.5);
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 20px 60px;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: transparent;
+            border: 3px solid #00ff88;
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .cta-button:hover {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 30px #00ff88;
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .section {
+            margin: 60px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="truth-bomb fade-in" style="font-size: 72px; line-height: 1.2;">
+            You're running at 20%
+        </div>
+
+        <div class="section fade-in" style="animation-delay: 1.5s; margin-top: 60px;">
+            <div class="pain-point" style="font-size: 32px; color: #fff;">
+                I can get you to 100%
+            </div>
+        </div>
+
+        <button class="cta-button fade-in" style="animation-delay: 2.5s" onclick="begin()">
+            Show Me How
+        </button>
+    </div>
+
+    <script>
+        function begin() {
+            window.location.href = 'why-you-need-this.html';
+        }
+    </script>
+</body>
+</html>

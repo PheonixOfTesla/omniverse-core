@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Live Activities - Phoenix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #00ff88;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Grid background */
+        .grid-underlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 217, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+            }
+            50% {
+                text-shadow: 0 0 50px rgba(0, 217, 255, 1);
+            }
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(0, 217, 255, 0.6);
+            letter-spacing: 2px;
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(0, 217, 255, 0.1));
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card:hover {
+            border-color: #00ff88;
+            background: rgba(0, 217, 255, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+        }
+
+        .activity-card.active {
+            border-color: #00ff88;
+            background: rgba(0, 217, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .activity-icon {
+            font-size: 32px;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 1);
+        }
+
+        .activity-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00ff88;
+            letter-spacing: 2px;
+        }
+
+        .activity-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-left: auto;
+        }
+
+        .activity-status.idle {
+            background: rgba(128, 128, 128, 0.2);
+            color: rgba(128, 128, 128, 0.8);
+            border: 1px solid rgba(128, 128, 128, 0.3);
+        }
+
+        .activity-status.active {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+            animation: statusPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 217, 255, 0.8);
+            }
+        }
+
+        .activity-body {
+            margin-bottom: 16px;
+        }
+
+        .activity-description {
+            font-size: 12px;
+            color: rgba(0, 217, 255, 0.6);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .activity-data {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .data-item {
+            background: rgba(0, 217, 255, 0.05);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .data-label {
+            font-size: 10px;
+            color: rgba(0, 217, 255, 0.5);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .data-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00ff88;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: inherit;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: rgba(0, 217, 255, 0.1);
+            color: #00ff88;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
+            background: rgba(0, 217, 255, 0.2);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 2px solid #ff4444;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.8);
+            background: rgba(255, 68, 68, 0.2);
+        }
+
+        .active-activities-panel {
+            background: rgba(0, 217, 255, 0.05);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00ff88;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .active-activity-item {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.4);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .active-activity-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .no-activities {
+            text-align: center;
+            color: rgba(0, 217, 255, 0.4);
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.7);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .form-input:focus {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 16px 24px;
+            color: #00ff88;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
+            animation: slideIn 0.3s ease-out;
+            display: none;
+        }
+
+        .notification.error {
+            background: rgba(255, 68, 68, 0.2);
+            border-color: #ff4444;
+            color: #ff4444;
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.6);
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .activities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-underlay"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">LIVE ACTIVITIES</h1>
+            <p class="subtitle">DYNAMIC ISLAND CONTROL PANEL</p>
+        </div>
+
+        <!-- Active Activities Panel -->
+        <div class="active-activities-panel">
+            <h2 class="panel-title">ACTIVE ON DEVICE</h2>
+            <div id="activeActivitiesList">
+                <p class="no-activities">No active Live Activities</p>
+            </div>
+        </div>
+
+        <!-- Activities Grid -->
+        <div class="activities-grid">
+            <!-- Workout Activity -->
+            <div class="activity-card" id="workout-card">
+                <div class="activity-header">
+                    <div class="activity-icon">💪</div>
+                    <div class="activity-title">WORKOUT</div>
+                    <div class="activity-status idle" id="workout-status">IDLE</div>
+                </div>
+                <div class="activity-body">
+                    <p class="activity-description">Track active workout session in Dynamic Island with real-time heart rate, calories, and duration.</p>
+
+                    <div id="workout-form" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Exercise Type</label>
+                            <input type="text" class="form-input" id="workout-exercise" placeholder="Running, Lifting, Yoga...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Duration (minutes)</label>
+                            <input type="number" class="form-input" id="workout-duration" placeholder="30" value="30">
+                        </div>
+                    </div>
+
+                    <div id="workout-data" style="display: none;">
+                        <div class="activity-data">
+                            <div class="data-item">
+                                <div class="data-label">DURATION</div>
+                                <div class="data-value" id="workout-duration-display">0:00</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">HEART RATE</div>
+                                <div class="data-value" id="workout-hr">--</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">CALORIES</div>
+                                <div class="data-value" id="workout-calories">0</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">INTENSITY</div>
+                                <div class="data-value" id="workout-intensity">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="workout-btn" onclick="toggleWorkout()">START WORKOUT</button>
+            </div>
+
+            <!-- Meditation Activity -->
+            <div class="activity-card" id="meditation-card">
+                <div class="activity-header">
+                    <div class="activity-icon">🧘</div>
+                    <div class="activity-title">MEDITATION</div>
+                    <div class="activity-status idle" id="meditation-status">IDLE</div>
+                </div>
+                <div class="activity-body">
+                    <p class="activity-description">Peaceful meditation timer in Dynamic Island with breathing guide and focus score.</p>
+
+                    <div id="meditation-form" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Duration (minutes)</label>
+                            <input type="number" class="form-input" id="meditation-duration" placeholder="10" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <input type="text" class="form-input" id="meditation-type" placeholder="Mindfulness, Breathing..." value="Mindfulness">
+                        </div>
+                    </div>
+
+                    <div id="meditation-data" style="display: none;">
+                        <div class="activity-data">
+                            <div class="data-item">
+                                <div class="data-label">TIME LEFT</div>
+                                <div class="data-value" id="meditation-time">0:00</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">BREATHING</div>
+                                <div class="data-value" id="meditation-breathing">In</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="meditation-btn" onclick="toggleMeditation()">START MEDITATION</button>
+            </div>
+
+            <!-- Recovery Score -->
+            <div class="activity-card" id="recovery-card">
+                <div class="activity-header">
+                    <div class="activity-icon">💚</div>
+                    <div class="activity-title">RECOVERY</div>
+                    <div class="activity-status idle" id="recovery-status">IDLE</div>
+                </div>
+                <div class="activity-body">
+                    <p class="activity-description">Display daily recovery score in Lock Screen widget based on sleep, HRV, and stress.</p>
+
+                    <div class="activity-data">
+                        <div class="data-item">
+                            <div class="data-label">SCORE</div>
+                            <div class="data-value" id="recovery-score">--</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">SLEEP</div>
+                            <div class="data-value" id="recovery-sleep">--</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">HRV</div>
+                            <div class="data-value" id="recovery-hrv">--</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">STATUS</div>
+                            <div class="data-value" id="recovery-status-text">--</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="recovery-btn" onclick="showRecovery()">SHOW RECOVERY</button>
+            </div>
+
+            <!-- Intervention Alert -->
+            <div class="activity-card" id="intervention-card">
+                <div class="activity-header">
+                    <div class="activity-icon">⚠️</div>
+                    <div class="activity-title">INTERVENTION</div>
+                    <div class="activity-status idle" id="intervention-status">IDLE</div>
+                </div>
+                <div class="activity-body">
+                    <p class="activity-description">Critical intervention alerts in Dynamic Island when Phoenix detects harmful patterns or risks.</p>
+
+                    <div id="intervention-form" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Alert Type</label>
+                            <input type="text" class="form-input" id="intervention-type" placeholder="Stress, Fatigue, Risk..." value="Stress">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <input type="text" class="form-input" id="intervention-message" placeholder="Take a break..." value="High stress detected. Take a 5-minute break.">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-danger" id="intervention-btn" onclick="triggerIntervention()">TRIGGER INTERVENTION</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Scripts -->
+    <script src="../src/config.js"></script>
+    <script src="../src/api.js"></script>
+
+    <script>
+        // ============================================
+        // LIVE ACTIVITIES MANAGER
+        // ============================================
+
+        let workoutState = {
+            active: false,
+            activityId: null,
+            startTime: null,
+            duration: 0,
+            heartRate: 0,
+            calories: 0,
+            interval: null
+        };
+
+        let meditationState = {
+            active: false,
+            activityId: null,
+            startTime: null,
+            duration: 0,
+            interval: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[Live Activities] Panel loaded');
+            loadActiveActivities();
+
+            // Refresh active activities every 5 seconds
+            setInterval(loadActiveActivities, 5000);
+        });
+
+        // ============================================
+        // WORKOUT CONTROLS
+        // ============================================
+        async function toggleWorkout() {
+            if (!workoutState.active) {
+                await startWorkout();
+            } else {
+                await stopWorkout();
+            }
+        }
+
+        async function startWorkout() {
+            const exercise = document.getElementById('workout-exercise').value || 'General Workout';
+            const duration = parseInt(document.getElementById('workout-duration').value) || 30;
+
+            try {
+                const response = await api.startWorkoutActivity({
+                    exercise,
+                    targetDuration: duration,
+                    currentHeartRate: 75,
+                    caloriesBurned: 0
+                });
+
+                workoutState.active = true;
+                workoutState.activityId = response.activityId;
+                workoutState.startTime = Date.now();
+                workoutState.duration = 0;
+                workoutState.heartRate = 75;
+                workoutState.calories = 0;
+
+                // UI updates
+                document.getElementById('workout-status').textContent = 'ACTIVE';
+                document.getElementById('workout-status').className = 'activity-status active';
+                document.getElementById('workout-card').classList.add('active');
+                document.getElementById('workout-form').style.display = 'none';
+                document.getElementById('workout-data').style.display = 'block';
+                document.getElementById('workout-btn').textContent = 'END WORKOUT';
+                document.getElementById('workout-btn').className = 'btn btn-danger';
+
+                // Start interval to update workout data
+                workoutState.interval = setInterval(updateWorkoutDisplay, 1000);
+
+                showNotification('Workout started! Live Activity created.', false);
+                loadActiveActivities();
+            } catch (error) {
+                console.error('Failed to start workout:', error);
+                showNotification('Failed to start workout. Please try again.', true);
+            }
+        }
+
+        async function stopWorkout() {
+            try {
+                if (workoutState.activityId) {
+                    await api.endActivity(workoutState.activityId);
+                }
+
+                clearInterval(workoutState.interval);
+                workoutState.active = false;
+                workoutState.activityId = null;
+
+                // UI updates
+                document.getElementById('workout-status').textContent = 'IDLE';
+                document.getElementById('workout-status').className = 'activity-status idle';
+                document.getElementById('workout-card').classList.remove('active');
+                document.getElementById('workout-form').style.display = 'block';
+                document.getElementById('workout-data').style.display = 'none';
+                document.getElementById('workout-btn').textContent = 'START WORKOUT';
+                document.getElementById('workout-btn').className = 'btn btn-primary';
+
+                showNotification('Workout completed!', false);
+                loadActiveActivities();
+            } catch (error) {
+                console.error('Failed to end workout:', error);
+                showNotification('Failed to end workout.', true);
+            }
+        }
+
+        function updateWorkoutDisplay() {
+            workoutState.duration = Math.floor((Date.now() - workoutState.startTime) / 1000);
+            const minutes = Math.floor(workoutState.duration / 60);
+            const seconds = workoutState.duration % 60;
+
+            // Simulate heart rate variation
+            workoutState.heartRate = 75 + Math.floor(Math.random() * 40);
+
+            // Simulate calorie burn (roughly 5-10 per minute)
+            workoutState.calories = Math.floor(workoutState.duration / 60 * 7.5);
+
+            document.getElementById('workout-duration-display').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('workout-hr').textContent = workoutState.heartRate;
+            document.getElementById('workout-calories').textContent = workoutState.calories;
+            document.getElementById('workout-intensity').textContent = workoutState.heartRate > 100 ? 'HIGH' : 'MODERATE';
+
+            // Update backend every 10 seconds
+            if (workoutState.duration % 10 === 0 && workoutState.activityId) {
+                api.updateWorkoutActivity({
+                    activityId: workoutState.activityId,
+                    currentHeartRate: workoutState.heartRate,
+                    caloriesBurned: workoutState.calories,
+                    duration: workoutState.duration
+                }).catch(err => console.error('Failed to update workout:', err));
+            }
+        }
+
+        // ============================================
+        // MEDITATION CONTROLS
+        // ============================================
+        async function toggleMeditation() {
+            if (!meditationState.active) {
+                await startMeditation();
+            } else {
+                await stopMeditation();
+            }
+        }
+
+        async function startMeditation() {
+            const duration = parseInt(document.getElementById('meditation-duration').value) || 10;
+            const type = document.getElementById('meditation-type').value || 'Mindfulness';
+
+            try {
+                const response = await api.startMeditationActivity({
+                    type,
+                    duration,
+                    breathingPattern: '4-7-8'
+                });
+
+                meditationState.active = true;
+                meditationState.activityId = response.activityId;
+                meditationState.startTime = Date.now();
+                meditationState.duration = duration * 60; // Convert to seconds
+
+                // UI updates
+                document.getElementById('meditation-status').textContent = 'ACTIVE';
+                document.getElementById('meditation-status').className = 'activity-status active';
+                document.getElementById('meditation-card').classList.add('active');
+                document.getElementById('meditation-form').style.display = 'none';
+                document.getElementById('meditation-data').style.display = 'block';
+                document.getElementById('meditation-btn').textContent = 'END MEDITATION';
+                document.getElementById('meditation-btn').className = 'btn btn-danger';
+
+                // Start countdown
+                meditationState.interval = setInterval(updateMeditationDisplay, 1000);
+
+                showNotification('Meditation started! Live Activity created.', false);
+                loadActiveActivities();
+            } catch (error) {
+                console.error('Failed to start meditation:', error);
+                showNotification('Failed to start meditation. Please try again.', true);
+            }
+        }
+
+        async function stopMeditation() {
+            try {
+                if (meditationState.activityId) {
+                    await api.endActivity(meditationState.activityId);
+                }
+
+                clearInterval(meditationState.interval);
+                meditationState.active = false;
+                meditationState.activityId = null;
+
+                // UI updates
+                document.getElementById('meditation-status').textContent = 'IDLE';
+                document.getElementById('meditation-status').className = 'activity-status idle';
+                document.getElementById('meditation-card').classList.remove('active');
+                document.getElementById('meditation-form').style.display = 'block';
+                document.getElementById('meditation-data').style.display = 'none';
+                document.getElementById('meditation-btn').textContent = 'START MEDITATION';
+                document.getElementById('meditation-btn').className = 'btn btn-primary';
+
+                showNotification('Meditation completed!', false);
+                loadActiveActivities();
+            } catch (error) {
+                console.error('Failed to end meditation:', error);
+                showNotification('Failed to end meditation.', true);
+            }
+        }
+
+        function updateMeditationDisplay() {
+            const elapsed = Math.floor((Date.now() - meditationState.startTime) / 1000);
+            const remaining = Math.max(0, meditationState.duration - elapsed);
+
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+
+            document.getElementById('meditation-time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // 4-7-8 breathing pattern visualization
+            const cycle = elapsed % 19; // 4+7+8=19 seconds
+            if (cycle < 4) {
+                document.getElementById('meditation-breathing').textContent = 'Inhale';
+            } else if (cycle < 11) {
+                document.getElementById('meditation-breathing').textContent = 'Hold';
+            } else {
+                document.getElementById('meditation-breathing').textContent = 'Exhale';
+            }
+
+            // Auto-complete when time is up
+            if (remaining === 0) {
+                stopMeditation();
+            }
+        }
+
+        // ============================================
+        // RECOVERY SCORE
+        // ============================================
+        async function showRecovery() {
+            try {
+                const response = await api.startRecoveryActivity({
+                    score: 85,
+                    sleepHours: 7.5,
+                    hrv: 65,
+                    status: 'Ready to train'
+                });
+
+                // Update display
+                document.getElementById('recovery-score').textContent = '85';
+                document.getElementById('recovery-sleep').textContent = '7.5h';
+                document.getElementById('recovery-hrv').textContent = '65ms';
+                document.getElementById('recovery-status-text').textContent = 'GOOD';
+                document.getElementById('recovery-status').textContent = 'ACTIVE';
+                document.getElementById('recovery-status').className = 'activity-status active';
+                document.getElementById('recovery-card').classList.add('active');
+
+                showNotification('Recovery score displayed on Lock Screen!', false);
+                loadActiveActivities();
+            } catch (error) {
+                console.error('Failed to show recovery:', error);
+                showNotification('Failed to show recovery score.', true);
+            }
+        }
+
+        // ============================================
+        // INTERVENTION ALERT
+        // ============================================
+        async function triggerIntervention() {
+            const type = document.getElementById('intervention-type').value || 'Stress';
+            const message = document.getElementById('intervention-message').value || 'Take a break';
+
+            try {
+                const response = await api.startInterventionActivity({
+                    type,
+                    message,
+                    severity: 'high',
+                    actions: ['Take Break', 'Call Support', 'Dismiss']
+                });
+
+                document.getElementById('intervention-status').textContent = 'ACTIVE';
+                document.getElementById('intervention-status').className = 'activity-status active';
+                document.getElementById('intervention-card').classList.add('active');
+
+                showNotification('Intervention alert sent to Dynamic Island!', false);
+                loadActiveActivities();
+
+                // Auto-dismiss after 30 seconds
+                setTimeout(() => {
+                    document.getElementById('intervention-status').textContent = 'IDLE';
+                    document.getElementById('intervention-status').className = 'activity-status idle';
+                    document.getElementById('intervention-card').classList.remove('active');
+                }, 30000);
+            } catch (error) {
+                console.error('Failed to trigger intervention:', error);
+                showNotification('Failed to trigger intervention alert.', true);
+            }
+        }
+
+        // ============================================
+        // ACTIVE ACTIVITIES LIST
+        // ============================================
+        async function loadActiveActivities() {
+            try {
+                const response = await api.getActiveActivities();
+                const activities = response.activities || [];
+
+                const listEl = document.getElementById('activeActivitiesList');
+
+                if (activities.length === 0) {
+                    listEl.innerHTML = '<p class="no-activities">No active Live Activities</p>';
+                    return;
+                }
+
+                listEl.innerHTML = activities.map(activity => `
+                    <div class="active-activity-item">
+                        <div class="active-activity-info">
+                            <span>${getActivityIcon(activity.type)}</span>
+                            <span>${activity.type.toUpperCase()}</span>
+                        </div>
+                        <button class="btn btn-danger" style="width: auto; padding: 8px 16px; font-size: 10px;" onclick="endActivity('${activity.id}')">END</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load active activities:', error);
+            }
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'workout': '💪',
+                'meditation': '🧘',
+                'recovery': '💚',
+                'intervention': '⚠️'
+            };
+            return icons[type.toLowerCase()] || '📱';
+        }
+
+        async function endActivity(activityId) {
+            try {
+                await api.endActivity(activityId);
+                showNotification('Activity ended', false);
+                loadActiveActivities();
+            } catch (error) {
+                console.error('Failed to end activity:', error);
+                showNotification('Failed to end activity', true);
+            }
+        }
+
+        // ============================================
+        // NOTIFICATION SYSTEM
+        // ============================================
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show' + (isError ? ' error' : '');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

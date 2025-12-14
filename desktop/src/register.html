@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Register - Phoenix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            background: #000;
+            color: #00ff88;
+            overflow-x: hidden;
+            overflow-y: auto;
+            width: 100vw;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .register-container {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 500px;
+            background: rgba(0, 10, 20, 0.95);
+            border: 2px solid rgba(0, 217, 255, 0.5);
+            padding: 50px 40px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 60px rgba(0, 217, 255, 0.4);
+            animation: slideIn 0.8s ease-out;
+            margin: 20px 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+            }
+            50% {
+                text-shadow: 0 0 50px rgba(0, 217, 255, 1);
+            }
+        }
+
+        .logo-subtitle {
+            font-size: 14px;
+            color: rgba(0, 217, 255, 0.6);
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.7);
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: rgba(0, 217, 255, 0.3);
+        }
+
+        .checkbox-group {
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #00ff88;
+        }
+
+        .checkbox-group label {
+            color: rgba(0, 217, 255, 0.7);
+            font-size: 12px;
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .checkbox-group a {
+            color: #00ff88;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .checkbox-group a:hover {
+            border-bottom-color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: rgba(0, 217, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.5);
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #ff4444;
+            font-size: 12px;
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: rgba(0, 217, 255, 0.6);
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .back-link a:hover {
+            color: #00ff88;
+            border-bottom-color: #00ff88;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading-spinner.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 217, 255, 0.2);
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .corner-bracket {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            z-index: 5;
+        }
+
+        .bracket-tl {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .bracket-tr {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .bracket-bl {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .bracket-br {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        @media (max-width: 600px) {
+            .register-container {
+                padding: 40px 30px;
+                width: 95%;
+            }
+
+            .logo-text {
+                font-size: 36px;
+            }
+
+            body {
+                padding: 20px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="corner-bracket bracket-tl"></div>
+    <div class="corner-bracket bracket-tr"></div>
+    <div class="corner-bracket bracket-bl"></div>
+    <div class="corner-bracket bracket-br"></div>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="register-container">
+        <div class="logo">
+            <div class="logo-text">PHOENIX</div>
+            <div class="logo-subtitle">CREATE YOUR ACCOUNT</div>
+        </div>
+
+        <div class="error-message" id="error-message"></div>
+
+        <form id="register-form">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input 
+                    type="text" 
+                    class="form-input" 
+                    id="name" 
+                    placeholder="John Doe"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input 
+                    type="email" 
+                    class="form-input" 
+                    id="email" 
+                    placeholder="your@email.com"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    class="form-input" 
+                    id="password" 
+                    placeholder="••••••••"
+                    required
+                    minlength="6"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input 
+                    type="password" 
+                    class="form-input" 
+                    id="password-confirm" 
+                    placeholder="••••••••"
+                    required
+                    minlength="6"
+                >
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="privacy-checkbox" required>
+                <label for="privacy-checkbox">
+                    I accept the <a href="/privacy" target="_blank">Privacy Policy</a>
+                </label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms-checkbox" required>
+                <label for="terms-checkbox">
+                    I accept the <a href="/terms" target="_blank">Terms of Service</a>
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn" id="register-btn">
+                Create Account & Continue
+            </button>
+        </form>
+
+        <div class="loading-spinner" id="loading-spinner">
+            <div class="spinner"></div>
+            <div style="margin-top: 15px; font-size: 12px; color: rgba(0, 217, 255,0.7);">
+                Creating your account...
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/login">Already have an account? Login</a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5000/api'
+            : 'https://pal-backend-production.up.railway.app/api';
+
+        // Animated background
+        class AnimatedBackground {
+            constructor() {
+                this.canvas = document.getElementById('bg-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+                this.init();
+            }
+
+            init() {
+                for (let i = 0; i < 100; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.width,
+                        y: Math.random() * this.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 2 + 1,
+                        alpha: Math.random() * 0.5 + 0.3
+                    });
+                }
+                this.animate();
+                
+                window.addEventListener('resize', () => {
+                    this.width = window.innerWidth;
+                    this.height = window.innerHeight;
+                    this.canvas.width = this.width;
+                    this.canvas.height = this.height;
+                });
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > this.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > this.height) p.vy *= -1;
+
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = `rgba(0, 217, 255, ${p.alpha})`;
+                    this.ctx.fill();
+                });
+
+                this.particles.forEach((p1, i) => {
+                    this.particles.slice(i + 1).forEach(p2 => {
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < 150) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p1.x, p1.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.strokeStyle = `rgba(0, 217, 255, ${(1 - dist / 150) * 0.2})`;
+                            this.ctx.lineWidth = 1;
+                            this.ctx.stroke();
+                        }
+                    });
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        new AnimatedBackground();
+
+        // Form submission
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+            const privacyChecked = document.getElementById('privacy-checkbox').checked;
+            const termsChecked = document.getElementById('terms-checkbox').checked;
+
+            hideError();
+
+            if (password !== passwordConfirm) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            if (!privacyChecked || !termsChecked) {
+                showError('You must accept the Privacy Policy and Terms of Service');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        name, 
+                        email, 
+                        password, 
+                        role: 'client' 
+                    })
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (data.success && data.token) {
+                    localStorage.setItem('phoenixToken', data.token);
+                    localStorage.setItem('phoenixUser', JSON.stringify(data.user));
+
+                    // Redirect to onboarding
+                    window.location.href = 'onboarding.html';
+                } else {
+                    showError(data.message || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                hideLoading();
+                showError('Connection error. Please check your internet and try again.');
+                console.error('Registration error:', error);
+            }
+        });
+
+        function showLoading() {
+            document.getElementById('loading-spinner').classList.add('show');
+            document.getElementById('register-btn').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-spinner').classList.remove('show');
+            document.getElementById('register-btn').disabled = false;
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('error-message').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

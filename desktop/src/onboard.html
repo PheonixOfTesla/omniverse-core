@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix - Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.08) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .question {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-indicator {
+            text-align: center;
+            margin-bottom: 60px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        input {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ff88;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .option:hover {
+            border-color: rgba(0, 217, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .option.selected {
+            border-color: #00ff88;
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 22px;
+            font-size: 20px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #00ff88, #0096ff);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: inherit;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .continue-btn.active {
+            opacity: 1;
+            pointer-events: all;
+            box-shadow:
+                0 10px 30px rgba(0, 217, 255, 0.3),
+                0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        .continue-btn.active:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 20px 50px rgba(0, 217, 255, 0.5),
+                0 0 40px rgba(0, 217, 255, 0.4);
+        }
+
+        .continue-btn.active:active {
+            transform: translateY(-1px);
+        }
+
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .integration {
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .integration:hover {
+            border-color: rgba(0, 217, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .integration.selected {
+            border-color: #00ff88;
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        .integration-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .integration-name {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .skip {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .skip:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Question 1: Name -->
+        <div class="question active" id="q1">
+            <div class="step-indicator">STEP 1 OF 3</div>
+            <h1>What's your name?</h1>
+            <div class="subtitle">So I know what to call you</div>
+            <input type="text" id="name" placeholder="Enter your name" autofocus>
+            <button class="continue-btn" id="btn1" onclick="nextQuestion(2)">Continue</button>
+        </div>
+
+        <!-- Question 2: Main Goal -->
+        <div class="question" id="q2">
+            <div class="step-indicator">STEP 2 OF 3</div>
+            <h1>What's your main goal?</h1>
+            <div class="subtitle">I'll optimize everything around this</div>
+            <div class="options">
+                <div class="option" onclick="selectGoal('performance')">⚡ Peak Performance</div>
+                <div class="option" onclick="selectGoal('health')">💪 Better Health</div>
+                <div class="option" onclick="selectGoal('recovery')">😴 Recovery & Sleep</div>
+                <div class="option" onclick="selectGoal('productivity')">🎯 Productivity</div>
+                <div class="option" onclick="selectGoal('balance')">⚖️ Life Balance</div>
+            </div>
+            <button class="continue-btn" id="btn2" onclick="nextQuestion(3)">Continue</button>
+        </div>
+
+        <!-- Question 3: Integrations -->
+        <div class="question" id="q3">
+            <div class="step-indicator">STEP 3 OF 3</div>
+            <h1>Connect your devices</h1>
+            <div class="subtitle">More data = better optimization</div>
+            <div class="integration-grid">
+                <div class="integration" onclick="toggleIntegration('fitbit')">
+                    <div class="integration-icon">💚</div>
+                    <div class="integration-name">Fitbit</div>
+                </div>
+                <div class="integration" onclick="toggleIntegration('apple')">
+                    <div class="integration-icon">⌚</div>
+                    <div class="integration-name">Apple Health</div>
+                </div>
+                <div class="integration" onclick="toggleIntegration('oura')">
+                    <div class="integration-icon">💍</div>
+                    <div class="integration-name">Oura Ring</div>
+                </div>
+                <div class="integration" onclick="toggleIntegration('whoop')">
+                    <div class="integration-icon">📊</div>
+                    <div class="integration-name">WHOOP</div>
+                </div>
+            </div>
+            <button class="continue-btn active" id="btn3" onclick="finish()">Start Optimizing</button>
+            <div class="skip" onclick="finish()">Skip for now</div>
+        </div>
+    </div>
+
+    <script>
+        const userData = {
+            name: '',
+            goal: '',
+            integrations: []
+        };
+
+        // Question 1: Name
+        const nameInput = document.getElementById('name');
+        const btn1 = document.getElementById('btn1');
+
+        nameInput.addEventListener('input', (e) => {
+            userData.name = e.target.value.trim();
+            if (userData.name.length > 0) {
+                btn1.classList.add('active');
+            } else {
+                btn1.classList.remove('active');
+            }
+        });
+
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && userData.name.length > 0) {
+                nextQuestion(2);
+            }
+        });
+
+        // Question 2: Goal
+        function selectGoal(goal) {
+            userData.goal = goal;
+
+            // Remove previous selection
+            document.querySelectorAll('#q2 .option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Add new selection
+            event.target.classList.add('selected');
+
+            // Enable continue
+            document.getElementById('btn2').classList.add('active');
+        }
+
+        // Question 3: Integrations
+        function toggleIntegration(integration) {
+            const index = userData.integrations.indexOf(integration);
+
+            if (index > -1) {
+                userData.integrations.splice(index, 1);
+                event.target.classList.remove('selected');
+            } else {
+                userData.integrations.push(integration);
+                event.target.classList.add('selected');
+            }
+        }
+
+        // Navigation
+        function nextQuestion(num) {
+            document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+            document.getElementById('q' + num).classList.add('active');
+        }
+
+        // Finish
+        function finish() {
+            console.log('User data:', userData);
+
+            // Save to localStorage
+            localStorage.setItem('phoenix_user', JSON.stringify(userData));
+            localStorage.setItem('phoenix_onboarded', 'true');
+
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,683 @@
+/**
+ * ============================================================================
+ * PHOENIX OPTIMIZATION SYSTEM - STYLES
+ * ============================================================================
+ *
+ * Styles for the "Maximize Optimization" system that guides users to connect
+ * all integrations and unlock AI personality modes (Basic → JARVIS → Butler → Optimized)
+ */
+
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
+:root {
+    --opt-cyan: #00ff88;
+    --opt-green: #00ff88;
+    --opt-red: #ff4444;
+    --opt-orange: #ffaa00;
+    --opt-gray: #888888;
+    --opt-dark: rgba(0, 10, 20, 0.95);
+    --opt-dark-transparent: rgba(0, 10, 20, 0.7);
+    --opt-cyan-dim: rgba(0, 217, 255, 0.1);
+    --opt-cyan-border: rgba(0, 217, 255, 0.3);
+}
+
+/* ============================================================================
+   OPTIMIZATION HUB PAGE
+   ============================================================================ */
+.optimization-hub {
+    background: #000;
+    color: var(--opt-cyan);
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.optimization-hub-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Header Section */
+.optimization-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.optimization-title {
+    font-size: 48px;
+    color: var(--opt-cyan);
+    text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+    letter-spacing: 6px;
+    margin-bottom: 15px;
+    animation: titlePulse 3s infinite;
+}
+
+.optimization-subtitle {
+    font-size: 14px;
+    color: rgba(0, 217, 255, 0.6);
+    letter-spacing: 2px;
+}
+
+/* Score Circle */
+.optimization-score-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto;
+    position: relative;
+}
+
+.score-circle-wrapper {
+    position: relative;
+}
+
+.score-text-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.score-percentage {
+    font-size: 64px;
+    font-weight: bold;
+    color: var(--opt-cyan);
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.8);
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 12px;
+    color: rgba(0, 217, 255, 0.5);
+    margin-top: 8px;
+    letter-spacing: 2px;
+}
+
+/* Current Tier Display */
+.current-tier-display {
+    text-align: center;
+    margin: 30px 0;
+    padding: 25px;
+    background: var(--opt-cyan-dim);
+    border: 2px solid var(--opt-cyan-border);
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.2);
+}
+
+.tier-name {
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    text-shadow: 0 0 15px currentColor;
+}
+
+.tier-description {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.8;
+}
+
+.tier-unlocks {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--opt-cyan-border);
+}
+
+.tier-unlocks-title {
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    opacity: 0.6;
+}
+
+.tier-unlocks-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.tier-unlock-badge {
+    padding: 6px 12px;
+    background: rgba(0, 217, 255, 0.05);
+    border: 1px solid var(--opt-cyan-border);
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+/* Next Tier Progress */
+.next-tier-progress {
+    margin: 30px 0;
+}
+
+.next-tier-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.next-tier-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 217, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.next-tier-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--opt-cyan), var(--opt-green));
+    transition: width 1s ease;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.6);
+}
+
+.next-tier-name {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: rgba(0, 217, 255, 0.7);
+    letter-spacing: 1px;
+}
+
+/* Integration Sections */
+.integrations-section {
+    margin: 50px 0;
+}
+
+.section-title {
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--opt-cyan-border);
+}
+
+.section-title.missing {
+    color: var(--opt-red);
+    border-color: rgba(255, 68, 68, 0.3);
+}
+
+.section-title.connected {
+    color: var(--opt-green);
+    border-color: rgba(0, 255, 136, 0.3);
+}
+
+/* Integration Grid */
+.integrations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* Integration Cards */
+.integration-card {
+    background: var(--opt-dark);
+    border: 2px solid var(--opt-cyan-border);
+    border-radius: 12px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.integration-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 217, 255, 0.3);
+}
+
+.integration-card.missing {
+    border-color: rgba(255, 68, 68, 0.3);
+    background: rgba(20, 5, 5, 0.9);
+}
+
+.integration-card.connected {
+    border-color: rgba(0, 255, 136, 0.5);
+    background: rgba(0, 20, 10, 0.9);
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.2);
+}
+
+.integration-card.connected::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, rgba(0, 255, 136, 0.3), rgba(0, 217, 255, 0.3));
+    border-radius: 12px;
+    z-index: -1;
+    animation: borderGlow 3s infinite;
+}
+
+/* Card Header */
+.integration-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+.integration-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.integration-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.integration-points {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--opt-cyan);
+    padding: 8px 15px;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid var(--opt-cyan-border);
+    border-radius: 8px;
+}
+
+.integration-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-top: 8px;
+}
+
+.integration-status.connected {
+    background: rgba(0, 255, 136, 0.2);
+    border: 1px solid rgba(0, 255, 136, 0.5);
+    color: var(--opt-green);
+}
+
+.integration-status.missing {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    color: var(--opt-red);
+}
+
+/* Card Body */
+.integration-benefits {
+    margin: 20px 0;
+}
+
+.benefits-title {
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    opacity: 0.6;
+}
+
+.benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.benefits-list li {
+    padding: 8px 0;
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.8;
+    position: relative;
+    padding-left: 20px;
+}
+
+.benefits-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--opt-green);
+    font-weight: bold;
+}
+
+/* Example Use Case */
+.integration-example {
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(0, 217, 255, 0.03);
+    border-left: 3px solid var(--opt-cyan-border);
+    border-radius: 6px;
+}
+
+.integration-example p {
+    font-size: 11px;
+    line-height: 1.6;
+    opacity: 0.7;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Card Footer */
+.integration-card-footer {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.integration-btn {
+    flex: 1;
+    padding: 12px 20px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border: 2px solid;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.integration-btn.primary {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(0, 255, 136, 0.2));
+    border-color: var(--opt-cyan);
+    color: var(--opt-cyan);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+}
+
+.integration-btn.primary:hover {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.3), rgba(0, 255, 136, 0.3));
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.integration-btn.secondary {
+    background: transparent;
+    border-color: var(--opt-cyan-border);
+    color: rgba(0, 217, 255, 0.6);
+}
+
+.integration-btn.secondary:hover {
+    border-color: var(--opt-cyan);
+    color: var(--opt-cyan);
+}
+
+.integration-btn.disconnect {
+    background: rgba(255, 68, 68, 0.1);
+    border-color: rgba(255, 68, 68, 0.3);
+    color: var(--opt-red);
+}
+
+.integration-btn.disconnect:hover {
+    background: rgba(255, 68, 68, 0.2);
+    border-color: rgba(255, 68, 68, 0.5);
+}
+
+/* ============================================================================
+   OPTIMIZATION WIDGET (Dashboard)
+   ============================================================================ */
+.optimization-widget {
+    position: fixed;
+    top: 180px;
+    right: 20px;
+    z-index: 1000;
+    padding: 15px;
+    background: var(--opt-dark);
+    border: 2px solid var(--opt-cyan-border);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    min-width: 200px;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.optimization-widget:hover {
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.5);
+}
+
+/* ============================================================================
+   TOAST NOTIFICATIONS
+   ============================================================================ */
+.optimization-toast {
+    position: fixed;
+    top: 100px;
+    right: 250px;
+    background: var(--opt-dark);
+    border: 2px solid;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+}
+
+.optimization-toast.success {
+    border-color: var(--opt-green);
+    color: var(--opt-green);
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+}
+
+.optimization-toast.achievement {
+    border-color: var(--opt-orange);
+    color: var(--opt-orange);
+    box-shadow: 0 0 30px rgba(255, 170, 0, 0.5);
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+@keyframes titlePulse {
+    0%, 100% {
+        text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+    }
+    50% {
+        text-shadow: 0 0 50px rgba(0, 217, 255, 1), 0 0 80px rgba(0, 217, 255, 0.5);
+    }
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================================================
+   TIER UNLOCK CELEBRATION
+   ============================================================================ */
+.tier-unlock-celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease;
+}
+
+.tier-unlock-content {
+    text-align: center;
+    padding: 60px;
+    border: 3px solid;
+    border-radius: 16px;
+    background: var(--opt-dark);
+    box-shadow: 0 0 100px currentColor;
+    animation: scaleIn 0.5s ease;
+}
+
+.tier-unlock-emoji {
+    font-size: 120px;
+    margin-bottom: 30px;
+    animation: bounce 1s infinite;
+}
+
+.tier-unlock-title {
+    font-size: 48px;
+    font-weight: bold;
+    letter-spacing: 6px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 40px currentColor;
+}
+
+.tier-unlock-message {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    opacity: 0.8;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+@media (max-width: 768px) {
+    .optimization-hub {
+        padding: 20px 10px;
+    }
+
+    .optimization-title {
+        font-size: 32px;
+        letter-spacing: 3px;
+    }
+
+    .score-percentage {
+        font-size: 48px;
+    }
+
+    .integrations-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .optimization-widget {
+        top: auto;
+        bottom: 80px;
+        right: 10px;
+        min-width: 180px;
+    }
+
+    .optimization-toast {
+        right: 10px;
+        left: 10px;
+    }
+
+    .tier-unlock-content {
+        padding: 40px 20px;
+        margin: 20px;
+    }
+
+    .tier-unlock-title {
+        font-size: 32px;
+        letter-spacing: 3px;
+    }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+.text-cyan {
+    color: var(--opt-cyan);
+}
+
+.text-green {
+    color: var(--opt-green);
+}
+
+.text-red {
+    color: var(--opt-red);
+}
+
+.text-orange {
+    color: var(--opt-orange);
+}
+
+.text-gray {
+    color: var(--opt-gray);
+}
+
+.glow-cyan {
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
+}
+
+.glow-green {
+    text-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
+}
+
+.glow-orange {
+    text-shadow: 0 0 15px rgba(255, 170, 0, 0.8);
+}

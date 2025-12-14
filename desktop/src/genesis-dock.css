@@ -1,0 +1,304 @@
+/**
+ * GENESIS DOCK STYLES
+ * Icon-based widget dock at bottom of screen
+ */
+
+/* ========================================
+   DOCK CONTAINER
+   ======================================== */
+
+#genesis-dock {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none; /* Hidden by default */
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 10, 20, 0.95);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 25px;
+    padding: 12px 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 40px rgba(255, 215, 0, 0.3),
+                0 0 30px rgba(0, 217, 255, 0.2);
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+#genesis-dock.visible {
+    display: flex;
+}
+
+/* Show dock in Genesis mode */
+body[data-mode="genesis"] #genesis-dock {
+    display: flex;
+}
+
+/* Dock hover effect */
+#genesis-dock:hover {
+    transform: translateX(-50%) translateY(-5px);
+    box-shadow: 0 12px 50px rgba(255, 215, 0, 0.4),
+                0 0 40px rgba(0, 217, 255, 0.3);
+}
+
+/* ========================================
+   DOCK ICONS CONTAINER
+   ======================================== */
+
+.dock-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ========================================
+   INDIVIDUAL DOCK ICON
+   ======================================== */
+
+.genesis-dock-icon {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    padding: 10px;
+    background: rgba(0, 217, 255, 0.05);
+    border: 2px solid rgba(0, 217, 255, 0.2);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.genesis-dock-icon:hover {
+    background: rgba(0, 217, 255, 0.1);
+    border-color: rgba(0, 217, 255, 0.4);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.3);
+}
+
+.genesis-dock-icon.active {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+/* Dock icon (Font Awesome) */
+.dock-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: rgba(0, 217, 255, 0.9);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+}
+
+.genesis-dock-icon:hover .dock-icon {
+    color: rgba(0, 217, 255, 1);
+    transform: scale(1.1);
+}
+
+.genesis-dock-icon.active .dock-icon {
+    color: rgba(255, 215, 0, 0.95);
+}
+
+/* Icon label */
+.icon-label {
+    font-size: 10px;
+    color: rgba(0, 217, 255, 0.8);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.genesis-dock-icon.active .icon-label {
+    color: rgba(255, 215, 0, 0.9);
+}
+
+/* ========================================
+   READY ARROW (Blinking notification)
+   ======================================== */
+
+.ready-arrow {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 215, 0, 0.95);
+    color: #000;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    transition: opacity 0.3s ease;
+}
+
+/* Arrow tail */
+.ready-arrow::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(255, 215, 0, 0.95);
+}
+
+/* Show arrow when ready */
+.genesis-dock-icon.ready-blink .ready-arrow {
+    opacity: 1;
+    animation: arrowBlink 1s ease-in-out infinite;
+}
+
+@keyframes arrowBlink {
+    0%, 100% {
+        opacity: 1;
+        transform: translateX(-50%) translateX(0);
+    }
+    50% {
+        opacity: 0.4;
+        transform: translateX(-50%) translateX(-5px);
+    }
+}
+
+/* ========================================
+   ADD WIDGET BUTTON
+   ======================================== */
+
+.dock-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 215, 0, 0.1);
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    border-radius: 50%;
+    color: rgba(255, 215, 0, 0.9);
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 8px;
+}
+
+.dock-add-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.7);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.dock-add-btn i {
+    display: block;
+    line-height: 1;
+    font-size: 20px;
+}
+
+/* ========================================
+   WIDGET POP-IN/OUT ANIMATIONS
+   ======================================== */
+
+.genesis-widget-pop-in {
+    animation: widgetPopIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.genesis-widget-pop-out {
+    animation: widgetPopOut 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes widgetPopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(100px);
+    }
+    50% {
+        transform: scale(1.05) translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes widgetPopOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3) translateY(100px);
+    }
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    #genesis-dock {
+        bottom: 10px;
+        padding: 10px 15px;
+        max-width: 95vw;
+        overflow-x: auto;
+    }
+
+    .genesis-dock-icon {
+        min-width: 60px;
+        padding: 8px;
+    }
+
+    .dock-icon {
+        font-size: 24px;
+    }
+
+    .icon-label {
+        font-size: 9px;
+    }
+
+    .ready-arrow {
+        font-size: 10px;
+        padding: 5px 10px;
+    }
+}
+
+/* ========================================
+   DOCK PULSE (When new widget added)
+   ======================================== */
+
+@keyframes dockPulse {
+    0%, 100% {
+        box-shadow: 0 8px 40px rgba(255, 215, 0, 0.3),
+                    0 0 30px rgba(0, 217, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 12px 60px rgba(255, 215, 0, 0.5),
+                    0 0 50px rgba(0, 217, 255, 0.4);
+    }
+}
+
+#genesis-dock.pulse {
+    animation: dockPulse 1s ease-in-out 3;
+}
+
+/* ========================================
+   SMOOTH SCROLLING FOR DOCK (Mobile)
+   ======================================== */
+
+.dock-icons::-webkit-scrollbar {
+    display: none;
+}
+
+.dock-icons {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>Token Check</title></head>
+<body>
+<script>
+const token = localStorage.getItem('phoenixToken');
+if (token) {
+    document.write('<h1>Token Found</h1>');
+    document.write('<p>Token exists: ' + token.substring(0, 20) + '...</p>');
+    document.write('<a href="http://localhost:8080/dashboard.html">Go to Dashboard</a>');
+} else {
+    document.write('<h1>No Token</h1>');
+    document.write('<p>You need to log in first</p>');
+    document.write('<a href="http://localhost:8080/">Go to Login</a>');
+}
+</script>
+</body>
+</html>

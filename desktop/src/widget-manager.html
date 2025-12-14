@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Widget Manager - Phoenix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #00ff88;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .grid-underlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 217, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(0, 217, 255, 1); }
+            50% { text-shadow: 0 0 50px rgba(0, 217, 255, 1); }
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(0, 217, 255, 0.6);
+            letter-spacing: 2px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px 16px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .search-box:focus {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: rgba(0, 217, 255, 0.7);
+            font-family: inherit;
+            font-size: 11px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(0, 217, 255, 0.2);
+            border-color: #00ff88;
+            color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: inherit;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: rgba(0, 217, 255, 0.1);
+            color: #00ff88;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
+            background: rgba(0, 217, 255, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(0, 217, 255, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 2px solid #ff4444;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: rgba(255, 68, 68, 0.2);
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.8);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(0, 217, 255, 0.1));
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.6);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .widget-card {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(0, 217, 255, 0.1));
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .widget-card:hover {
+            border-color: #00ff88;
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+        }
+
+        .widget-card.disabled {
+            opacity: 0.5;
+            border-color: rgba(128, 128, 128, 0.3);
+        }
+
+        .widget-card.pinned::before {
+            content: '📌';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .widget-info {
+            flex: 1;
+        }
+
+        .widget-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+
+        .widget-type {
+            font-size: 10px;
+            color: rgba(0, 217, 255, 0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .widget-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .widget-badge.enabled {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .widget-badge.disabled {
+            background: rgba(128, 128, 128, 0.2);
+            color: rgba(128, 128, 128, 0.8);
+            border: 1px solid rgba(128, 128, 128, 0.3);
+        }
+
+        .widget-description {
+            font-size: 12px;
+            color: rgba(0, 217, 255, 0.6);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .widget-code {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.7);
+            margin-bottom: 16px;
+            max-height: 100px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .widget-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .widget-actions button {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px 12px;
+            font-size: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(0, 10, 20, 0.95), rgba(0, 20, 30, 0.95));
+            border: 2px solid rgba(0, 217, 255, 0.5);
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 60px rgba(0, 217, 255, 0.4);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #00ff88;
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 12px;
+            color: rgba(0, 217, 255, 0.6);
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.7);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 16px 24px;
+            color: #00ff88;
+            font-size: 14px;
+            z-index: 2000;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
+            animation: slideInRight 0.3s ease-out;
+            display: none;
+        }
+
+        .notification.error {
+            background: rgba(255, 68, 68, 0.2);
+            border-color: #ff4444;
+            color: #ff4444;
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.6);
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .no-widgets {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(0, 217, 255, 0.4);
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .widgets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                width: 95%;
+            }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-underlay"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">WIDGET MANAGER</h1>
+            <p class="subtitle">CUSTOM TRACKERS & AI-GENERATED WIDGETS</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-total">--</div>
+                <div class="stat-label">Total Widgets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-enabled">--</div>
+                <div class="stat-label">Enabled</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-inactive">--</div>
+                <div class="stat-label">Inactive</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-templates">--</div>
+                <div class="stat-label">Templates</div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search widgets...">
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterWidgets('all')">All</button>
+                <button class="filter-btn" onclick="filterWidgets('enabled')">Enabled</button>
+                <button class="filter-btn" onclick="filterWidgets('disabled')">Disabled</button>
+                <button class="filter-btn" onclick="filterWidgets('pinned')">Pinned</button>
+            </div>
+            <button class="btn btn-primary" onclick="showCreateModal()">+ CREATE WIDGET</button>
+            <button class="btn btn-secondary" onclick="showAIGenerateModal()">✨ AI GENERATE</button>
+            <button class="btn btn-secondary" onclick="showTemplatesModal()">📋 TEMPLATES</button>
+        </div>
+
+        <!-- Widgets Grid -->
+        <div class="widgets-grid" id="widgetsGrid">
+            <div class="no-widgets">Loading widgets...</div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Widget Modal -->
+    <div class="modal" id="widgetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">CREATE WIDGET</h2>
+                <p class="modal-subtitle">Build your custom tracker or widget</p>
+            </div>
+
+            <form id="widgetForm">
+                <div class="form-group">
+                    <label class="form-label">Widget Name</label>
+                    <input type="text" class="form-input" id="widget-name" placeholder="Daily Water Intake" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Widget Type</label>
+                    <select class="form-select" id="widget-type" required>
+                        <option value="tracker">Tracker</option>
+                        <option value="counter">Counter</option>
+                        <option value="timer">Timer</option>
+                        <option value="checklist">Checklist</option>
+                        <option value="custom">Custom JavaScript</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="widget-description" placeholder="Track daily water consumption">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">JavaScript Code (Optional)</label>
+                    <textarea class="form-textarea" id="widget-code" placeholder="// Your custom widget logic&#10;function render() {&#10;  return 'Hello World';&#10;}"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Configuration JSON (Optional)</label>
+                    <textarea class="form-textarea" id="widget-config" placeholder='{"goal": 8, "unit": "glasses"}'></textarea>
+                </div>
+            </form>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideModal('widgetModal')">CANCEL</button>
+                <button class="btn btn-primary" onclick="saveWidget()">SAVE WIDGET</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Generate Modal -->
+    <div class="modal" id="aiModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">AI WIDGET GENERATOR</h2>
+                <p class="modal-subtitle">Describe your widget and let AI build it</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Widget Description</label>
+                <textarea class="form-textarea" id="ai-prompt" placeholder="Example: Create a mood tracker that lets me rate my mood from 1-10 throughout the day and shows a weekly graph"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideModal('aiModal')">CANCEL</button>
+                <button class="btn btn-primary" onclick="generateWidget()">GENERATE WIDGET</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div class="modal" id="templatesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">WIDGET TEMPLATES</h2>
+                <p class="modal-subtitle">Pre-built widgets ready to use</p>
+            </div>
+
+            <div id="templatesList" style="margin-bottom: 20px;">
+                <div class="no-widgets">Loading templates...</div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideModal('templatesModal')">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Scripts -->
+    <script src="../src/config.js"></script>
+    <script src="../src/api.js"></script>
+
+    <script>
+        // ============================================
+        // WIDGET MANAGER
+        // ============================================
+
+        let widgets = [];
+        let currentFilter = 'all';
+        let editingWidgetId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[Widget Manager] Initializing...');
+            await loadWidgets();
+            await loadStats();
+            setupSearch();
+        });
+
+        // ============================================
+        // LOAD WIDGETS
+        // ============================================
+        async function loadWidgets() {
+            try {
+                const response = await api.getWidgets();
+                widgets = response.widgets || [];
+                renderWidgets();
+            } catch (error) {
+                console.error('Failed to load widgets:', error);
+                showNotification('Failed to load widgets', true);
+                document.getElementById('widgetsGrid').innerHTML = '<div class="no-widgets">Failed to load widgets</div>';
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const stats = await api.getWidgetStats();
+                document.getElementById('stat-total').textContent = stats.total || 0;
+                document.getElementById('stat-enabled').textContent = stats.enabled || 0;
+                document.getElementById('stat-inactive').textContent = stats.inactive || 0;
+
+                const templates = await api.getWidgetTemplates();
+                document.getElementById('stat-templates').textContent = templates.templates?.length || 0;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // ============================================
+        // RENDER WIDGETS
+        // ============================================
+        function renderWidgets() {
+            const grid = document.getElementById('widgetsGrid');
+
+            let filteredWidgets = widgets;
+
+            // Apply filter
+            if (currentFilter === 'enabled') {
+                filteredWidgets = widgets.filter(w => w.enabled);
+            } else if (currentFilter === 'disabled') {
+                filteredWidgets = widgets.filter(w => !w.enabled);
+            } else if (currentFilter === 'pinned') {
+                filteredWidgets = widgets.filter(w => w.pinned);
+            }
+
+            // Apply search
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            if (searchTerm) {
+                filteredWidgets = filteredWidgets.filter(w =>
+                    w.name?.toLowerCase().includes(searchTerm) ||
+                    w.description?.toLowerCase().includes(searchTerm) ||
+                    w.type?.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (filteredWidgets.length === 0) {
+                grid.innerHTML = '<div class="no-widgets">No widgets found</div>';
+                return;
+            }
+
+            grid.innerHTML = filteredWidgets.map(widget => `
+                <div class="widget-card ${widget.enabled ? '' : 'disabled'} ${widget.pinned ? 'pinned' : ''}" data-id="${widget._id}">
+                    <div class="widget-header">
+                        <div class="widget-info">
+                            <div class="widget-name">
+                                ${widget.name || 'Unnamed Widget'}
+                                <span class="widget-badge ${widget.enabled ? 'enabled' : 'disabled'}">
+                                    ${widget.enabled ? 'ACTIVE' : 'DISABLED'}
+                                </span>
+                            </div>
+                            <div class="widget-type">${widget.type || 'custom'}</div>
+                        </div>
+                    </div>
+
+                    ${widget.description ? `<div class="widget-description">${widget.description}</div>` : ''}
+
+                    ${widget.code ? `
+                        <div class="widget-code">
+                            <pre>${widget.code.substring(0, 200)}${widget.code.length > 200 ? '...' : ''}</pre>
+                        </div>
+                    ` : ''}
+
+                    <div class="widget-actions">
+                        <button class="btn btn-secondary" onclick="toggleWidget('${widget._id}')">${widget.enabled ? 'Disable' : 'Enable'}</button>
+                        <button class="btn btn-secondary" onclick="pinWidget('${widget._id}')">${widget.pinned ? 'Unpin' : 'Pin'}</button>
+                        <button class="btn btn-secondary" onclick="editWidget('${widget._id}')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteWidget('${widget._id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
+        // WIDGET ACTIONS
+        // ============================================
+        async function toggleWidget(widgetId) {
+            try {
+                await api.toggleWidget(widgetId);
+                await loadWidgets();
+                await loadStats();
+                showNotification('Widget toggled', false);
+            } catch (error) {
+                console.error('Failed to toggle widget:', error);
+                showNotification('Failed to toggle widget', true);
+            }
+        }
+
+        async function pinWidget(widgetId) {
+            try {
+                await api.pinWidget(widgetId);
+                await loadWidgets();
+                showNotification('Widget pinned', false);
+            } catch (error) {
+                console.error('Failed to pin widget:', error);
+                showNotification('Failed to pin widget', true);
+            }
+        }
+
+        async function deleteWidget(widgetId) {
+            if (!confirm('Are you sure you want to delete this widget?')) return;
+
+            try {
+                await api.deleteWidget(widgetId);
+                await loadWidgets();
+                await loadStats();
+                showNotification('Widget deleted', false);
+            } catch (error) {
+                console.error('Failed to delete widget:', error);
+                showNotification('Failed to delete widget', true);
+            }
+        }
+
+        function editWidget(widgetId) {
+            const widget = widgets.find(w => w._id === widgetId);
+            if (!widget) return;
+
+            editingWidgetId = widgetId;
+            document.getElementById('modalTitle').textContent = 'EDIT WIDGET';
+            document.getElementById('widget-name').value = widget.name || '';
+            document.getElementById('widget-type').value = widget.type || 'custom';
+            document.getElementById('widget-description').value = widget.description || '';
+            document.getElementById('widget-code').value = widget.code || '';
+            document.getElementById('widget-config').value = widget.config ? JSON.stringify(widget.config, null, 2) : '';
+
+            showModal('widgetModal');
+        }
+
+        // ============================================
+        // CREATE/SAVE WIDGET
+        // ============================================
+        function showCreateModal() {
+            editingWidgetId = null;
+            document.getElementById('modalTitle').textContent = 'CREATE WIDGET';
+            document.getElementById('widgetForm').reset();
+            showModal('widgetModal');
+        }
+
+        async function saveWidget() {
+            const name = document.getElementById('widget-name').value;
+            const type = document.getElementById('widget-type').value;
+            const description = document.getElementById('widget-description').value;
+            const code = document.getElementById('widget-code').value;
+            const configText = document.getElementById('widget-config').value;
+
+            if (!name) {
+                showNotification('Widget name is required', true);
+                return;
+            }
+
+            let config = {};
+            if (configText) {
+                try {
+                    config = JSON.parse(configText);
+                } catch (e) {
+                    showNotification('Invalid JSON in configuration', true);
+                    return;
+                }
+            }
+
+            const widgetData = {
+                name,
+                type,
+                description,
+                code,
+                config,
+                enabled: true
+            };
+
+            try {
+                if (editingWidgetId) {
+                    await api.updateWidget(editingWidgetId, widgetData);
+                    showNotification('Widget updated!', false);
+                } else {
+                    await api.createWidget(widgetData);
+                    showNotification('Widget created!', false);
+                }
+
+                hideModal('widgetModal');
+                await loadWidgets();
+                await loadStats();
+            } catch (error) {
+                console.error('Failed to save widget:', error);
+                showNotification('Failed to save widget', true);
+            }
+        }
+
+        // ============================================
+        // AI WIDGET GENERATION
+        // ============================================
+        function showAIGenerateModal() {
+            document.getElementById('ai-prompt').value = '';
+            showModal('aiModal');
+        }
+
+        async function generateWidget() {
+            const prompt = document.getElementById('ai-prompt').value;
+
+            if (!prompt) {
+                showNotification('Please describe your widget', true);
+                return;
+            }
+
+            try {
+                showNotification('Generating widget with AI...', false);
+                const response = await api.generateWidget(prompt);
+
+                if (response.widget) {
+                    hideModal('aiModal');
+                    await loadWidgets();
+                    await loadStats();
+                    showNotification('AI widget generated successfully!', false);
+                }
+            } catch (error) {
+                console.error('Failed to generate widget:', error);
+                showNotification('Failed to generate widget', true);
+            }
+        }
+
+        // ============================================
+        // TEMPLATES
+        // ============================================
+        async function showTemplatesModal() {
+            showModal('templatesModal');
+
+            try {
+                const response = await api.getWidgetTemplates();
+                const templates = response.templates || [];
+
+                const listEl = document.getElementById('templatesList');
+
+                if (templates.length === 0) {
+                    listEl.innerHTML = '<div class="no-widgets">No templates available</div>';
+                    return;
+                }
+
+                listEl.innerHTML = templates.map(template => `
+                    <div class="widget-card" style="margin-bottom: 16px;">
+                        <div class="widget-header">
+                            <div class="widget-info">
+                                <div class="widget-name">${template.name}</div>
+                                <div class="widget-type">${template.category || 'general'}</div>
+                            </div>
+                        </div>
+                        <div class="widget-description">${template.description || ''}</div>
+                        <button class="btn btn-primary" onclick="createFromTemplate('${template._id}')" style="margin-top: 12px; width: 100%;">USE TEMPLATE</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load templates:', error);
+                document.getElementById('templatesList').innerHTML = '<div class="no-widgets">Failed to load templates</div>';
+            }
+        }
+
+        async function createFromTemplate(templateId) {
+            try {
+                await api.createFromTemplate(templateId);
+                hideModal('templatesModal');
+                await loadWidgets();
+                await loadStats();
+                showNotification('Widget created from template!', false);
+            } catch (error) {
+                console.error('Failed to create from template:', error);
+                showNotification('Failed to create from template', true);
+            }
+        }
+
+        // ============================================
+        // FILTER & SEARCH
+        // ============================================
+        function filterWidgets(filter) {
+            currentFilter = filter;
+
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            renderWidgets();
+        }
+
+        function setupSearch() {
+            document.getElementById('searchBox').addEventListener('input', () => {
+                renderWidgets();
+            });
+        }
+
+        // ============================================
+        // MODAL MANAGEMENT
+        // ============================================
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // ============================================
+        // NOTIFICATIONS
+        // ============================================
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show' + (isError ? ' error' : '');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

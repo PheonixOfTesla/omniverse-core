@@ -1,0 +1,478 @@
+/* ========================================
+   PHOENIX ORB - UNIVERSAL AI ASSISTANT
+   Planet-Adaptive, Voice+Text, Always Watching
+   ======================================== */
+
+/* Orb Container - Fixed Top-Right */
+#phoenixOrbContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Collapsed Orb State */
+.phoenix-orb {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--planet-color-light) 0%, var(--planet-color-dark) 100%);
+    box-shadow: 0 0 30px var(--planet-color-glow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: orbPulse 2s ease-in-out infinite;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Activity Indicator */
+.phoenix-orb::before {
+    content: attr(data-activity);
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4444;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.phoenix-orb.has-activity::before {
+    opacity: 1;
+}
+
+/* Orb Icon */
+.phoenix-orb-icon {
+    width: 30px;
+    height: 30px;
+    fill: white;
+    opacity: 0.9;
+}
+
+/* Hover State */
+.phoenix-orb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 50px var(--planet-color-glow);
+}
+
+/* Active/Listening State */
+.phoenix-orb.listening {
+    animation: orbListening 1s ease-in-out infinite;
+    box-shadow: 0 0 60px var(--planet-color-glow);
+}
+
+/* Processing State */
+.phoenix-orb.processing {
+    animation: orbProcessing 1.5s linear infinite;
+}
+
+/* Speaking State (like Siri) */
+.phoenix-orb.speaking {
+    animation: orbSpeaking 0.8s ease-in-out infinite;
+    box-shadow: 0 0 80px var(--planet-color-glow);
+}
+
+/* Expanded Panel State */
+.phoenix-panel {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    width: 400px;
+    max-height: 600px;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+#phoenixOrbContainer.expanded .phoenix-panel {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+/* Panel Header */
+.phoenix-panel-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.phoenix-panel-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--planet-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.phoenix-planet-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--planet-color-badge);
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.phoenix-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.phoenix-close:hover {
+    color: white;
+}
+
+/* Input Tabs */
+.phoenix-input-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.phoenix-tab {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}
+
+.phoenix-tab.active {
+    color: var(--planet-color);
+    border-bottom-color: var(--planet-color);
+}
+
+.phoenix-tab:hover {
+    color: white;
+}
+
+/* Content Area */
+.phoenix-panel-content {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Voice Input */
+.phoenix-voice-input {
+    display: none;
+    text-align: center;
+}
+
+.phoenix-voice-input.active {
+    display: block;
+}
+
+.phoenix-voice-button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--planet-color-light), var(--planet-color-dark));
+    border: none;
+    cursor: pointer;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.phoenix-voice-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 40px var(--planet-color-glow);
+}
+
+.phoenix-voice-button.listening {
+    animation: orbListening 1s ease-in-out infinite;
+}
+
+/* Text Input */
+.phoenix-text-input {
+    display: none;
+}
+
+.phoenix-text-input.active {
+    display: block;
+}
+
+.phoenix-input-field {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.phoenix-input-field:focus {
+    outline: none;
+    border-color: var(--planet-color);
+    box-shadow: 0 0 0 2px var(--planet-color-shadow);
+}
+
+.phoenix-send-button {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px;
+    background: var(--planet-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.phoenix-send-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.phoenix-send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Transcript Display */
+.phoenix-transcript {
+    margin: 16px 0;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    min-height: 60px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Response Display */
+.phoenix-response {
+    padding: 16px;
+    background: var(--planet-color-response);
+    border-left: 3px solid var(--planet-color);
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.phoenix-response-text {
+    color: white;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.phoenix-intent-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--planet-color-badge);
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--planet-color);
+}
+
+/* Activity Log */
+.phoenix-activity {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.phoenix-activity-title {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.phoenix-activity-item {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 4px 0;
+    display: flex;
+    gap: 8px;
+}
+
+.phoenix-activity-item::before {
+    content: '●';
+    color: var(--planet-color);
+}
+
+/* Scrollbar Styling */
+.phoenix-panel-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.phoenix-panel-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.phoenix-panel-content::-webkit-scrollbar-thumb {
+    background: var(--planet-color);
+    border-radius: 3px;
+}
+
+/* Animations */
+@keyframes orbPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes orbListening {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--planet-color-glow); }
+    50% { transform: scale(1.1); box-shadow: 0 0 60px var(--planet-color-glow); }
+}
+
+@keyframes orbProcessing {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes orbSpeaking {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 40px var(--planet-color-glow), 0 0 80px var(--planet-color-glow);
+    }
+    25% {
+        transform: scale(1.08);
+        box-shadow: 0 0 60px var(--planet-color-glow), 0 0 100px var(--planet-color-glow);
+    }
+    50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 80px var(--planet-color-glow), 0 0 120px var(--planet-color-glow);
+    }
+    75% {
+        transform: scale(1.08);
+        box-shadow: 0 0 60px var(--planet-color-glow), 0 0 100px var(--planet-color-glow);
+    }
+}
+
+/* ========================================
+   PLANET-SPECIFIC COLOR THEMES
+   ======================================== */
+
+/* Mercury - Cyan/Blue */
+.planet-mercury {
+    --planet-color: #00d4ff;
+    --planet-color-light: #00d4ff;
+    --planet-color-dark: #0066ff;
+    --planet-color-glow: rgba(0, 212, 255, 0.6);
+    --planet-color-badge: rgba(0, 212, 255, 0.2);
+    --planet-color-response: rgba(0, 212, 255, 0.1);
+    --planet-color-shadow: rgba(0, 212, 255, 0.3);
+}
+
+/* Venus - Pink/Magenta */
+.planet-venus {
+    --planet-color: #ff1493;
+    --planet-color-light: #ff1493;
+    --planet-color-dark: #c71585;
+    --planet-color-glow: rgba(255, 20, 147, 0.6);
+    --planet-color-badge: rgba(255, 20, 147, 0.2);
+    --planet-color-response: rgba(255, 20, 147, 0.1);
+    --planet-color-shadow: rgba(255, 20, 147, 0.3);
+}
+
+/* Earth - Green */
+.planet-earth {
+    --planet-color: #00ff7f;
+    --planet-color-light: #00ff7f;
+    --planet-color-dark: #00cc66;
+    --planet-color-glow: rgba(0, 255, 127, 0.6);
+    --planet-color-badge: rgba(0, 255, 127, 0.2);
+    --planet-color-response: rgba(0, 255, 127, 0.1);
+    --planet-color-shadow: rgba(0, 255, 127, 0.3);
+}
+
+/* Mars - Orange/Red */
+.planet-mars {
+    --planet-color: #ff4500;
+    --planet-color-light: #ff6347;
+    --planet-color-dark: #dc143c;
+    --planet-color-glow: rgba(255, 69, 0, 0.6);
+    --planet-color-badge: rgba(255, 69, 0, 0.2);
+    --planet-color-response: rgba(255, 69, 0, 0.1);
+    --planet-color-shadow: rgba(255, 69, 0, 0.3);
+}
+
+/* Jupiter - Gold */
+.planet-jupiter {
+    --planet-color: #ffa500;
+    --planet-color-light: #ffd700;
+    --planet-color-dark: #ff8c00;
+    --planet-color-glow: rgba(255, 165, 0, 0.6);
+    --planet-color-badge: rgba(255, 165, 0, 0.2);
+    --planet-color-response: rgba(255, 165, 0, 0.1);
+    --planet-color-shadow: rgba(255, 165, 0, 0.3);
+}
+
+/* Saturn - Purple */
+.planet-saturn {
+    --planet-color: #9370db;
+    --planet-color-light: #ba55d3;
+    --planet-color-dark: #8a2be2;
+    --planet-color-glow: rgba(147, 112, 219, 0.6);
+    --planet-color-badge: rgba(147, 112, 219, 0.2);
+    --planet-color-response: rgba(147, 112, 219, 0.1);
+    --planet-color-shadow: rgba(147, 112, 219, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #phoenixOrbContainer {
+        top: 16px;
+        right: 16px;
+    }
+
+    .phoenix-panel {
+        width: calc(100vw - 32px);
+        max-width: 400px;
+    }
+
+    .phoenix-orb {
+        width: 50px;
+        height: 50px;
+    }
+
+    .phoenix-orb-icon {
+        width: 25px;
+        height: 25px;
+    }
+}

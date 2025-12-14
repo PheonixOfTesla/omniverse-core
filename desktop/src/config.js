@@ -20,6 +20,10 @@ const isLocalhost = window.location.hostname === 'localhost' ||
                     window.location.hostname === '127.0.0.1' ||
                     window.location.hostname === '';
 
+// Detect Tauri (Omniverse desktop)
+const isTauri = window.__TAURI__ !== undefined;
+const isOmniverse = isTauri || window.location.protocol === 'tauri:';
+
 // API Base URL - FORCE Railway for testing (even on localhost)
 const API_BASE_URL = 'https://pal-backend-production.up.railway.app/api';
 // const API_BASE_URL = isLocalhost
@@ -56,7 +60,9 @@ window.PhoenixConfig = {
     FEATURES,
     API_CONFIG,
     isLocalhost,
-    environment: isLocalhost ? 'development' : 'production'
+    isTauri,
+    isOmniverse,
+    environment: isOmniverse ? 'omniverse' : (isLocalhost ? 'development' : 'production')
 };
 
 // Log configuration in development

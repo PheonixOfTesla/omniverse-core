@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Phoenix - Desk Mode</title>
+    <link rel="stylesheet" href="styles.css?v=20251201">
+    <link rel="stylesheet" href="desk-mode.css?v=20251201">
+    <link rel="stylesheet" href="widget-styles.css?v=20251201">
+</head>
+<body data-mode="desk">
+    <!-- Back to Dashboard -->
+    <button onclick="window.location.href='dashboard.html'" class="back-btn">
+        ← DASHBOARD
+    </button>
+
+    <!-- Mode Toggle -->
+    <div id="mode-toggle-container" class="mode-toggle-container">
+        <button onclick="window.location.href='dashboard.html'" class="mode-toggle-btn">
+            VOICE
+        </button>
+        <button onclick="window.location.href='dashboard.html'" class="mode-toggle-btn">
+            MANUAL
+        </button>
+        <button class="mode-toggle-btn mode-toggle-btn-active">
+            DESK
+        </button>
+    </div>
+
+    <!-- Three-Panel Desk Layout -->
+    <div class="desk-container">
+        <!-- Left Panel: Quick Stats & Metrics -->
+        <div class="desk-panel desk-panel-left">
+            <div class="panel-header">
+                <h2>📊 Quick Stats</h2>
+            </div>
+
+            <div class="stats-grid">
+                <!-- Revenue Card -->
+                <div class="stat-card" id="revenue-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Revenue This Month</div>
+                        <div class="stat-value" id="revenue-value">$0</div>
+                        <div class="stat-subtitle" id="revenue-subtitle">0 completed orders</div>
+                    </div>
+                </div>
+
+                <!-- Active Orders Card -->
+                <div class="stat-card" id="orders-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Active Orders</div>
+                        <div class="stat-value" id="orders-value">0</div>
+                        <div class="stat-subtitle" id="orders-subtitle">In progress</div>
+                    </div>
+                </div>
+
+                <!-- Outstanding Invoices Card -->
+                <div class="stat-card" id="invoices-card">
+                    <div class="stat-icon">💳</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Outstanding</div>
+                        <div class="stat-value" id="invoices-value">$0</div>
+                        <div class="stat-subtitle" id="invoices-subtitle">0 invoices</div>
+                    </div>
+                </div>
+
+                <!-- Clients Card -->
+                <div class="stat-card" id="clients-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Clients</div>
+                        <div class="stat-value" id="clients-value">0</div>
+                        <div class="stat-subtitle" id="clients-subtitle">Active</div>
+                    </div>
+                </div>
+
+                <!-- Low Stock Alert -->
+                <div class="stat-card alert-card" id="inventory-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Low Stock Items</div>
+                        <div class="stat-value" id="inventory-value">0</div>
+                        <div class="stat-subtitle">Need reordering</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel: Main Workspace -->
+        <div class="desk-panel desk-panel-center">
+            <div class="workspace-tabs">
+                <button class="workspace-tab active" data-view="dashboard">Dashboard</button>
+                <button class="workspace-tab" data-view="clients">Clients</button>
+                <button class="workspace-tab" data-view="orders">Orders</button>
+                <button class="workspace-tab" data-view="invoices">Invoices</button>
+                <button class="workspace-tab" data-view="inventory">Inventory</button>
+            </div>
+
+            <div class="workspace-content">
+                <!-- Dashboard View -->
+                <div id="dashboard-view" class="workspace-view active">
+                    <h2>Business Dashboard</h2>
+                    <p class="view-subtitle">Overview of your business performance</p>
+
+                    <div id="dashboard-charts">
+                        <canvas id="revenue-chart"></canvas>
+                    </div>
+
+                    <div id="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div id="activity-feed"></div>
+                    </div>
+                </div>
+
+                <!-- Clients View -->
+                <div id="clients-view" class="workspace-view">
+                    <h2>👥 Clients</h2>
+                    <div class="view-actions">
+                        <button class="action-btn" onclick="addClient()">+ Add Client</button>
+                        <input type="search" placeholder="Search clients..." class="search-input">
+                    </div>
+                    <div id="clients-table-container"></div>
+                </div>
+
+                <!-- Orders View -->
+                <div id="orders-view" class="workspace-view">
+                    <h2>📦 Orders & Projects</h2>
+                    <div class="view-actions">
+                        <button class="action-btn" onclick="addOrder()">+ New Order</button>
+                        <select class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="Quote">Quote</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Complete">Complete</option>
+                        </select>
+                    </div>
+                    <div id="orders-kanban-container"></div>
+                </div>
+
+                <!-- Invoices View -->
+                <div id="invoices-view" class="workspace-view">
+                    <h2>💰 Invoices & Billing</h2>
+                    <div class="view-actions">
+                        <button class="action-btn" onclick="createInvoice()">+ Create Invoice</button>
+                        <select class="filter-select">
+                            <option value="">All Statuses</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Sent">Sent</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                    </div>
+                    <div id="invoices-table-container"></div>
+                </div>
+
+                <!-- Inventory View -->
+                <div id="inventory-view" class="workspace-view">
+                    <h2>📦 Inventory & Stock</h2>
+                    <div class="view-actions">
+                        <button class="action-btn" onclick="addInventoryItem()">+ Add Item</button>
+                        <button class="action-btn-secondary" onclick="filterLowStock()">Low Stock Only</button>
+                    </div>
+                    <div id="inventory-table-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: AI Assistant -->
+        <div class="desk-panel desk-panel-right">
+            <div class="panel-header">
+                <h2>🎙️ Phoenix Assistant</h2>
+            </div>
+
+            <!-- Voice Orb (Smaller) -->
+            <div class="desk-orb-container">
+                <div id="desk-orb" class="desk-orb" onclick="toggleVoiceAssistant()">
+                    <div class="orb-glow"></div>
+                </div>
+                <p class="orb-status" id="orb-status">Click to activate voice</p>
+            </div>
+
+            <!-- Transcript Display -->
+            <div class="transcript-container">
+                <div id="transcript-display" class="transcript-display">
+                    <p class="transcript-placeholder">Say something like "Show clients" or "What's my revenue this month?"</p>
+                </div>
+            </div>
+
+            <!-- AI Suggestions -->
+            <div class="suggestions-container">
+                <h3>Quick Actions</h3>
+                <div id="suggestions-list">
+                    <button class="suggestion-btn" onclick="voiceCommand('show clients')">
+                        Show Clients
+                    </button>
+                    <button class="suggestion-btn" onclick="voiceCommand('show active orders')">
+                        Active Orders
+                    </button>
+                    <button class="suggestion-btn" onclick="voiceCommand('outstanding invoices')">
+                        Outstanding Invoices
+                    </button>
+                    <button class="suggestion-btn" onclick="voiceCommand('revenue this month')">
+                        This Month Revenue
+                    </button>
+                    <button class="suggestion-btn" onclick="voiceCommand('low stock items')">
+                        Low Stock Items
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="phoenix-voice-commands.js?v=20251201"></script>
+    <script src="src/business-desk.js?v=20251201"></script>
+</body>
+</html>

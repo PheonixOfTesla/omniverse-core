@@ -1,0 +1,373 @@
+/* ============================================
+   GENESIS WIDGETS - BASE WIDGET STYLING
+   Controls for all user-generated widgets
+   ============================================ */
+
+/* ============================================
+   BASE WIDGET FRAME
+   ============================================ */
+
+.genesis-widget {
+    position: fixed;
+    background: rgba(0, 10, 20, 0.95);
+    border: 2px solid rgba(0, 217, 255, 0.4);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(0, 217, 255, 0.3);
+    min-width: 300px;
+    min-height: 200px;
+    z-index: 9000;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.genesis-widget.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.genesis-widget.minimized {
+    opacity: 0;
+    transform: scale(0.1);
+    pointer-events: none;
+}
+
+/* ============================================
+   WIDGET HEADER (Title Bar)
+   ============================================ */
+
+.widget-header {
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: move; /* Draggable handle */
+    user-select: none;
+}
+
+.widget-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #00d9ff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    flex: 1;
+}
+
+.widget-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ============================================
+   WIDGET CONTROL BUTTONS
+   ============================================ */
+
+.widget-control-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.widget-control-btn:hover {
+    background: rgba(0, 217, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.6);
+    transform: scale(1.1);
+}
+
+/* Minimize Button */
+.widget-btn-minimize {
+    color: #00d9ff;
+}
+
+.widget-btn-minimize:hover {
+    background: rgba(0, 217, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+/* Settings Button */
+.widget-btn-settings {
+    color: #FFD700;
+}
+
+.widget-btn-settings:hover {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Close Button */
+.widget-btn-close {
+    color: #ff4444;
+}
+
+.widget-btn-close:hover {
+    background: rgba(255, 68, 68, 0.2);
+    border-color: rgba(255, 68, 68, 0.6);
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+/* ============================================
+   WIDGET CONTENT AREA
+   ============================================ */
+
+.widget-content {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100% - 50px); /* Account for header */
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ============================================
+   WIDGET RESIZE HANDLES (Optional)
+   ============================================ */
+
+.widget-resize-handle {
+    position: absolute;
+    background: rgba(0, 217, 255, 0.3);
+    transition: background 0.2s ease;
+}
+
+.widget-resize-handle:hover {
+    background: rgba(0, 217, 255, 0.6);
+}
+
+/* Bottom-right corner resize */
+.widget-resize-se {
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    border-radius: 0 0 14px 0;
+}
+
+/* Bottom resize */
+.widget-resize-s {
+    bottom: 0;
+    left: 20%;
+    right: 20%;
+    height: 4px;
+    cursor: ns-resize;
+}
+
+/* Right resize */
+.widget-resize-e {
+    top: 20%;
+    bottom: 20%;
+    right: 0;
+    width: 4px;
+    cursor: ew-resize;
+}
+
+/* ============================================
+   DRAGGING STATE
+   ============================================ */
+
+.genesis-widget.dragging {
+    opacity: 0.8;
+    cursor: grabbing !important;
+    box-shadow: 0 15px 60px rgba(0, 0, 0, 0.8),
+                0 0 50px rgba(0, 217, 255, 0.6);
+    transform: scale(1.02);
+}
+
+.widget-header.dragging {
+    cursor: grabbing !important;
+}
+
+/* ============================================
+   WIDGET DOCK (For Minimized Widgets)
+   ============================================ */
+
+#genesis-widget-dock {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(0, 10, 20, 0.95);
+    border: 2px solid rgba(0, 217, 255, 0.3);
+    border-radius: 50px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#genesis-widget-dock.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.docked-widget {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 217, 255, 0.2);
+    border: 2px solid rgba(0, 217, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 18px;
+}
+
+.docked-widget:hover {
+    background: rgba(0, 217, 255, 0.4);
+    border-color: #00d9ff;
+    transform: scale(1.15);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+}
+
+/* ============================================
+   WIDGET TYPES - CUSTOM STYLES
+   ============================================ */
+
+/* Social Media Panel */
+.genesis-widget[data-type="social-media-panel"] {
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+.genesis-widget[data-type="social-media-panel"] .widget-header {
+    background: rgba(255, 215, 0, 0.1);
+    border-bottom-color: rgba(255, 215, 0, 0.3);
+}
+
+/* Calendar Widget */
+.genesis-widget[data-type="calendar-view"] {
+    border-color: rgba(156, 39, 176, 0.5);
+}
+
+.genesis-widget[data-type="calendar-view"] .widget-header {
+    background: rgba(156, 39, 176, 0.1);
+    border-bottom-color: rgba(156, 39, 176, 0.3);
+}
+
+/* Tracker Widget */
+.genesis-widget[data-type="tracker"] {
+    border-color: rgba(0, 255, 127, 0.5);
+}
+
+.genesis-widget[data-type="tracker"] .widget-header {
+    background: rgba(0, 255, 127, 0.1);
+    border-bottom-color: rgba(0, 255, 127, 0.3);
+}
+
+/* ============================================
+   WIDGET SCROLLBAR
+   ============================================ */
+
+.widget-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.widget-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+.widget-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 217, 255, 0.5);
+    border-radius: 3px;
+}
+
+.widget-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 217, 255, 0.8);
+}
+
+/* ============================================
+   WIDGET APPEAR ANIMATION
+   ============================================ */
+
+@keyframes widgetAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(-50px);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.05) translateY(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.genesis-widget.appearing {
+    animation: widgetAppear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .genesis-widget {
+        min-width: 250px;
+        max-width: calc(100vw - 40px);
+    }
+
+    .widget-header {
+        padding: 10px 14px;
+    }
+
+    .widget-title {
+        font-size: 12px;
+    }
+
+    .widget-control-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .widget-content {
+        padding: 15px;
+    }
+
+    #genesis-widget-dock {
+        bottom: 10px;
+        padding: 8px 15px;
+    }
+
+    .docked-widget {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.widget-control-btn:focus {
+    outline: 2px solid rgba(0, 217, 255, 0.8);
+    outline-offset: 2px;
+}
+
+.widget-header:focus {
+    outline: 2px solid rgba(0, 217, 255, 0.5);
+    outline-offset: -2px;
+}

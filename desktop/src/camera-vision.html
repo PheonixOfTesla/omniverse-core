@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Camera Vision - Phoenix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #00ff88;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .grid-underlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 217, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(0, 217, 255, 1); }
+            50% { text-shadow: 0 0 50px rgba(0, 217, 255, 1); }
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: rgba(0, 217, 255, 0.6);
+            letter-spacing: 2px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            flex: 1;
+            max-width: 250px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(0, 217, 255, 0.1));
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .mode-btn:hover, .mode-btn.active {
+            border-color: #00ff88;
+            background: rgba(0, 217, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .mode-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .mode-name {
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .camera-section {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(0, 217, 255, 0.1));
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto 20px;
+            border: 2px solid rgba(0, 217, 255, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .capture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px solid #00ff88;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .capture-overlay.active {
+            opacity: 1;
+            animation: captureFlash 0.5s ease-out;
+        }
+
+        @keyframes captureFlash {
+            0% {
+                background: rgba(0, 217, 255, 0.8);
+            }
+            100% {
+                background: transparent;
+            }
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: inherit;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: rgba(0, 217, 255, 0.1);
+            color: #00ff88;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
+            background: rgba(0, 217, 255, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(0, 217, 255, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .preview-section {
+            display: none;
+            background: rgba(0, 217, 255, 0.05);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .preview-section.show {
+            display: block;
+        }
+
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00ff88;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 20px;
+            border: 2px solid rgba(0, 217, 255, 0.5);
+            border-radius: 8px;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.7);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: #00ff88;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .form-input:focus {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .results-section {
+            display: none;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.15));
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+        }
+
+        .results-section.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00ff88;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 1);
+        }
+
+        .result-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .result-label {
+            font-size: 11px;
+            color: rgba(0, 217, 255, 0.6);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 16px;
+            color: #00ff88;
+            line-height: 1.6;
+        }
+
+        .result-score {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .result-score.excellent {
+            background: rgba(0, 255, 128, 0.2);
+            color: #00ff80;
+            border: 2px solid #00ff80;
+        }
+
+        .result-score.good {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00ff88;
+            border: 2px solid #00ff88;
+        }
+
+        .result-score.warning {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 2px solid #ffa500;
+        }
+
+        .result-score.danger {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 2px solid #ff4444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(0, 217, 255, 0.7);
+            font-size: 16px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(0, 217, 255, 0.2);
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 16px 24px;
+            color: #00ff88;
+            font-size: 14px;
+            z-index: 2000;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
+            animation: slideInRight 0.3s ease-out;
+            display: none;
+        }
+
+        .notification.error {
+            background: rgba(255, 68, 68, 0.2);
+            border-color: #ff4444;
+            color: #ff4444;
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.6);
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .mode-selector {
+                flex-direction: column;
+            }
+
+            .mode-btn {
+                max-width: 100%;
+            }
+
+            .camera-section {
+                padding: 20px;
+            }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-underlay"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">CAMERA VISION</h1>
+            <p class="subtitle">AI-POWERED VISUAL ANALYSIS</p>
+        </div>
+
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <button class="mode-btn active" id="workout-mode-btn" onclick="setMode('workout')">
+                <div class="mode-icon">💪</div>
+                <div class="mode-name">Workout Form</div>
+            </button>
+            <button class="mode-btn" id="nutrition-mode-btn" onclick="setMode('nutrition')">
+                <div class="mode-icon">🍎</div>
+                <div class="mode-name">Nutrition Analysis</div>
+            </button>
+        </div>
+
+        <!-- Camera Section -->
+        <div class="camera-section">
+            <div class="video-container">
+                <video id="video" autoplay playsinline></video>
+                <div class="capture-overlay" id="captureOverlay"></div>
+            </div>
+            <canvas id="canvas"></canvas>
+
+            <div class="camera-controls">
+                <button class="btn btn-primary" id="start-camera-btn" onclick="startCamera()">START CAMERA</button>
+                <button class="btn btn-primary" id="capture-btn" onclick="capturePhoto()" style="display: none;">CAPTURE PHOTO</button>
+                <button class="btn btn-secondary" id="stop-camera-btn" onclick="stopCamera()" style="display: none;">STOP CAMERA</button>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="preview-section" id="preview-section">
+            <h3 class="preview-title" id="preview-title">CAPTURED IMAGE</h3>
+            <img id="preview-image" class="preview-image">
+
+            <div id="workout-form" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Exercise Name</label>
+                    <input type="text" class="form-input" id="exercise-name" placeholder="Squat, Deadlift, Push-up..." value="Squat">
+                </div>
+            </div>
+
+            <div class="camera-controls">
+                <button class="btn btn-primary" id="analyze-btn" onclick="analyzeImage()">ANALYZE IMAGE</button>
+                <button class="btn btn-secondary" onclick="retakePhoto()">RETAKE</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="results-section">
+            <h3 class="results-title" id="results-title">ANALYSIS RESULTS</h3>
+            <div id="results-content"></div>
+            <div class="camera-controls" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="resetAnalysis()">NEW ANALYSIS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Scripts -->
+    <script src="../src/config.js"></script>
+    <script src="../src/api.js"></script>
+
+    <script>
+        // ============================================
+        // CAMERA VISION MANAGER
+        // ============================================
+
+        let stream = null;
+        let currentMode = 'workout'; // 'workout' or 'nutrition'
+        let capturedImageData = null;
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureOverlay = document.getElementById('captureOverlay');
+
+        // ============================================
+        // MODE SELECTION
+        // ============================================
+        function setMode(mode) {
+            currentMode = mode;
+
+            // Update button states
+            document.getElementById('workout-mode-btn').classList.toggle('active', mode === 'workout');
+            document.getElementById('nutrition-mode-btn').classList.toggle('active', mode === 'nutrition');
+
+            // Update preview title
+            if (mode === 'workout') {
+                document.getElementById('preview-title').textContent = 'WORKOUT FORM CHECK';
+                document.getElementById('workout-form').style.display = 'block';
+            } else {
+                document.getElementById('preview-title').textContent = 'NUTRITION ANALYSIS';
+                document.getElementById('workout-form').style.display = 'none';
+            }
+
+            console.log('[Camera Vision] Mode set to:', mode);
+        }
+
+        // ============================================
+        // CAMERA CONTROLS
+        // ============================================
+        async function startCamera() {
+            try {
+                // Request camera access with rear camera preference (for mobile)
+                const constraints = {
+                    video: {
+                        facingMode: 'environment', // Prefer rear camera
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+
+                // Update UI
+                document.getElementById('start-camera-btn').style.display = 'none';
+                document.getElementById('capture-btn').style.display = 'inline-block';
+                document.getElementById('stop-camera-btn').style.display = 'inline-block';
+
+                showNotification('Camera started', false);
+            } catch (error) {
+                console.error('Failed to start camera:', error);
+                showNotification('Failed to access camera. Please grant camera permissions.', true);
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                stream = null;
+            }
+
+            // Update UI
+            document.getElementById('start-camera-btn').style.display = 'inline-block';
+            document.getElementById('capture-btn').style.display = 'none';
+            document.getElementById('stop-camera-btn').style.display = 'none';
+
+            showNotification('Camera stopped', false);
+        }
+
+        function capturePhoto() {
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw video frame to canvas
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            // Get image data as base64
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
+
+            // Show preview
+            document.getElementById('preview-image').src = capturedImageData;
+            document.getElementById('preview-section').classList.add('show');
+            document.getElementById('results-section').classList.remove('show');
+
+            // Flash effect
+            captureOverlay.classList.add('active');
+            setTimeout(() => captureOverlay.classList.remove('active'), 500);
+
+            showNotification('Photo captured!', false);
+        }
+
+        function retakePhoto() {
+            document.getElementById('preview-section').classList.remove('show');
+            capturedImageData = null;
+        }
+
+        function resetAnalysis() {
+            document.getElementById('results-section').classList.remove('show');
+            document.getElementById('preview-section').classList.remove('show');
+            capturedImageData = null;
+        }
+
+        // ============================================
+        // IMAGE ANALYSIS
+        // ============================================
+        async function analyzeImage() {
+            if (!capturedImageData) {
+                showNotification('No image to analyze', true);
+                return;
+            }
+
+            const resultsContent = document.getElementById('results-content');
+            resultsContent.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Analyzing image with AI Vision...</div>
+                </div>
+            `;
+            document.getElementById('results-section').classList.add('show');
+
+            try {
+                let response;
+
+                if (currentMode === 'workout') {
+                    const exercise = document.getElementById('exercise-name').value || 'Unknown Exercise';
+                    response = await api.checkWorkoutForm(capturedImageData, exercise);
+                    renderWorkoutResults(response);
+                } else {
+                    response = await api.analyzeNutritionPhoto(capturedImageData);
+                    renderNutritionResults(response);
+                }
+
+            } catch (error) {
+                console.error('Analysis failed:', error);
+                resultsContent.innerHTML = `
+                    <div class="result-item">
+                        <div class="result-label">ERROR</div>
+                        <div class="result-value">Analysis failed. Please try again or check your connection.</div>
+                    </div>
+                `;
+                showNotification('Analysis failed', true);
+            }
+        }
+
+        // ============================================
+        // RENDER RESULTS
+        // ============================================
+        function renderWorkoutResults(data) {
+            const resultsContent = document.getElementById('results-content');
+            document.getElementById('results-title').textContent = 'FORM CHECK RESULTS';
+
+            const formScore = data.formScore || data.score || 0;
+            const scoreClass = formScore >= 90 ? 'excellent' : formScore >= 70 ? 'good' : formScore >= 50 ? 'warning' : 'danger';
+
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <div class="result-label">EXERCISE</div>
+                    <div class="result-value">${data.exercise || 'Unknown'}</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">FORM SCORE</div>
+                    <div class="result-value">
+                        <span class="result-score ${scoreClass}">${formScore}/100</span>
+                    </div>
+                </div>
+
+                ${data.feedback ? `
+                    <div class="result-item">
+                        <div class="result-label">FEEDBACK</div>
+                        <div class="result-value">${data.feedback}</div>
+                    </div>
+                ` : ''}
+
+                ${data.corrections && data.corrections.length > 0 ? `
+                    <div class="result-item">
+                        <div class="result-label">CORRECTIONS NEEDED</div>
+                        <div class="result-value">
+                            ${data.corrections.map(c => `• ${c}`).join('<br>')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${data.strengths && data.strengths.length > 0 ? `
+                    <div class="result-item">
+                        <div class="result-label">STRENGTHS</div>
+                        <div class="result-value">
+                            ${data.strengths.map(s => `• ${s}`).join('<br>')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${data.analysis ? `
+                    <div class="result-item">
+                        <div class="result-label">DETAILED ANALYSIS</div>
+                        <div class="result-value">${data.analysis}</div>
+                    </div>
+                ` : ''}
+            `;
+
+            showNotification('Form analysis complete!', false);
+        }
+
+        function renderNutritionResults(data) {
+            const resultsContent = document.getElementById('results-content');
+            document.getElementById('results-title').textContent = 'NUTRITION ANALYSIS';
+
+            resultsContent.innerHTML = `
+                ${data.foods && data.foods.length > 0 ? `
+                    <div class="result-item">
+                        <div class="result-label">DETECTED FOODS</div>
+                        <div class="result-value">
+                            ${data.foods.map(f => `• ${f}`).join('<br>')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${data.calories ? `
+                    <div class="result-item">
+                        <div class="result-label">ESTIMATED CALORIES</div>
+                        <div class="result-value">
+                            <span class="result-score good">${data.calories} kcal</span>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${data.macros ? `
+                    <div class="result-item">
+                        <div class="result-label">MACRONUTRIENTS</div>
+                        <div class="result-value">
+                            Protein: ${data.macros.protein || '?'}g<br>
+                            Carbs: ${data.macros.carbs || '?'}g<br>
+                            Fats: ${data.macros.fats || '?'}g
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${data.healthScore ? `
+                    <div class="result-item">
+                        <div class="result-label">HEALTH SCORE</div>
+                        <div class="result-value">
+                            <span class="result-score ${data.healthScore >= 80 ? 'excellent' : data.healthScore >= 60 ? 'good' : 'warning'}">
+                                ${data.healthScore}/100
+                            </span>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${data.analysis ? `
+                    <div class="result-item">
+                        <div class="result-label">NUTRITIONAL ANALYSIS</div>
+                        <div class="result-value">${data.analysis}</div>
+                    </div>
+                ` : ''}
+
+                ${data.recommendations && data.recommendations.length > 0 ? `
+                    <div class="result-item">
+                        <div class="result-label">RECOMMENDATIONS</div>
+                        <div class="result-value">
+                            ${data.recommendations.map(r => `• ${r}`).join('<br>')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            showNotification('Nutrition analysis complete!', false);
+        }
+
+        // ============================================
+        // NOTIFICATIONS
+        // ============================================
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show' + (isError ? ' error' : '');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[Camera Vision] Initialized');
+
+            // Check if camera is available
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showNotification('Camera not available on this device', true);
+                document.getElementById('start-camera-btn').disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>

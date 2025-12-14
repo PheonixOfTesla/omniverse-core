@@ -4,39 +4,39 @@
 // Version: 2.0 - 100% COMPLETE
 // Last Updated: October 25, 2025
 
-const DEBUG_MODE = false; // Set to true to enable verbose debug logging
-
 /**
  * =============================================================================
  * WHAT USERS CAN DO WITH ORCHESTRATOR
  * =============================================================================
- *
+ * 
  * AUTOMATIC ON APP START:
  * ✅ Seamless app startup (< 3 seconds)
  * ✅ Automatic authentication (login/register/validate)
  * ✅ Resume where you left off (state + cache restoration)
  * ✅ Auto-detect and fix system issues
  * ✅ Auto-reconnect when network restored
- *
+ * 
  * VOICE COMMANDS ENABLED BY ORCHESTRATOR:
  * - "What's my system status?"
  * - "Run diagnostics"
  * - "Show me what's broken"
  * - "Restart Phoenix"
  * - "Clear my cache"
- *
+ * 
  * HEALTH MONITORING:
  * ✅ Detect API failures → Auto-retry
  * ✅ Detect authentication issues → Auto-refresh token
  * ✅ Detect voice crashes → Auto-reconnect
  * ✅ Detect memory leaks → Auto-cleanup
  * ✅ Detect network loss → Queue actions for later
- *
+ * 
  * =============================================================================
  */
 
 class PhoenixOrchestrator {
     constructor() {
+        console.log('Phoenix Orchestrator initializing...');
+        
         // Core state management - prevents restarts
         this.state = {
             initialized: false,
@@ -155,10 +155,12 @@ class PhoenixOrchestrator {
     async initialize() {
         // Prevent multiple simultaneous initializations
         if (this.initPromise) {
+            console.log('Orchestrator already initializing, waiting...');
             return this.initPromise;
         }
 
         if (this.state.initialized) {
+            console.log('Orchestrator already initialized');
             return true;
         }
 
@@ -170,11 +172,12 @@ class PhoenixOrchestrator {
     async _performInitialization() {
         try {
             this.initAttempts++;
-
+            console.log(`🚀 Phoenix initialization attempt ${this.initAttempts}/${this.maxInitAttempts}`);
+            
             // Create session ID
             this.state.session.id = this.generateSessionId();
             this.state.session.startTime = Date.now();
-            if (DEBUG_MODE) console.log(`📋 Session ID: ${this.state.session.id}`);
+            console.log(`📋 Session ID: ${this.state.session.id}`);
             
             // STEP 1: Setup authentication (3 endpoints)
             await this.executeInitStep('Authentication', () => this.setupAuthentication());
@@ -227,13 +230,17 @@ class PhoenixOrchestrator {
             
             // Mark as initialized
             this.state.initialized = true;
-
+            
+            console.log(`✅ Phoenix initialized successfully in ${this.performanceMetrics.initDuration}ms`);
+            console.log(`📊 Performance: ${this.performanceMetrics.componentsLoaded} components, ${this.performanceMetrics.endpointsCalled} endpoints called, ${this.performanceMetrics.failedEndpoints} failures`);
+            
             // STEP 16: Dispatch ready event
             this.dispatchReadyEvent();
             
             return true;
             
         } catch (error) {
+            console.error('❌ Critical initialization failure:', error);
             this.handleInitializationError(error);
             return false;
         }
@@ -241,8 +248,11 @@ class PhoenixOrchestrator {
 
     async executeInitStep(stepName, stepFunction) {
         try {
+            console.log(`Initializing ${stepName}...`);
             await stepFunction();
+            console.log(`✅ ${stepName} ready`);
         } catch (error) {
+            console.error(`❌ ${stepName} failed:`, error);
             this.logError(`${stepName} initialization failed`, error);
             
             // Some steps are critical, others can fail
@@ -311,33 +321,36 @@ class PhoenixOrchestrator {
      * =============================================================================
      */
     async setupAuthentication() {
+        console.log('Setting up authentication...');
         
         try {
             // Check for existing token
             const storedToken = localStorage.getItem('phoenixToken');
             const storedUserId = localStorage.getItem('phoenix_user_id');
-            
+
             if (storedToken && storedUserId) {
-                
+                console.log('Found stored credentials, validating...');
+
                 // ENDPOINT 1: GET /api/auth/me (validate token)
                 // Real-world: "Is this token still valid? Who is this user?"
                 const isValid = await this.validateStoredToken(storedToken);
-                
+
                 if (isValid) {
                     this.state.session.authToken = storedToken;
                     this.state.session.userId = storedUserId;
                     this.state.authenticated = true;
                     this.state.health.auth = 'healthy';
                     this.performanceMetrics.endpointsCalled++;
-                    if (DEBUG_MODE) console.log(`✅ Token valid for user: ${this.state.user?.name || storedUserId}`);
+                    console.log(`✅ Token valid for user: ${this.state.user?.name || storedUserId}`);
                     return;
                 }
-                
+
+                console.log('Stored token invalid, attempting refresh...');
 
                 // Try to refresh token
                 const refreshed = await this.attemptTokenRefresh(storedToken);
                 if (refreshed) {
-                    if (DEBUG_MODE) console.log('Token refreshed successfully');
+                    console.log('Token refreshed successfully');
                     return;
                 }
             }
@@ -346,6 +359,7 @@ class PhoenixOrchestrator {
             const currentPath = window.location.pathname;
             
             if (currentPath.includes('/login')) {
+                console.log('User on login page, waiting for login...');
                 this.state.health.auth = 'waiting_for_login';
                 
                 // ENDPOINT 2: POST /api/auth/login (will be called when user submits form)
@@ -362,32 +376,19 @@ class PhoenixOrchestrator {
                 return;
             }
             
-            // Not authenticated and not on auth pages
-            console.log('⚠️  No valid authentication found - allowing guest mode');
+            // Not authenticated and not on auth pages - redirect to onboarding
+            console.log('⚠️  No valid authentication found - redirecting to onboarding');
 
-            // DISABLED: Aggressive redirect was causing loops
-            // Instead, allow dashboard to load and handle errors gracefully
-            // User can still use basic features without full auth
-
-            // Don't redirect if already on dashboard - prevents loops
-            if (currentPath.includes('index.html')) {
-                console.log('✅ Already on dashboard - allowing degraded mode');
-                await this.useGuestMode();
+            // Check if already on onboarding/index page to prevent redirect loops
+            if (currentPath.includes('onboarding.html') || currentPath.includes('index.html')) {
+                console.log('✅ Already on auth page - waiting for user to sign up/login');
+                this.state.health.auth = 'waiting_for_auth';
                 return;
             }
 
-            // Check if this is a public route that doesn't need auth
-            const publicRoutes = ['/', '/about', '/pricing', '/features', '/index.html'];
-            if (publicRoutes.some(route => currentPath.includes(route))) {
-                console.log('ℹ️ Public route, using guest mode');
-                await this.useGuestMode();
-                return;
-            }
-
-            // For any other protected route, use guest mode instead of redirecting
-            // This prevents redirect loops
-            console.log('⚠️  Protected route but using guest mode to prevent redirect loop');
-            await this.useGuestMode();
+            // Redirect to onboarding for all unauthenticated users
+            console.log('Redirecting to onboarding...');
+            window.location.href = 'index.html';
             
         } catch (error) {
             console.error('❌ Authentication setup failed:', error);
@@ -409,14 +410,14 @@ return true; // Token is valid if this succeeds
             if (response.ok) {
                 const userData = await response.json();
                 this.state.user = userData;
-                if (DEBUG_MODE) console.log(`✅ Token valid for user: ${userData.name || userData.email}`);
+                console.log(`✅ Token valid for user: ${userData.name || userData.email}`);
                 return true;
             }
-
+            
             if (response.status === 401) {
-                if (DEBUG_MODE) console.log('Token expired (401 Unauthorized)');
+                console.log('Token expired (401 Unauthorized)');
             } else if (response.status === 403) {
-                if (DEBUG_MODE) console.log('Token invalid (403 Forbidden)');
+                console.log('Token invalid (403 Forbidden)');
             }
             
             return false;
@@ -430,7 +431,7 @@ return true; // Token is valid if this succeeds
 
     async attemptTokenRefresh(oldToken) {
         try {
-            if (DEBUG_MODE) console.log('Attempting token refresh...');
+            console.log('Attempting token refresh...');
             
             // ENDPOINT: POST /api/auth/refresh
             // Real-world: "This token expired, give me a new one"
@@ -455,13 +456,13 @@ return true; // Token is valid if this succeeds
                 
                 localStorage.setItem('phoenixToken', token);
                 localStorage.setItem('phoenix_user_id', userId);
-
+                
                 this.performanceMetrics.endpointsCalled++;
-                if (DEBUG_MODE) console.log('Token refreshed - continuing seamlessly');
+                console.log('Token refreshed - continuing seamlessly');
                 return true;
             }
-
-            if (DEBUG_MODE) console.log('Token refresh failed - user needs to login again');
+            
+            console.log('Token refresh failed - user needs to login again');
             return false;
             
         } catch (error) {
@@ -478,7 +479,7 @@ return true; // Token is valid if this succeeds
             const { email, password } = event.detail;
             
             try {
-                if (DEBUG_MODE) console.log(`📝 Logging in as ${email}...`);
+                console.log(`📝 Logging in as ${email}...`);
                 
                 // ENDPOINT: POST /api/auth/login
                 // Real-world: "User wants to login, check credentials"
@@ -503,8 +504,8 @@ return true; // Token is valid if this succeeds
                     localStorage.setItem('phoenix_user_id', userId);
                     
                     this.performanceMetrics.endpointsCalled++;
-
-                    if (DEBUG_MODE) console.log(`✅ Login successful: ${user.name || email}`);
+                    
+                    console.log(`✅ Login successful: ${user.name || email}`);
                     
                     // Continue initialization now that we're authenticated
                     this.initialize();
@@ -533,7 +534,7 @@ return true; // Token is valid if this succeeds
             const { email, password, name } = event.detail;
             
             try {
-                if (DEBUG_MODE) console.log(`📝 Registering new user: ${email}...`);
+                console.log(`📝 Registering new user: ${email}...`);
                 
                 // ENDPOINT: POST /api/auth/register
                 // Real-world: "New user wants to create an account"
@@ -558,8 +559,8 @@ return true; // Token is valid if this succeeds
                     localStorage.setItem('phoenix_user_id', userId);
                     
                     this.performanceMetrics.endpointsCalled++;
-
-                    if (DEBUG_MODE) console.log(`✅ Registration successful: Welcome ${user.name || email}!`);
+                    
+                    console.log(`✅ Registration successful: Welcome ${user.name || email}!`);
                     
                     // Continue initialization now that we're authenticated
                     this.initialize();
@@ -581,29 +582,6 @@ return true; // Token is valid if this succeeds
         });
     }
 
-    async useGuestMode() {
-        // CRITICAL: Check localStorage first - NEVER overwrite existing JWT token
-        const existingToken = localStorage.getItem('phoenixToken');
-        if (existingToken && existingToken.startsWith('eyJ')) {
-            if (DEBUG_MODE) console.log('✅ JWT token found in localStorage - using authenticated mode instead of guest');
-            this.state.session.authToken = existingToken;
-            this.state.authenticated = true;
-            this.state.health.auth = 'valid';
-            return;
-        }
-
-        console.log('Entering guest mode (limited features)...');
-
-        // Generate temporary guest credentials - but DON'T save to localStorage
-        // This prevents overwriting real tokens
-        this.state.session.authToken = 'guest_' + this.generateSessionId();
-        this.state.session.userId = 'guest_' + Date.now();
-        this.state.authenticated = false;
-        this.state.health.auth = 'guest';
-
-        // Guest users have limited access
-        console.log('Guest mode - sign up for full features');
-    }
 
     redirectToLogin() {
         // Save current path to return after login
@@ -664,7 +642,7 @@ return true; // Token is valid if this succeeds
             // Set authentication token on all API requests
             if (this.components.api.setAuthToken) {
                 this.components.api.setAuthToken(this.state.session.authToken);
-                if (DEBUG_MODE) console.log('🔑 Auth token configured on API client');
+                console.log('🔑 Auth token configured on API client');
             }
             
             // VERIFY ALL REQUIRED METHODS EXIST
@@ -803,12 +781,12 @@ return true; // Token is valid if this succeeds
      */
     async loadUserProfile() {
         console.log('Loading user profile...');
-        
+
         try {
             if (!this.components.api || !this.components.api.getUserProfile) {
                 throw new Error('API client not ready');
             }
-            
+
             // ENDPOINT 1: GET /api/user/profile
             // Real-world: "Give me everything about this user"
             const profile = await this.components.api.getUserProfile();
@@ -933,12 +911,12 @@ return true; // Token is valid if this succeeds
      */
     async checkSubscription() {
         console.log('💳 Checking subscription status...');
-        
+
         try {
             if (!this.components.api || !this.components.api.getSubscriptionStatus) {
                 throw new Error('API client not ready');
             }
-            
+
             // ENDPOINT: GET /api/subscription/status
             // Real-world: "Does this user have access? What plan? When expires?"
             const subscription = await this.components.api.getSubscriptionStatus();
@@ -1066,7 +1044,7 @@ return true; // Token is valid if this succeeds
      */
     async loadInitialPlanetData() {
         console.log('🪐 Loading initial planet data...');
-        
+
         const planetEndpoints = [
             { name: 'Mercury', method: 'getRecoveryDashboard', icon: '☿️' },
             { name: 'Venus', method: 'getWorkouts', icon: '♀️' },
@@ -1076,7 +1054,7 @@ return true; // Token is valid if this succeeds
             { name: 'Saturn', method: 'getVision', icon: '♄' },
             { name: 'Phoenix', method: 'getInsights', icon: '🤖' }
         ];
-        
+
         // Load all planets in parallel for speed
         const planetPromises = planetEndpoints.map(async (planet) => {
             try {
@@ -1161,7 +1139,7 @@ return true; // Token is valid if this succeeds
      */
     async setupAIContext() {
         console.log('🧠 Setting up AI context...');
-        
+
         try {
             // ENDPOINT 1: GET /api/phoenix/companion/personality
             const personality = await this.components.api.getPersonality();
@@ -1261,17 +1239,31 @@ return true; // Token is valid if this succeeds
             } else {
                 throw new Error('ButlerService not found');
             }
-            
-            // ENDPOINT 1: GET /api/phoenix/butler/automations
-            const automations = await this.components.api.getButlerAutomations();
-            this.performanceMetrics.endpointsCalled++;
-            console.log(`✅ Butler Automations: ${automations.automations?.length || 0} active`);
-            
-            // ENDPOINT 2: GET /api/phoenix/companion/history
-            const history = await this.components.api.getCompanionHistory();
-            this.performanceMetrics.endpointsCalled++;
-            console.log(`✅ Butler History: ${history.history?.length || 0} past tasks`);
-            
+
+            // Try to load butler data (optional - gracefully handle missing endpoints)
+            let automations = { automations: [] };
+            let history = { history: [] };
+
+            try {
+                if (this.components.api && this.components.api.getButlerAutomations) {
+                    automations = await this.components.api.getButlerAutomations();
+                    this.performanceMetrics.endpointsCalled++;
+                    console.log(`✅ Butler Automations: ${automations.automations?.length || 0} active`);
+                }
+            } catch (err) {
+                console.log('ℹ️ Butler automations endpoint not implemented yet');
+            }
+
+            try {
+                if (this.components.api && this.components.api.getCompanionHistory) {
+                    history = await this.components.api.getCompanionHistory();
+                    this.performanceMetrics.endpointsCalled++;
+                    console.log(`✅ Butler History: ${history.history?.length || 0} past tasks`);
+                }
+            } catch (err) {
+                console.log('ℹ️ Butler history endpoint not implemented yet');
+            }
+
             // Initialize butler with data
             if (this.components.butler.initialize) {
                 await this.components.butler.initialize({
@@ -1279,15 +1271,16 @@ return true; // Token is valid if this succeeds
                     history
                 });
             }
-            
+
             this.state.systemsReady.butler = true;
             this.state.health.butler = 'healthy';
             this.performanceMetrics.componentsLoaded++;
-            
+
         } catch (error) {
-            // Butler is optional - app works without it
-            this.state.systemsReady.butler = true;
-            this.state.health.butler = 'healthy';
+            console.error('❌ Butler initialization failed:', error);
+            this.logError('Butler initialization failed', error);
+            this.state.systemsReady.butler = false;
+            this.state.health.butler = 'failed';
         }
     }
 
@@ -1323,43 +1316,50 @@ return true; // Token is valid if this succeeds
         console.log('🎤 Setting up voice interface...');
         
         try {
-            // Check if voice interface exists (optional - phoenix-voice-commands.js handles voice)
+            // Check if voice interface exists
             if (!window.voiceInterface) {
-                // Voice commands work via phoenix-voice-commands.js - mark as operational
-                this.state.systemsReady.voice = true;
-                this.state.health.voice = 'healthy';
+                console.warn('⚠️ Voice interface not found');
+                this.state.systemsReady.voice = false;
+                this.state.health.voice = 'unavailable';
                 return;
             }
-            
+
             this.components.voice = window.voiceInterface;
-            
-            // ENDPOINT: POST /api/phoenix/voice/session
-            // Real-world: "Create a voice session for this user"
-            const voiceSession = await this.components.api.createVoiceSession();
-            this.performanceMetrics.endpointsCalled++;
-            if (DEBUG_MODE) console.log(`✅ Voice Session: ${voiceSession.sessionId}`);
-            
+
+            // Try to create voice session (optional - gracefully handle missing endpoint)
+            let voiceSession = null;
+            try {
+                if (this.components.api && this.components.api.createVoiceSession) {
+                    voiceSession = await this.components.api.createVoiceSession();
+                    this.performanceMetrics.endpointsCalled++;
+                    console.log(`✅ Voice Session: ${voiceSession.sessionId}`);
+                }
+            } catch (err) {
+                console.log('ℹ️ Voice session endpoint not implemented yet - using local session');
+                voiceSession = { sessionId: `local_${Date.now()}` };
+            }
+
             // Configure voice with session
-            if (this.components.voice.setSession) {
+            if (this.components.voice.setSession && voiceSession) {
                 this.components.voice.setSession(voiceSession);
             }
-            
+
             // Set orchestrator reference
             if (this.components.voice.setOrchestrator) {
                 this.components.voice.setOrchestrator(this);
             }
-            
+
             // Prevent voice restart on interaction
             if (this.components.voice.preventRestart) {
                 this.components.voice.preventRestart = true;
             }
-            
+
             this.state.systemsReady.voice = true;
             this.state.health.voice = 'healthy';
             this.performanceMetrics.componentsLoaded++;
-            
+
             console.log('Voice interface ready - say "Hey Phoenix"');
-            
+
         } catch (error) {
             console.error('❌ Voice setup failed:', error);
             this.logError('Voice setup failed', error);
@@ -1412,10 +1412,10 @@ return true; // Token is valid if this succeeds
         console.log('Initializing real-time systems...');
         
         try {
-            // Check if reactor exists (optional component)
+            // Check if reactor exists
             if (!window.Reactor) {
-                // Reactor is optional - app works without real-time features
-                this.state.systemsReady.reactor = true;
+                console.warn('⚠️ Reactor not found');
+                this.state.systemsReady.reactor = false;
                 return;
             }
             
@@ -1559,8 +1559,8 @@ return true; // Token is valid if this succeeds
                 this.performanceMetrics.componentsLoaded++;
                 console.log('Planets initialized');
             } catch (error) {
-                // Planets is optional - continue without it
-                this.state.systemsReady.planets = true;
+                console.error('❌ Planets initialization failed:', error);
+                this.logError('Planets initialization failed', error);
             }
         }
         
@@ -1709,15 +1709,15 @@ return true; // Token is valid if this succeeds
         // Load all cache endpoints in parallel for speed
         const cachePromises = cacheEndpoints.map(async (endpoint) => {
             try {
-                // Check if method exists
+                // Check if method exists (skip gracefully if not implemented yet)
                 if (!this.components.api || !this.components.api[endpoint.method]) {
-                    console.warn(`⚠️ Cache method not found: ${endpoint.method}`);
-                    return { key: endpoint.key, success: false, reason: 'method_not_found' };
+                    // Don't log or count as failure - just skip unimplemented methods
+                    return { key: endpoint.key, success: false, reason: 'not_implemented', skip: true };
                 }
-                
+
                 const data = await this.components.api[endpoint.method]();
                 this.performanceMetrics.endpointsCalled++;
-                
+
                 // Store in cache
                 this.state.cache[endpoint.key] = {
                     data,
@@ -1725,9 +1725,9 @@ return true; // Token is valid if this succeeds
                     category: endpoint.category,
                     description: endpoint.description
                 };
-                
+
                 return { key: endpoint.key, success: true, description: endpoint.description };
-                
+
             } catch (error) {
                 console.warn(`⚠️ Cache load failed for ${endpoint.key}:`, error.message);
                 this.performanceMetrics.failedEndpoints++;
@@ -1736,11 +1736,15 @@ return true; // Token is valid if this succeeds
         });
         
         const results = await Promise.all(cachePromises);
-        
+
         const successCount = results.filter(r => r.success).length;
-        const failedCount = results.filter(r => !r.success).length;
-        
-        console.log(`✅ Cache restoration complete: ${successCount}/${cacheEndpoints.length} successful`);
+        const skippedCount = results.filter(r => r.skip).length;
+        const failedCount = results.filter(r => !r.success && !r.skip).length;
+
+        console.log(`✅ Cache restoration complete: ${successCount}/${cacheEndpoints.length - skippedCount} available endpoints loaded`);
+        if (skippedCount > 0) {
+            console.log(`ℹ️  ${skippedCount} endpoints not yet implemented (will be added in future updates)`);
+        }
         if (failedCount > 0) {
             console.warn(`⚠️ ${failedCount} cache endpoints failed - features may have slower initial load`);
         }
@@ -1778,15 +1782,15 @@ return true; // Token is valid if this succeeds
             const maxAge = 30 * 60 * 1000; // 30 minutes
             
             if (age < maxAge) {
-                if (DEBUG_MODE) console.log(`💾 Cache hit: ${key} (age: ${Math.floor(age / 1000)}s)`);
+                console.log(`💾 Cache hit: ${key} (age: ${Math.floor(age / 1000)}s)`);
                 return this.state.cache[key].data;
             } else {
-                if (DEBUG_MODE) console.log(`⏰ Cache expired: ${key}`);
+                console.log(`⏰ Cache expired: ${key}`);
             }
         }
         
         // Cache miss or expired - fetch from API
-        if (DEBUG_MODE) console.log(`🌐 Cache miss: ${key} - fetching from API...`);
+        console.log(`🌐 Cache miss: ${key} - fetching from API...`);
         
         if (this.components.api && this.components.api[fallbackMethod]) {
             try {
@@ -1798,7 +1802,7 @@ return true; // Token is valid if this succeeds
                     timestamp: Date.now()
                 };
                 
-                if (DEBUG_MODE) console.log(`✅ Cache updated: ${key}`);
+                console.log(`✅ Cache updated: ${key}`);
                 return data;
             } catch (error) {
                 console.error(`❌ Failed to fetch ${key}:`, error);
@@ -1848,7 +1852,7 @@ return true; // Token is valid if this succeeds
             if (this.state.session.authToken) {
                 const authValid = await this.validateStoredToken(this.state.session.authToken);
                 this.state.health.auth = authValid ? 'healthy' : 'unhealthy';
-                
+
                 if (!authValid) {
                     console.warn('⚠️ Auth token invalid, attempting refresh...');
                     await this.attemptTokenRefresh(this.state.session.authToken);
@@ -2201,7 +2205,7 @@ return true; // Token is valid if this succeeds
         console.log('═══════════════════════════════════════════════════════');
         console.log('PHOENIX ORCHESTRATOR READY');
         console.log('═══════════════════════════════════════════════════════');
-        if (DEBUG_MODE) console.log(`📋 Session ID: ${this.state.session.id}`);
+        console.log(`📋 Session ID: ${this.state.session.id}`);
         console.log(`👤 User: ${this.state.user?.name || 'User'}`);
         console.log(`⏱️ Init Time: ${this.performanceMetrics.initDuration}ms`);
         console.log(`📡 Endpoints Called: ${this.performanceMetrics.endpointsCalled}`);

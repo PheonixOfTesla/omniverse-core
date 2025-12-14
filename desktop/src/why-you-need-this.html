@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix - Here's Why You're Failing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 2px,
+                rgba(0, 0, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .content {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .headline {
+            font-size: 56px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            line-height: 1.2;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subhead {
+            font-size: 28px;
+            margin: 30px 0;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .reveal {
+            font-size: 24px;
+            margin: 40px 0;
+            padding: 40px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            background: rgba(0, 20, 40, 0.6);
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .price-reveal {
+            font-size: 72px;
+            font-weight: bold;
+            color: #00ff88;
+            margin: 60px 0;
+        }
+
+        .price-comparison {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 20px 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin: 50px auto;
+            padding: 25px 80px;
+            font-size: 28px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: transparent;
+            border: 3px solid #00ff88;
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .cta-button:hover {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 40px #00ff88;
+        }
+
+        .red {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .scroll-hint {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(0, 217, 255, 0.5);
+            font-size: 14px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: The Problem -->
+    <div class="slide active" id="slide1">
+        <div class="content">
+            <div class="headline">
+                Your brain burns out every Tuesday
+            </div>
+            <div class="subhead">
+                You crash at 3 PM.<br>
+                Your HRV is in the gutter.<br>
+                Your sleep was garbage Sunday night.
+            </div>
+            <div class="reveal">
+                <span class="red">But you keep pushing.</span><br><br>
+                Because you don't know you're about to break.
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: The Pattern -->
+    <div class="slide" id="slide2">
+        <div class="content">
+            <div class="headline">
+                I would have told you Sunday
+            </div>
+            <div class="subhead">
+                I saw your sleep drop 22%.<br>
+                I saw your recovery tank.<br>
+                I saw the pattern 3 days before you felt it.
+            </div>
+            <div class="reveal">
+                And I would have <span class="red">canceled your Tuesday meetings</span><br>
+                before you even woke up.
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Examples -->
+    <div class="slide" id="slide3">
+        <div class="content">
+            <div class="headline">
+                Here's what I do
+            </div>
+            <div class="reveal" style="text-align: left;">
+                → Your Uber arrives at 8:43 AM every day. You never call it.<br><br>
+                → Your gym session moves to mornings when you're overtraining.<br><br>
+                → Your calendar blocks focus time when your brain actually works.<br><br>
+                → You get a notification: "Sleep 30 min early tonight. Tomorrow will be rough."<br><br>
+                → I track 10,000 data points. You live your life.<br><br>
+                <span style="color: #00ff88; font-size: 28px;">
+                    I optimize everything. Automatically.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: The Cost of NOT Having It -->
+    <div class="slide" id="slide4">
+        <div class="content">
+            <div class="headline">
+                What's it worth?
+            </div>
+            <div class="subhead">
+                You waste 2 hours every day being unproductive.<br>
+                That's <span class="red">730 hours a year.</span><br><br>
+
+                If your time is worth $50/hour, that's <span class="red">$36,500</span> lost.<br><br>
+
+                Every. Single. Year.
+            </div>
+            <div class="reveal">
+                Phoenix gets 50% of that back.<br><br>
+                <span style="color: #00ff88; font-size: 32px;">
+                    That's $18,250 in value.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: The Price -->
+    <div class="slide" id="slide5">
+        <div class="content">
+            <div class="headline">
+                What I'm asking
+            </div>
+            <div class="price-reveal">
+                $9.99/month
+            </div>
+            <div class="price-comparison">
+                Less than Netflix.<br>
+                Less than Spotify.<br>
+                Less than your morning coffee.
+            </div>
+            <div class="reveal">
+                For a system that gives you back<br>
+                <span class="red" style="font-size: 36px;">365 hours a year.</span><br><br>
+
+                That's 15 full days.<br><br>
+
+                <span style="color: #00ff88;">
+                    What would you do with 15 extra days?
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: The Reality -->
+    <div class="slide" id="slide6">
+        <div class="content">
+            <div class="headline">
+                Here's the truth
+            </div>
+            <div class="subhead">
+                You'll pay $9.99 for Netflix and watch shows about other people's lives.<br><br>
+
+                Or you'll pay $9.99 for Phoenix and <span class="red">actually optimize your own.</span>
+            </div>
+            <div class="reveal">
+                Every minute I save you.<br>
+                Every burnout I prevent.<br>
+                Every goal I help you hit.<br><br>
+
+                <span style="color: #00ff88; font-size: 32px;">
+                    You can't afford NOT to have this.
+                </span>
+            </div>
+            <button class="cta-button" onclick="startTrial()">
+                Start Free Trial
+            </button>
+            <div class="price-comparison" style="margin-top: 30px;">
+                7 days free. Cancel anytime.<br>
+                No credit card required.
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-hint">↓ scroll to continue</div>
+
+    <script>
+        // Auto-scroll through slides
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const scrollHint = document.querySelector('.scroll-hint');
+
+        function showNextSlide() {
+            if (currentSlide < slides.length - 1) {
+                slides[currentSlide].classList.remove('active');
+                currentSlide++;
+                slides[currentSlide].classList.add('active');
+
+                if (currentSlide === slides.length - 1) {
+                    scrollHint.style.display = 'none';
+                }
+            }
+        }
+
+        // Scroll detection
+        let scrollTimeout;
+        window.addEventListener('wheel', (e) => {
+            if (e.deltaY > 0) { // Scrolling down
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(showNextSlide, 100);
+            }
+        });
+
+        // Touch detection for mobile
+        let touchStart = 0;
+        window.addEventListener('touchstart', (e) => {
+            touchStart = e.touches[0].clientY;
+        });
+
+        window.addEventListener('touchend', (e) => {
+            const touchEnd = e.changedTouches[0].clientY;
+            if (touchStart - touchEnd > 50) { // Swiped up
+                showNextSlide();
+            }
+        });
+
+        function startTrial() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

@@ -8,8 +8,6 @@
  * ========================================
  */
 
-const DEBUG_MODE = false; // Set to true to enable verbose debug logging
-
 class PhoenixOrb {
     constructor() {
         this.currentPlanet = this.detectPlanet();
@@ -23,7 +21,6 @@ class PhoenixOrb {
         // NEW: Wake Word Detection & TTS
         this.wakeWordDetector = null;
         this.tts = null;
-        this.captions = null; // NEW: Caption-style dialogue
         this.userName = null; // User's name for personalization
 
         // Initialize
@@ -48,6 +45,7 @@ class PhoenixOrb {
      * Initialize Phoenix Orb
      */
     async init() {
+        console.log(`🔥 Phoenix Orb initializing on ${this.currentPlanet.toUpperCase()}...`);
 
         // Fetch user name for personalization
         await this.fetchUserName();
@@ -61,9 +59,6 @@ class PhoenixOrb {
         // NEW: Initialize TTS (Text-to-Speech)
         this.initTTS();
 
-        // NEW: Initialize Caption-Style Dialogue
-        this.initCaptions();
-
         // NEW: Initialize Wake Word Detection
         this.initWakeWordDetection();
 
@@ -73,6 +68,7 @@ class PhoenixOrb {
         // Set up activity batch sending
         setInterval(() => this.sendActivityBatch(), 5000); // Send every 5 seconds
 
+        console.log('✅ Phoenix Orb ready');
 
         // ⭐ NEW: Cache common responses in background
         setTimeout(() => this.cacheCommonResponses(), 2000);
@@ -88,6 +84,7 @@ class PhoenixOrb {
         try {
             const token = localStorage.getItem('phoenixToken');
             if (!token) {
+                console.log('⚠️  No auth token, skipping user name fetch');
                 return;
             }
 
@@ -100,8 +97,10 @@ class PhoenixOrb {
             if (response.ok) {
                 const data = await response.json();
                 this.userName = data.user?.name || data.user?.email?.split('@')[0] || 'there';
+                console.log(`👤 User name loaded: ${this.userName}`);
             }
         } catch (error) {
+            console.error('Error fetching user name:', error);
             this.userName = 'there'; // Fallback
         }
     }
@@ -111,36 +110,23 @@ class PhoenixOrb {
      */
     initTTS() {
         if (typeof VoiceTTS === 'undefined') {
+            console.error('❌ VoiceTTS not loaded');
             return;
         }
 
         if (typeof window.API === 'undefined') {
+            console.error('❌ Phoenix API not loaded - TTS disabled');
             return;
         }
 
         this.tts = new VoiceTTS({
             phoenixAPI: window.API,
             voice: 'nova', // OpenAI nova voice
-            rate: 1.25, // Slightly faster for responsiveness (1.0-2.0)
+            rate: 1.4, // Slightly faster for responsiveness (1.0-2.0)
             volume: 0.8
         });
 
-    }
-
-    /**
-     * Initialize Caption-Style Dialogue
-     */
-    initCaptions() {
-        if (typeof PhoenixCaptions === 'undefined') {
-            console.warn('⚠️  PhoenixCaptions not loaded');
-            return;
-        }
-
-        this.captions = new PhoenixCaptions({
-            tts: this.tts
-        });
-
-        console.log('✅ Caption-style dialogue initialized');
+        console.log('🔊 TTS initialized with OpenAI nova voice');
     }
 
     /**
@@ -148,6 +134,7 @@ class PhoenixOrb {
      */
     initWakeWordDetection() {
         if (typeof WakeWordDetector === 'undefined') {
+            console.error('❌ WakeWordDetector not loaded');
             return;
         }
 
@@ -159,6 +146,7 @@ class PhoenixOrb {
 
         // Handle wake word detection
         this.wakeWordDetector.onWakeWord((detection) => {
+            console.log(`🔥 Wake word detected: "${detection.transcript}"`);
 
             // Expand panel if not expanded
             if (!this.isExpanded) {
@@ -178,6 +166,7 @@ class PhoenixOrb {
         // Handle sleep word detection (if method exists)
         if (typeof this.wakeWordDetector.onSleepWord === 'function') {
             this.wakeWordDetector.onSleepWord((detection) => {
+                console.log(`💤 Sleep word detected: "${detection.transcript}"`);
 
                 // Show sleep notification
                 this.showSleepNotification();
@@ -190,6 +179,8 @@ class PhoenixOrb {
         // Start wake word detection
         this.wakeWordDetector.start();
 
+        console.log('🎤 Wake word detection started');
+        console.log('💬 Say "Hey Phoenix" to activate or "Sleep Phoenix" to stop listening');
     }
 
     /**
@@ -235,11 +226,13 @@ class PhoenixOrb {
      * Start voice interaction when clicking the center orb (like Siri)
      */
     startVoiceFromOrb() {
+        console.log('🎤 Orb clicked - starting voice interaction');
 
         const orb = document.querySelector('.phoenix-orb');
 
         // Check if system is sleeping - wake it up
         if (this.wakeWordDetector && this.wakeWordDetector.isSleeping) {
+            console.log('⏰ Waking Phoenix from sleep...');
             orb.classList.remove('sleeping');
             this.wakeWordDetector.wake();
             // Use cached audio for instant response
@@ -275,6 +268,7 @@ class PhoenixOrb {
      */
     async speak(text, options = {}) {
         if (!this.tts) {
+            console.log('🔇 TTS not available');
             return;
         }
 
@@ -289,6 +283,7 @@ class PhoenixOrb {
             // Remove speaking animation when done
             orb.classList.remove('speaking');
         } catch (error) {
+            console.error('TTS error:', error);
             // Remove animation even if error
             document.querySelector('.phoenix-orb')?.classList.remove('speaking');
         }
@@ -310,7 +305,6 @@ class PhoenixOrb {
                     <circle cx="12" cy="12" r="3" fill="currentColor"/>
                     <path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12" stroke="currentColor" stroke-width="2"/>
                 </svg>
-                <div class="phoenix-orb-hint">Tap to communicate</div>
             </div>
 
             <!-- Expanded Panel -->
@@ -358,10 +352,9 @@ class PhoenixOrb {
                         </button>
                     </div>
 
-                    <!-- Response Area - DEPRECATED: Now using caption-style dialogue -->
-                    <div class="phoenix-response" id="phoenixResponse" style="display:none !important;">
-                        <!-- Intent badge hidden - was showing debug info like "CLARIFIED_CAPABILITY | action (98%)" -->
-                        <div class="phoenix-intent-badge" id="phoenixIntent" style="display:none;"></div>
+                    <!-- Response Area -->
+                    <div class="phoenix-response" id="phoenixResponse" style="display:none;">
+                        <div class="phoenix-intent-badge" id="phoenixIntent"></div>
                         <div class="phoenix-response-text" id="phoenixResponseText"></div>
                     </div>
 
@@ -382,6 +375,7 @@ class PhoenixOrb {
      */
     initVoiceRecognition() {
         if (!('webkitSpeechRecognition' in window)) {
+            console.warn('Speech recognition not supported');
             return;
         }
 
@@ -417,6 +411,7 @@ class PhoenixOrb {
         };
 
         this.recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
             this.stopVoice();
             this.logActivity('voice_error', { error: event.error });
         };
@@ -430,6 +425,7 @@ class PhoenixOrb {
      * Start Behavior Tracking - EVERYTHING
      */
     startBehaviorTracking() {
+        console.log('📊 Behavior tracking active - Phoenix is watching...');
 
         // Track all clicks
         document.addEventListener('click', (e) => {
@@ -513,6 +509,7 @@ class PhoenixOrb {
         // Disabled: backend endpoint doesn't exist yet
         // Activities are logged locally for now
         if (this.activityBatchQueue.length > 0) {
+            console.log(`📊 Logged ${this.activityBatchQueue.length} activities (local only)`);
             this.activityBatchQueue = []; // Clear queue
         }
     }
@@ -616,7 +613,7 @@ class PhoenixOrb {
      */
     startVoice() {
         if (!this.recognition) {
-            showToast('Voice recognition not supported in this browser', 'error');
+            alert('Voice recognition not supported in this browser');
             return;
         }
 
@@ -659,6 +656,7 @@ class PhoenixOrb {
      * Process Command via Universal NL
      */
     async processCommand(message, inputType) {
+        console.log(`💬 Processing command: "${message}" (${inputType})`);
 
         // Show processing state
         const orb = document.querySelector('.phoenix-orb');
@@ -715,14 +713,14 @@ class PhoenixOrb {
             }
 
             const result = await response.json();
-            if (DEBUG_MODE)
+            console.log('🌟 Phoenix Companion Response:', result);
 
             // Extract message from companion chat format
             const aiMessage = result.data?.message || result.message || 'Sorry, I didn\'t get a response';
             const confidence = result.data?.confidence || 0;
 
-            if (DEBUG_MODE) {
-            }
+            console.log(`📊 Confidence: ${confidence}%);
+            console.log(`💬 Response: ${aiMessage}`);
 
             // ⭐ NEW: Show text IMMEDIATELY in conversation bubble
             this.showTextBubble(aiMessage, 'phoenix');
@@ -756,6 +754,7 @@ class PhoenixOrb {
             }
 
         } catch (error) {
+            console.error('❌ Command processing error:', error);
             orb.classList.remove('processing');
             this.clearStatusMessage();
 
@@ -826,11 +825,6 @@ class PhoenixOrb {
      * Show text bubble in conversation UI
      */
     showTextBubble(text, sender = 'phoenix') {
-        // Strip JSON metadata that AI sometimes appends
-        text = text.replace(/\s*\{[\s\S]*?"confidence_score"[\s\S]*?\}\s*$/i, '').trim();
-        text = text.replace(/\s*\{[\s\S]*?"mood"[\s\S]*?\}\s*$/i, '').trim();
-        text = text.replace(/\s*\{[\s\S]*?"action_taken"[\s\S]*?\}\s*$/i, '').trim();
-
         let conversationEl = document.getElementById('phoenix-conversation');
 
         if (!conversationEl) {
@@ -899,12 +893,14 @@ class PhoenixOrb {
      */
     async speakAsync(text, options = {}) {
         if (!this.tts) {
+            console.log('🔇 TTS not available');
             return;
         }
 
         // Check cache first
         const cachedAudio = this.getCachedAudio(text);
         if (cachedAudio) {
+            console.log('🎵 Playing cached audio');
             this.playAudioBlob(cachedAudio);
             return;
         }
@@ -924,6 +920,7 @@ class PhoenixOrb {
             orb.classList.remove('generating-voice');
 
         } catch (error) {
+            console.error('TTS error:', error);
             this.clearStatusMessage();
             document.querySelector('.phoenix-orb')?.classList.remove('generating-voice');
         }
@@ -947,6 +944,7 @@ class PhoenixOrb {
                 }
                 return new Blob([ab], { type: 'audio/mpeg' });
             } catch (error) {
+                console.error('Cache read error:', error);
                 return null;
             }
         }
@@ -966,6 +964,7 @@ class PhoenixOrb {
             "Anything else I can help with?"
         ];
 
+        console.log('🎵 Caching common responses...');
 
         for (const phrase of commonPhrases) {
             const cacheKey = `phoenix_tts_${phrase.toLowerCase().trim()}`;
@@ -984,16 +983,19 @@ class PhoenixOrb {
                     reader.onloadend = () => {
                         const base64 = reader.result.split(',')[1];
                         localStorage.setItem(cacheKey, base64);
+                        console.log(`✅ Cached: "${phrase}"`);
                     };
                     reader.readAsDataURL(audioBlob);
                 }
             } catch (error) {
+                console.error(`Failed to cache "${phrase}":`, error);
             }
 
             // Small delay between requests
             await new Promise(resolve => setTimeout(resolve, 500));
         }
 
+        console.log('✅ Common responses cached');
     }
 
     /**
@@ -1017,6 +1019,7 @@ class PhoenixOrb {
         };
 
         audio.play().catch(error => {
+            console.error('Audio playback error:', error);
             orb.classList.remove('speaking');
         });
     }
@@ -1025,35 +1028,23 @@ class PhoenixOrb {
      * Show Response
      */
     showResponse(intent, response, data) {
+        const responseEl = document.getElementById('phoenixResponse');
+        const intentEl = document.getElementById('phoenixIntent');
+        const responseTextEl = document.getElementById('phoenixResponseText');
+
+        if (typeof intent === 'object') {
+            intentEl.textContent = `${intent.planet} | ${intent.action} (${Math.round(intent.confidence * 100)}%)`;
+        } else {
+            intentEl.textContent = intent;
+        }
+
         // Add personalization to response
         const personalizedResponse = this.personalizeResponse(response);
+        responseTextEl.textContent = personalizedResponse;
+        responseEl.style.display = 'block';
 
-        // NEW: Use caption-style dialogue instead of big box
-        if (this.captions) {
-            this.captions.display(personalizedResponse, {
-                speak: true, // Will auto-speak via TTS
-                rate: 1.25
-            });
-        } else {
-            // Fallback to old method if captions not loaded
-            const responseEl = document.getElementById('phoenixResponse');
-            const intentEl = document.getElementById('phoenixIntent');
-            const responseTextEl = document.getElementById('phoenixResponseText');
-
-            if (responseEl && intentEl && responseTextEl) {
-                if (typeof intent === 'object') {
-                    intentEl.textContent = `${intent.planet} | ${intent.action} (${Math.round(intent.confidence * 100)}%)`;
-                } else {
-                    intentEl.textContent = intent;
-                }
-
-                responseTextEl.textContent = personalizedResponse;
-                responseEl.style.display = 'block';
-            }
-
-            // Speak response using TTS
-            this.speak(personalizedResponse);
-        }
+        // Speak response using TTS
+        this.speak(personalizedResponse);
     }
 
     /**
@@ -1083,9 +1074,11 @@ class PhoenixOrb {
         // ⭐ NEW: Check for navigation command from backend FIRST
         if (result.navigation) {
             const { target, planetName, action, metric, metricName } = result.navigation;
+            console.log(`🧭 Navigation command received: ${action} - ${target} (metric: ${metric || 'none'})`);
 
             // ⭐ METRIC SPOTLIGHT - Show specific metric modal
             if (action === 'spotlight_metric' && metric) {
+                console.log(`🎯 Spotlighting metric: ${metric}`);
 
                 // Trigger metric spotlight on current page
                 if (window.mercuryDashboard && typeof window.mercuryDashboard.spotlightMetric === 'function') {
@@ -1121,6 +1114,7 @@ class PhoenixOrb {
                 this.speak(announcement);
 
                 setTimeout(() => {
+                    console.log(`🚀 Auto-navigating to ${targetUrl}`);
                     // Store greeting flag for post-navigation
                     sessionStorage.setItem('phoenixNavigated', 'true');
                     sessionStorage.setItem('phoenixTargetPlanet', target);
@@ -1155,6 +1149,7 @@ class PhoenixOrb {
                 this.speak(announcement);
 
                 setTimeout(() => {
+                    console.log(`🚀 Auto-navigating to ${targetUrl}`);
                     // Store greeting flag for post-navigation
                     sessionStorage.setItem('phoenixNavigated', 'true');
                     sessionStorage.setItem('phoenixTargetPlanet', result.intent.planet);
@@ -1189,6 +1184,7 @@ class PhoenixOrb {
      * Handle SMS Intent
      */
     async handleSMSIntent(data) {
+        console.log('📱 Handling SMS intent:', data);
 
         if (!data.contact || !data.message) {
             this.speak('I need a contact and message to send a text');
@@ -1218,6 +1214,7 @@ class PhoenixOrb {
                 throw new Error('Failed to send SMS');
             }
         } catch (error) {
+            console.error('SMS error:', error);
             this.speak('Sorry, I couldn\'t send that text message');
             this.showResponse('error', 'Failed to send SMS', error.message);
         }
@@ -1237,6 +1234,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (window.PhoenixConfig) {
             phoenixOrb = new PhoenixOrb();
         } else {
+            console.error('❌ PhoenixConfig not found! Make sure config.js is loaded.');
         }
     }, 100);
 });

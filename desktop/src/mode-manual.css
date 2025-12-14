@@ -1,0 +1,125 @@
+/* ============================================
+   MANUAL MODE - FULL CONSCIOUSNESS DASHBOARD
+   Real-time WebSocket updates, complete control
+   ============================================ */
+
+/* Show all dashboard elements in manual mode */
+body[data-mode="manual"] #hud-tl,
+body[data-mode="manual"] #hud-bl,
+body[data-mode="manual"] #jarvis-orb,
+body[data-mode="manual"] #quick-actions-orb,
+body[data-mode="manual"] #settings-orb,
+body[data-mode="manual"] #planet-nav-tab,
+body[data-mode="manual"] #planet-selection-panel,
+body[data-mode="manual"] .hud-frame,
+body[data-mode="manual"] .corner-bracket,
+body[data-mode="manual"] #greeting,
+body[data-mode="manual"] #holographic-hub,
+body[data-mode="manual"] #holo-nav-container,
+body[data-mode="manual"] #phoenix-widget-container,
+body[data-mode="manual"] #weather-widget,
+body[data-mode="manual"] #system-status,
+body[data-mode="manual"] button[onclick="window.history.back()"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    display: block !important;
+    transform: translateZ(0) scale(1) !important;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Phoenix orb scales down to make room for dashboard */
+body[data-mode="manual"] #phoenix-core-container {
+    transform: translate(-50%, -50%) scale(1) !important;
+    filter: none !important;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Manual mode button active state */
+body[data-mode="manual"] #manual-mode-btn {
+    background: rgba(0, 217, 255, 0.3) !important;
+    color: #00ff88 !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5), inset 0 0 15px rgba(0, 217, 255, 0.3) !important;
+}
+
+body[data-mode="manual"] #voice-mode-btn {
+    background: transparent !important;
+    color: rgba(0, 217, 255, 0.5) !important;
+    box-shadow: none !important;
+}
+
+/* Hardware acceleration for smooth transitions */
+body[data-mode="manual"] #hud-tl,
+body[data-mode="manual"] #hud-bl,
+body[data-mode="manual"] #phoenix-core-container,
+body[data-mode="manual"] #weather-widget {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATION (375px baseline)
+   ============================================ */
+@media (max-width: 768px) {
+    body[data-mode="manual"] #hud-tl,
+    body[data-mode="manual"] #hud-bl {
+        font-size: 12px;
+        padding: 12px;
+    }
+
+    /* Hide sidebar on mobile */
+    body[data-mode="manual"] #planet-nav-tab {
+        display: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body[data-mode="manual"] #hud-tl,
+    body[data-mode="manual"] #hud-bl {
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    /* Scale orb smaller on mobile */
+    body[data-mode="manual"] #phoenix-core-container {
+        transform: translate(-50%, -50%) scale(0.8) !important;
+    }
+
+    /* Smaller floating orbs */
+    body[data-mode="manual"] #settings-orb,
+    body[data-mode="manual"] #quick-actions-orb {
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    /* Optimization indicator smaller */
+    body[data-mode="manual"] #optimization-indicator {
+        width: 80px !important;
+        height: 80px !important;
+    }
+}
+
+/* ============================================
+   REAL-TIME UPDATES (WebSocket animations)
+   ============================================ */
+.realtime-update {
+    animation: pulse-glow 0.5s ease-out;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 rgba(0, 217, 255, 0); }
+    50% { box-shadow: 0 0 20px rgba(0, 217, 255, 0.8); }
+    100% { box-shadow: 0 0 0 rgba(0, 217, 255, 0); }
+}
+
+/* Streaming text indicator */
+.phoenix-typing::after {
+    content: '▌';
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}

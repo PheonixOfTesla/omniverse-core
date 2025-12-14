@@ -1,0 +1,195 @@
+/* ============================================
+   GENESIS MODE - UI VISIBILITY CONTROL
+   Hides all dashboard elements except Genesis panel and mode toggle
+   ============================================ */
+
+/* ============================================
+   GENESIS MODE - HIDE EVERYTHING
+   ============================================ */
+body[data-mode="genesis"] #hud-tl,
+body[data-mode="genesis"] #hud-bl,
+body[data-mode="genesis"] #hud-tr,
+body[data-mode="genesis"] #hud-br,
+body[data-mode="genesis"] #jarvis-orb,
+body[data-mode="genesis"] #quick-actions-orb,
+body[data-mode="genesis"] #settings-orb,
+body[data-mode="genesis"] #jarvis-quick-menu,
+body[data-mode="genesis"] #quick-actions-menu,
+body[data-mode="genesis"] #settings-menu,
+body[data-mode="genesis"] #planet-nav-tab,
+body[data-mode="genesis"] #planet-selection-panel,
+body[data-mode="genesis"] .hud-frame,
+body[data-mode="genesis"] .corner-bracket,
+body[data-mode="genesis"] #greeting,
+body[data-mode="genesis"] #holographic-hub,
+body[data-mode="genesis"] #holo-nav-container,
+body[data-mode="genesis"] #holo-core,
+body[data-mode="genesis"] #holo-nav-ring,
+body[data-mode="genesis"] #phoenix-widget-container,
+body[data-mode="genesis"] .phoenix-widget,
+body[data-mode="genesis"] #sync-panel,
+body[data-mode="genesis"] #weather-widget,
+body[data-mode="genesis"] #weather-display,
+body[data-mode="genesis"] #system-status,
+body[data-mode="genesis"] #time-display,
+body[data-mode="genesis"] #date-display,
+body[data-mode="genesis"] #location-display,
+body[data-mode="genesis"] #dashboard-content,
+body[data-mode="genesis"] #phoenixOrbContainer,
+body[data-mode="genesis"] button[onclick="window.history.back()"] {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    transition: opacity 0.5s ease-out;
+    display: none !important;
+}
+
+/* ============================================
+   GENESIS MODE - KEEP VISIBLE
+   ============================================ */
+
+/* Keep Phoenix center orb visible but subtle */
+body[data-mode="genesis"] #phoenix-core-container {
+    opacity: 0.3 !important;
+    transform: translate(-50%, -50%) scale(0.6) !important;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none !important;
+}
+
+/* Keep mode toggle always visible and centered */
+body[data-mode="genesis"] #mode-toggle-container {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: fixed !important;
+    top: 40px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10001 !important;
+    visibility: visible !important;
+    display: flex !important;
+}
+
+/* Show Genesis panel when in Genesis mode */
+body[data-mode="genesis"] #genesis-panel {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    display: flex !important;
+}
+
+/* Show Genesis widgets when in Genesis mode */
+body[data-mode="genesis"] .genesis-widget {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    display: block !important;
+}
+
+/* ============================================
+   GENESIS MODE BUTTON STYLING
+   ============================================ */
+
+#genesis-mode-btn {
+    background: rgba(255, 215, 0, 0.1);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    color: rgba(255, 215, 0, 0.8);
+    transition: all 0.3s ease;
+}
+
+#genesis-mode-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.6);
+    color: #FFD700;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+/* Active state when in Genesis mode */
+body[data-mode="genesis"] #genesis-mode-btn {
+    background: rgba(255, 215, 0, 0.3) !important;
+    border-color: #FFD700 !important;
+    color: #FFD700 !important;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
+                inset 0 0 20px rgba(255, 215, 0, 0.3) !important;
+    animation: genesisPulse 2s infinite;
+}
+
+/* DNA Helix icon animation */
+body[data-mode="genesis"] #genesis-mode-btn svg {
+    animation: dnaRotate 4s linear infinite;
+}
+
+/* Other mode buttons when Genesis is active */
+body[data-mode="genesis"] #voice-mode-btn,
+body[data-mode="genesis"] #manual-mode-btn,
+body[data-mode="genesis"] #desk-btn {
+    background: transparent !important;
+    border-color: rgba(0, 217, 255, 0.2) !important;
+    color: rgba(0, 217, 255, 0.4) !important;
+    box-shadow: none !important;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes genesisPulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
+                    inset 0 0 15px rgba(255, 215, 0, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.8),
+                    inset 0 0 30px rgba(255, 215, 0, 0.4);
+    }
+}
+
+@keyframes dnaRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS FOR MODE CHANGES
+   ============================================ */
+
+#hud-tl,
+#hud-bl,
+#jarvis-orb,
+#quick-actions-orb,
+#settings-orb,
+#planet-nav-tab,
+#dashboard-content,
+.hud-frame,
+.corner-bracket,
+#phoenix-core-container,
+#genesis-panel {
+    transition: all 0.5s ease-in-out;
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    body[data-mode="genesis"] #mode-toggle-container {
+        top: 20px !important;
+        transform: translateX(-50%) scale(0.9) !important;
+    }
+
+    body[data-mode="genesis"] #phoenix-core-container {
+        transform: translate(-50%, -50%) scale(0.4) !important;
+    }
+}
+
+/* ============================================
+   PREVENT SCROLLING IN GENESIS MODE
+   ============================================ */
+
+body[data-mode="genesis"] {
+    overflow: hidden;
+}

@@ -1,0 +1,321 @@
+/* ============================================
+   PHOENIX CENTER ORB - SIRI-LIKE VISUAL STATES
+   Listening, Thinking, Speaking animations
+   ============================================ */
+
+/* Base orb glow enhancement */
+#phoenix-core-container {
+    transition: all 0.3s ease-in-out;
+}
+
+/* LISTENING STATE - Pulsing atoms/particles */
+#phoenix-core-container.listening {
+    animation: phoenixListening 1.2s ease-in-out infinite;
+}
+
+#phoenix-core-container.listening .core-inner {
+    animation: particleExpand 1.2s ease-in-out infinite;
+}
+
+#phoenix-core-container.listening .phoenix-particles circle {
+    animation: particlePulse 1.2s ease-in-out infinite;
+    opacity: 1 !important;
+}
+
+/* THINKING STATE - Processing/buffering animation */
+#phoenix-core-container.thinking {
+    animation: phoenixThinking 1.5s linear infinite;
+}
+
+#phoenix-core-container.thinking .core-inner {
+    animation: bufferRotate 2s linear infinite;
+    filter: brightness(1.3);
+}
+
+#phoenix-core-container.thinking .phoenix-particles circle {
+    animation: bufferPulse 0.8s ease-in-out infinite;
+}
+
+/* SPEAKING STATE - Voice pulse animation */
+#phoenix-core-container.speaking {
+    animation: phoenixSpeaking 0.6s ease-in-out infinite;
+}
+
+#phoenix-core-container.speaking .core-inner {
+    animation: voicePulse 0.6s ease-in-out infinite;
+}
+
+#phoenix-core-container.speaking .phoenix-particles circle {
+    animation: voiceWave 0.6s ease-in-out infinite;
+    opacity: 1 !important;
+}
+
+/* IDLE STATE - Subtle breathing */
+#phoenix-core-container.idle {
+    animation: phoenixBreathing 4s ease-in-out infinite;
+}
+
+/* ============================================
+   LISTENING ANIMATIONS (Pulsing atoms)
+   ============================================ */
+@keyframes phoenixListening {
+    0%, 100% {
+        filter: drop-shadow(0 0 40px rgba(0, 217, 255, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 80px rgba(0, 217, 255, 1));
+    }
+}
+
+@keyframes particleExpand {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.1);
+        filter: brightness(1.4);
+    }
+}
+
+@keyframes particlePulse {
+    0%, 100% {
+        r: 2;
+        fill-opacity: 0.8;
+    }
+    50% {
+        r: 3;
+        fill-opacity: 1;
+    }
+}
+
+/* ============================================
+   THINKING ANIMATIONS (Processing buffer)
+   ============================================ */
+@keyframes phoenixThinking {
+    0%, 100% {
+        filter: drop-shadow(0 0 50px rgba(0, 217, 255, 0.7))
+                drop-shadow(0 0 30px rgba(0, 255, 136, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 70px rgba(0, 217, 255, 0.9))
+                drop-shadow(0 0 50px rgba(0, 255, 136, 0.7));
+    }
+}
+
+@keyframes bufferRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bufferPulse {
+    0%, 100% {
+        fill-opacity: 0.3;
+    }
+    25% {
+        fill-opacity: 0.8;
+    }
+    50% {
+        fill-opacity: 0.4;
+    }
+    75% {
+        fill-opacity: 0.9;
+    }
+}
+
+/* ============================================
+   SPEAKING ANIMATIONS (Voice pulse)
+   ============================================ */
+@keyframes phoenixSpeaking {
+    0%, 100% {
+        filter: drop-shadow(0 0 50px rgba(0, 217, 255, 0.8))
+                drop-shadow(0 0 80px rgba(0, 217, 255, 0.4));
+    }
+    25% {
+        filter: drop-shadow(0 0 70px rgba(0, 217, 255, 1))
+                drop-shadow(0 0 100px rgba(0, 217, 255, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 60px rgba(0, 217, 255, 0.9))
+                drop-shadow(0 0 90px rgba(0, 217, 255, 0.5));
+    }
+    75% {
+        filter: drop-shadow(0 0 75px rgba(0, 217, 255, 1))
+                drop-shadow(0 0 110px rgba(0, 217, 255, 0.7));
+    }
+}
+
+@keyframes voicePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    75% {
+        transform: scale(1.07);
+    }
+}
+
+@keyframes voiceWave {
+    0%, 100% {
+        cy: attr(cy);
+        fill-opacity: 0.7;
+    }
+    25% {
+        cy: calc(attr(cy) - 2);
+        fill-opacity: 1;
+    }
+    50% {
+        cy: attr(cy);
+        fill-opacity: 0.8;
+    }
+    75% {
+        cy: calc(attr(cy) + 2);
+        fill-opacity: 1;
+    }
+}
+
+/* ============================================
+   IDLE ANIMATIONS (Subtle breathing)
+   ============================================ */
+@keyframes phoenixBreathing {
+    0%, 100% {
+        filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 45px rgba(0, 217, 255, 0.7));
+    }
+}
+
+/* ============================================
+   PARTICLE/ATOM EFFECTS
+   ============================================ */
+.phoenix-particles {
+    pointer-events: none;
+}
+
+.phoenix-particles circle {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Enhance visibility during active states */
+#phoenix-core-container.listening .phoenix-particles circle,
+#phoenix-core-container.speaking .phoenix-particles circle {
+    fill: #00ff88;
+    filter: drop-shadow(0 0 4px rgba(0, 217, 255, 0.8));
+}
+
+#phoenix-core-container.thinking .phoenix-particles circle {
+    fill: #00ff88;
+    filter: drop-shadow(0 0 4px rgba(0, 255, 136, 0.8));
+}
+
+/* ============================================
+   VOICE MODE ENHANCEMENTS
+   ============================================ */
+body[data-mode="voice"] #phoenix-core-container.listening,
+body[data-mode="voice"] #phoenix-core-container.speaking,
+body[data-mode="voice"] #phoenix-core-container.thinking {
+    transform: translate(-50%, -50%) scale(1.3) !important;
+}
+
+body[data-mode="voice"] #phoenix-core-container.idle {
+    transform: translate(-50%, -50%) scale(1.2) !important;
+}
+
+/* ============================================
+   VISUAL FEEDBACK PULSES
+   ============================================ */
+/* Quick pulse when user starts speaking */
+@keyframes quickPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+#phoenix-core-container.user-speaking {
+    animation: quickPulse 0.3s ease-out;
+}
+
+/* ============================================
+   RESPONSE READY STATE
+   ============================================ */
+#phoenix-core-container.ready-to-speak {
+    animation: readyPulse 0.5s ease-in-out 2;
+}
+
+@keyframes readyPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 40px rgba(0, 217, 255, 0.6));
+        transform: scale(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 90px rgba(0, 217, 255, 1));
+        transform: scale(1.1);
+    }
+}
+
+/* ============================================
+   SMOOTH STATE TRANSITIONS
+   ============================================ */
+#phoenix-core-container.listening,
+#phoenix-core-container.thinking,
+#phoenix-core-container.speaking,
+#phoenix-core-container.idle {
+    transition: filter 0.3s ease-in-out;
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+#phoenix-core-container {
+    will-change: transform, filter;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+#phoenix-core-container .core-inner,
+#phoenix-core-container .phoenix-particles circle {
+    will-change: transform, opacity;
+}
+
+/* Use GPU acceleration */
+@media (prefers-reduced-motion: no-preference) {
+    #phoenix-core-container,
+    #phoenix-core-container .core-inner,
+    #phoenix-core-container .phoenix-particles circle {
+        transform: translateZ(0);
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    #phoenix-core-container.listening,
+    #phoenix-core-container.thinking,
+    #phoenix-core-container.speaking {
+        animation: none;
+    }
+
+    #phoenix-core-container.listening,
+    #phoenix-core-container.speaking {
+        filter: drop-shadow(0 0 60px rgba(0, 217, 255, 0.8)) !important;
+    }
+
+    #phoenix-core-container.thinking {
+        filter: drop-shadow(0 0 60px rgba(0, 255, 136, 0.7)) !important;
+    }
+}

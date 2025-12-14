@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix - Initializing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Phoenix Orb - Always visible, breathing */
+        .phoenix-orb {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            z-index: 1;
+        }
+
+        .orb-core {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #00ff88 0%, #0096ff 40%, transparent 70%);
+            border-radius: 50%;
+            animation: breathe 4s ease-in-out infinite;
+            filter: blur(20px);
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .orb-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
+
+        .orb-ring:nth-child(2) {
+            width: 120%;
+            height: 120%;
+            top: -10%;
+            left: -10%;
+            animation: rotate 15s linear infinite reverse;
+        }
+
+        .orb-ring:nth-child(3) {
+            width: 140%;
+            height: 140%;
+            top: -20%;
+            left: -20%;
+            animation: rotate 25s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Speech bubble from Phoenix */
+        .phoenix-speech {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 600px;
+            padding: 30px 40px;
+            background: rgba(0, 20, 40, 0.95);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .phoenix-speech::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .speech-text {
+            font-size: 28px;
+            line-height: 1.6;
+            color: #00ff88;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 28px;
+            background: #00ff88;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* Input area */
+        .input-area {
+            position: fixed;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            z-index: 10;
+            opacity: 0;
+        }
+
+        .input-area.visible {
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(50px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        input {
+            width: 100%;
+            padding: 25px 30px;
+            font-size: 24px;
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 16px;
+            color: #fff;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        input::placeholder {
+            color: rgba(0, 255, 136, 0.3);
+        }
+
+        /* Choice buttons */
+        .choices {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .choice-btn {
+            padding: 20px 30px;
+            background: rgba(0, 20, 40, 0.8);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+        }
+
+        .choice-btn:hover {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateX(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        /* Particles floating around */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 255, 136, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="phoenix-orb">
+        <div class="orb-core"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
+    </div>
+
+    <!-- Phoenix Speech Bubble -->
+    <div class="phoenix-speech" id="speech">
+        <div class="speech-text" id="speechText"></div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area" id="inputArea">
+        <input type="text" id="userInput" placeholder="Type here...">
+        <div class="choices" id="choices"></div>
+    </div>
+
+    <script>
+        const userData = {};
+        let currentQuestion = 0;
+
+        const conversation = [
+            {
+                phoenix: "Hello. I'm Phoenix.",
+                type: 'speak',
+                delay: 1000
+            },
+            {
+                phoenix: "I'm going to optimize your entire life.",
+                type: 'speak',
+                delay: 3000
+            },
+            {
+                phoenix: "But first, I need to know you.",
+                type: 'speak',
+                delay: 5500
+            },
+            {
+                phoenix: "What's your name?",
+                type: 'input',
+                field: 'name',
+                delay: 7500
+            },
+            {
+                phoenix: (name) => `Nice to meet you, ${name}.`,
+                type: 'speak',
+                delay: 1000
+            },
+            {
+                phoenix: "What's your main goal right now?",
+                type: 'choices',
+                field: 'goal',
+                options: [
+                    { text: '⚡ Peak Performance', value: 'performance' },
+                    { text: '💪 Better Health', value: 'health' },
+                    { text: '😴 Recovery & Sleep', value: 'recovery' },
+                    { text: '🎯 Productivity', value: 'productivity' }
+                ],
+                delay: 3000
+            },
+            {
+                phoenix: "Perfect. I'll optimize everything for that.",
+                type: 'speak',
+                delay: 1000
+            },
+            {
+                phoenix: "Let's go.",
+                type: 'finish',
+                delay: 3000
+            }
+        ];
+
+        // Speak text using browser TTS
+        function speak(text) {
+            return new Promise(resolve => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+
+                // Try to use a female voice
+                const voices = window.speechSynthesis.getVoices();
+                const femaleVoice = voices.find(v =>
+                    v.name.includes('Samantha') ||
+                    v.name.includes('Karen') ||
+                    v.name.includes('Victoria') ||
+                    v.name.includes('Female') ||
+                    v.name.includes('Fiona')
+                );
+                if (femaleVoice) {
+                    utterance.voice = femaleVoice;
+                }
+
+                utterance.onend = () => resolve();
+                utterance.onerror = () => resolve();
+
+                window.speechSynthesis.speak(utterance);
+            });
+        }
+
+        // Typing effect
+        function typeText(element, text, speed = 50) {
+            return new Promise(resolve => {
+                element.innerHTML = '';
+                let i = 0;
+
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                element.appendChild(cursor);
+
+                // Start speaking while typing
+                speak(text);
+
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        element.insertBefore(document.createTextNode(text[i]), cursor);
+                        i++;
+                    } else {
+                        cursor.remove();
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
+
+        // Load voices
+        window.speechSynthesis.onvoiceschanged = () => {
+            console.log('Voices loaded:', window.speechSynthesis.getVoices().length);
+        };
+
+        // Show next conversation step
+        async function showNext() {
+            if (currentQuestion >= conversation.length) return;
+
+            const step = conversation[currentQuestion];
+
+            // Wait for delay
+            await new Promise(resolve => setTimeout(resolve, step.delay));
+
+            // Get Phoenix's text
+            let phoenixText = typeof step.phoenix === 'function'
+                ? step.phoenix(userData.name)
+                : step.phoenix;
+
+            // Type Phoenix's message
+            await typeText(document.getElementById('speechText'), phoenixText);
+
+            // Handle interaction type
+            if (step.type === 'input') {
+                showInput(step.field);
+            } else if (step.type === 'choices') {
+                showChoices(step.options, step.field);
+            } else if (step.type === 'finish') {
+                finish();
+            } else {
+                currentQuestion++;
+                showNext();
+            }
+        }
+
+        // Show input field
+        function showInput(field) {
+            const inputArea = document.getElementById('inputArea');
+            const input = document.getElementById('userInput');
+
+            inputArea.classList.add('visible');
+            input.focus();
+
+            input.onkeypress = (e) => {
+                if (e.key === 'Enter' && input.value.trim()) {
+                    userData[field] = input.value.trim();
+                    inputArea.classList.remove('visible');
+                    input.value = '';
+                    currentQuestion++;
+                    showNext();
+                }
+            };
+        }
+
+        // Show choice buttons
+        function showChoices(options, field) {
+            const inputArea = document.getElementById('inputArea');
+            const choices = document.getElementById('choices');
+
+            choices.innerHTML = options.map(opt =>
+                `<div class="choice-btn" onclick="selectChoice('${field}', '${opt.value}')">${opt.text}</div>`
+            ).join('');
+
+            inputArea.classList.add('visible');
+        }
+
+        // Select a choice
+        function selectChoice(field, value) {
+            userData[field] = value;
+            document.getElementById('inputArea').classList.remove('visible');
+            currentQuestion++;
+            showNext();
+        }
+
+        // Finish onboarding
+        function finish() {
+            localStorage.setItem('phoenix_user', JSON.stringify(userData));
+            localStorage.setItem('phoenix_onboarded', 'true');
+
+            document.getElementById('speechText').innerHTML = 'Initializing...';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+        }
+
+        // Create floating particles
+        function createParticles() {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Start
+        createParticles();
+        showNext();
+    </script>
+</body>
+</html>

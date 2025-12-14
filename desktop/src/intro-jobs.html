@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.08) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Glowing orbs in background */
+        body::after {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 150, 255, 0.15) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(80px);
+            z-index: -1;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+        }
+
+        .container {
+            max-width: 1000px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .product-name {
+            font-size: 80px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00ff88, #0096ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+        }
+
+        .tagline {
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 60px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.3;
+        }
+
+        .demo {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(0, 150, 255, 0.05));
+            border-radius: 24px;
+            padding: 60px;
+            margin: 60px 0;
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            box-shadow:
+                0 20px 60px rgba(0, 255, 136, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .demo-item {
+            font-size: 24px;
+            margin: 40px 0;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+        }
+
+        .before {
+            color: rgba(255, 100, 100, 0.8);
+        }
+
+        .after {
+            color: #00ff88;
+            font-weight: 500;
+        }
+
+        .arrow {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 36px;
+            margin: 0 40px;
+        }
+
+        .price {
+            font-size: 32px;
+            margin: 60px 0 20px 0;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .price-amount {
+            font-size: 72px;
+            font-weight: 600;
+            color: #00ff88;
+            margin: 20px 0;
+        }
+
+        .cta {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 22px 70px;
+            font-size: 20px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #00ff88, #0096ff);
+            color: #000;
+            border-radius: 980px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            font-family: inherit;
+            box-shadow:
+                0 10px 30px rgba(0, 255, 136, 0.3),
+                0 0 0 0 rgba(0, 255, 136, 0.4);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3), 0 0 20px rgba(0, 255, 136, 0.2); }
+            50% { box-shadow: 0 10px 40px rgba(0, 255, 136, 0.5), 0 0 30px rgba(0, 255, 136, 0.4); }
+        }
+
+        .cta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow:
+                0 20px 60px rgba(0, 255, 136, 0.5),
+                0 0 40px rgba(0, 255, 136, 0.6);
+        }
+
+        .cta:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .footnote {
+            margin-top: 30px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="product-name">Phoenix</div>
+        <div class="tagline">Your life. Optimized.</div>
+
+        <div class="demo">
+            <div class="demo-item">
+                <div class="before">You waste 2 hours daily</div>
+                <div class="arrow">→</div>
+                <div class="after">I get you 1 hour back</div>
+            </div>
+            <div class="demo-item">
+                <div class="before">You burn out every month</div>
+                <div class="arrow">→</div>
+                <div class="after">I warn you 3 days early</div>
+            </div>
+            <div class="demo-item">
+                <div class="before">You miss your goals</div>
+                <div class="arrow">→</div>
+                <div class="after">I adjust them automatically</div>
+            </div>
+        </div>
+
+        <div class="price">
+            That's worth $18,000/year to you.<br>
+            I'm asking:
+        </div>
+        <div class="price-amount">$9.99/month</div>
+
+        <button class="cta" onclick="start()">Try Free for 7 Days</button>
+        <div class="footnote">No credit card required</div>
+    </div>
+
+    <script>
+        function start() {
+            window.location.href = 'onboard-alive.html';
+        }
+    </script>
+</body>
+</html>

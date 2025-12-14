@@ -3,8 +3,6 @@
 // ✅ AUTHENTICATION FIXED - proper token handling
 // ✅ ERROR HANDLING - proper 401 detection and recovery
 
-const DEBUG_MODE = false; // Set to true to enable verbose debug logging
-
 class JARVISEngine {
     constructor() {
         // Use centralized config if available, fallback to production
@@ -20,10 +18,13 @@ class JARVISEngine {
         this.activeInterventions = [];
         this.insights = [];
         this.recommendations = [];
+        
+        console.log('JARVIS Engine constructed');
     }
 
     getHeaders() {
         const token = localStorage.getItem('phoenixToken'); // FIXED: correct key
+        if (!token) console.warn('⚠️ No auth token - endpoints will return 401');
         return {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -33,41 +34,47 @@ class JARVISEngine {
     async checkAuth() {
         const token = localStorage.getItem('phoenixToken');
         if (!token) {
+            console.error('❌ No authentication token');
             return false;
         }
-        
+
         try {
             const response = await fetch(`${this.baseURL}/auth/me`, {
                 headers: this.getHeaders()
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
-                if (DEBUG_MODE) console.log('Authenticated:', data.user?.name);
+                console.log('Authenticated:', data.user?.name);
                 return true;
             } else {
+                console.error('❌ Token invalid');
                 localStorage.removeItem('phoenixToken');
                 return false;
             }
         } catch (error) {
+            console.error('❌ Auth check failed:', error);
             return false;
         }
     }
 
     async init() {
+        console.log('⚡ Initializing JARVIS (optimized)...');
         const startTime = performance.now();
 
         const isAuth = await this.checkAuth();
         if (!isAuth) {
+            console.error('❌ No authentication - JARVIS limited mode');
             return;
         }
 
         try {
             // OPTIMIZATION: Load critical features in parallel (300-500ms instead of 3.5s!)
+            console.log('⚡ Loading features in parallel...');
             await Promise.all([
-                this.loadPersonality().catch(e => {}),
-                this.loadChatHistory().catch(e => {}),
-                this.loadInsights().catch(e => {})
+                this.loadPersonality().catch(e => console.warn('Personality load failed:', e)),
+                this.loadChatHistory().catch(e => console.warn('Chat history load failed:', e)),
+                this.loadInsights().catch(e => console.warn('Insights load failed:', e))
             ]);
 
             // OPTIMIZATION: Lazy load non-critical features in background
@@ -76,14 +83,17 @@ class JARVISEngine {
             // Setup UI immediately
             this.setupChatInterface();
 
+            // Setup voice session cleanup handler
+            this.setupVoiceSessionCleanup();
+
             // OPTIMIZATION: Delay real-time monitoring to avoid blocking
             setTimeout(() => this.startRealtimeMonitoring(), 2000);
 
             const loadTime = Math.round(performance.now() - startTime);
-            if (DEBUG_MODE) console.log(`✅ JARVIS initialized in ${loadTime}ms`);
+            console.log(`✅ JARVIS initialized in ${loadTime}ms (optimized)`);
             this.showWelcomeMessage();
         } catch (error) {
-            if (DEBUG_MODE) console.error('Init error:', error);
+            console.error('❌ Init error:', error);
         }
     }
 
@@ -103,10 +113,18 @@ class JARVISEngine {
     // COMPANION CHAT - 6 endpoints
     async chat(message) {
         try {
+            // ⚡ OPTIMIZATION: Use pre-loaded context if available (saves 2+ seconds!)
+            const cachedContext = window.phoenixCache?.context || null;
+
             const response = await fetch(`${this.baseURL}/phoenix/companion/chat`, {
                 method: 'POST',
                 headers: this.getHeaders(),
-                body: JSON.stringify({ message, personality: this.personality })
+                body: JSON.stringify({
+                    message,
+                    personality: this.personality,
+                    // Pass cached context to skip DB queries on backend
+                    cachedContext: cachedContext
+                })
             });
 
             if (!response.ok) {
@@ -119,8 +137,15 @@ class JARVISEngine {
 
             const data = await response.json();
             this.chatHistory.push({ role: 'user', content: message, timestamp: new Date().toISOString() });
-            this.chatHistory.push({ role: 'assistant', content: data.response, timestamp: new Date().toISOString() });
-            return data;
+            this.chatHistory.push({ role: 'assistant', content: data.data.message, timestamp: new Date().toISOString() });
+
+            // Execute UI commands from Claude if present
+            if (data.data.ui && window.phoenixUI) {
+                console.log('[JARVIS] Executing UI command:', data.data.ui);
+                window.phoenixUI.execute(data.data.ui);
+            }
+
+            return data.data;
         } catch (error) {
             console.warn('⚠️  Backend AI unavailable - using intelligent fallback:', error.message);
             // Use intelligent fallback instead of generic error
@@ -514,7 +539,10 @@ class JARVISEngine {
             const response = await this.chat(message);
             this.hideTypingIndicator();
 
-            if (response?.response) {
+            if (response?.message) {
+                this.addMessageToUI(response.message, 'assistant');
+            } else if (response?.response) {
+                // Fallback for old format
                 this.addMessageToUI(response.response, 'assistant');
             } else {
                 this.addMessageToUI('Error processing message', 'assistant');
@@ -529,13 +557,6 @@ class JARVISEngine {
     async processConversation(message) {
         // Display user message immediately in conversation panel
         this.addMessageToConversationPanel(message, 'user');
-
-        // Check for workspace commands first
-        const workspaceResult = await this.handleWorkspaceCommand(message);
-        if (workspaceResult) {
-            this.addMessageToConversationPanel(workspaceResult.response, 'assistant');
-            return;
-        }
 
         // Show typing indicator with personality
         this.showTypingIndicatorInPanel();
@@ -557,14 +578,14 @@ class JARVISEngine {
 
             this.hideTypingIndicatorInPanel();
 
-            if (response?.response) {
+            if (response?.message) {
                 // ⚡ STREAM THE RESPONSE for better UX (typewriter effect)
-                await this.streamMessageToPanel(response.response, 'assistant');
+                await this.streamMessageToPanel(response.message, 'assistant');
                 console.log(`✅ Response time: ${responseTime}ms`);
-            } else if (response?.fallback) {
-                // Show intelligent fallback
+            } else if (response?.response) {
+                // Fallback for old format or intelligent fallback
                 await this.streamMessageToPanel(response.response, 'assistant');
-                console.log(`⚡ Using intelligent fallback (backend unavailable)`);
+                console.log(response.fallback ? `⚡ Using intelligent fallback (backend unavailable)` : `✅ Response time: ${responseTime}ms`);
             } else {
                 this.addMessageToConversationPanel('I didn\'t catch that. Can you rephrase?', 'assistant');
             }
@@ -787,13 +808,13 @@ class JARVISEngine {
 
     showNotification(title, message, type = 'info') {
         console.log(`📢 ${type.toUpperCase()} - ${title}: ${message}`);
-        
+
         const colors = {
             info: '#00d9ff',
             warning: '#ffc800',
             error: '#ff4444'
         };
-        
+
         const notification = document.createElement('div');
         notification.style.cssText = `
             position: fixed; top: 100px; right: 30px;
@@ -802,7 +823,7 @@ class JARVISEngine {
             padding: 20px; max-width: 350px; z-index: 10000;
             border-radius: 4px;
         `;
-        
+
         notification.innerHTML = `
             <div style="font-size: 14px; font-weight: bold; color: ${colors[type]}; margin-bottom: 10px;">${title}</div>
             <div style="font-size: 12px; color: ${colors[type]}; opacity: 0.8;">${message}</div>
@@ -812,94 +833,163 @@ class JARVISEngine {
         setTimeout(() => notification.remove(), 5000);
     }
 
-    // WORKSPACE COMMAND HANDLER - Intercepts workspace-related commands
-    async handleWorkspaceCommand(message) {
-        const lowerMsg = message.toLowerCase();
-        const token = localStorage.getItem('phoenixToken');
-        const API = 'https://pal-backend-production.up.railway.app/api';
+    // ============================================
+    // ENHANCED VOICE SESSION MANAGEMENT
+    // Uses new iOS voice endpoints for context-aware voice interactions
+    // ============================================
 
-        // Check Google connection status first
-        let googleConnected = false;
+    async startVoiceSession(context = {}) {
         try {
-            const statusRes = await fetch(`${API}/google/status`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const status = await statusRes.json();
-            googleConnected = status.connected;
-        } catch (e) {
-            googleConnected = false;
-        }
+            console.log('🎤 [Voice] Starting enhanced voice session...');
 
-        // Define workspace command patterns
-        const patterns = {
-            email: /\b(email|emails|inbox|mail|messages?)\b/i,
-            calendar: /\b(calendar|schedule|events?|meetings?|appointments?|what('s|s)?\s*(on|planned)|today('s)?\s*schedule)\b/i,
-            tasks: /\b(tasks?|to.?do|todos?|reminders?|list)\b/i,
-            contacts: /\b(contacts?|people|find\s+\w+|who\s+is|look\s+up)\b/i,
-            drive: /\b(drive|files?|documents?|find\s+file|find\s+document)\b/i
-        };
+            // Gather current context from dashboard
+            const sessionContext = {
+                ...context,
+                currentView: window.location.pathname,
+                timestamp: Date.now(),
+                userState: {
+                    activeTasks: this.activePredictions?.length || 0,
+                    pendingInterventions: this.activeInterventions?.length || 0
+                }
+            };
 
-        // Check which pattern matches
-        let matchedType = null;
-        for (const [type, pattern] of Object.entries(patterns)) {
-            if (pattern.test(lowerMsg)) {
-                matchedType = type;
-                break;
+            const response = await api.startVoiceSession(sessionContext);
+
+            if (response.sessionId) {
+                this.activeVoiceSession = {
+                    sessionId: response.sessionId,
+                    startTime: Date.now(),
+                    context: sessionContext
+                };
+
+                console.log('✅ [Voice] Session started:', response.sessionId);
+                this.showNotification('Voice Session', 'Voice session started', 'info');
+
+                return response;
+            } else {
+                throw new Error('No session ID received');
             }
-        }
-
-        if (!matchedType) return null; // Not a workspace command
-
-        // If Google not connected, prompt to connect
-        if (!googleConnected) {
-            return {
-                response: `I'd love to help with your ${matchedType}, but you haven't connected your Google account yet. Click the DESK button above to connect Google Workspace.`
-            };
-        }
-
-        // Fetch the data
-        try {
-            const endpoints = {
-                email: '/google/gmail/recent?limit=10',
-                calendar: '/google/calendar/upcoming?limit=10',
-                tasks: '/google/tasks/lists',
-                contacts: '/google/contacts?limit=20',
-                drive: '/google/drive/files?limit=10'
-            };
-
-            const res = await fetch(`${API}${endpoints[matchedType]}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-
-            // Show the widget
-            if (window.showDynamicWidget) {
-                window.showDynamicWidget(matchedType, data);
-            }
-
-            // Generate response based on type
-            const responses = {
-                email: `Found ${data.count || 0} recent emails. I've displayed them for you.`,
-                calendar: `You have ${data.count || 0} upcoming events. I've pulled up your schedule.`,
-                tasks: `Found ${data.count || 0} task lists. Here they are.`,
-                contacts: `Found ${data.count || 0} contacts. Take a look.`,
-                drive: `Found ${data.count || 0} files in your Drive.`
-            };
-
-            return { response: responses[matchedType] };
-
         } catch (error) {
-            console.error('Workspace command error:', error);
-            return {
-                response: `I had trouble accessing your ${matchedType}. Please try again or check your Google connection in the DESK panel.`
-            };
+            console.error('❌ [Voice] Failed to start voice session:', error);
+            this.showNotification('Voice Error', 'Failed to start voice session', 'error');
+            throw error;
         }
+    }
+
+    async processVoiceCommand(command, additionalContext = {}) {
+        try {
+            if (!this.activeVoiceSession) {
+                console.warn('⚠️ [Voice] No active session, starting new one...');
+                await this.startVoiceSession(additionalContext);
+            }
+
+            console.log('🎤 [Voice] Processing command:', command);
+
+            const context = {
+                ...this.activeVoiceSession?.context,
+                ...additionalContext,
+                timestamp: Date.now()
+            };
+
+            const response = await api.processVoiceCommand(
+                this.activeVoiceSession.sessionId,
+                command,
+                context
+            );
+
+            console.log('✅ [Voice] Command processed:', response);
+
+            // If backend suggests an action, execute it
+            if (response.suggestedAction) {
+                await this.executeVoiceAction(response.suggestedAction);
+            }
+
+            return response;
+        } catch (error) {
+            console.error('❌ [Voice] Failed to process command:', error);
+            this.showNotification('Voice Error', 'Failed to process voice command', 'error');
+            throw error;
+        }
+    }
+
+    async executeVoiceAction(action) {
+        try {
+            if (!this.activeVoiceSession) {
+                throw new Error('No active voice session');
+            }
+
+            console.log('🎤 [Voice] Executing action:', action);
+
+            const response = await api.executeVoiceAction(
+                this.activeVoiceSession.sessionId,
+                action
+            );
+
+            console.log('✅ [Voice] Action executed:', response);
+
+            // Handle different action types
+            if (action.type === 'navigate' && action.target) {
+                window.location.href = action.target;
+            } else if (action.type === 'notification' && action.message) {
+                this.showNotification('Voice Action', action.message, 'info');
+            } else if (action.type === 'chat' && action.message) {
+                await this.sendMessage(action.message);
+            }
+
+            return response;
+        } catch (error) {
+            console.error('❌ [Voice] Failed to execute action:', error);
+            this.showNotification('Voice Error', 'Failed to execute voice action', 'error');
+            throw error;
+        }
+    }
+
+    async endVoiceSession() {
+        try {
+            if (!this.activeVoiceSession) {
+                console.warn('⚠️ [Voice] No active session to end');
+                return;
+            }
+
+            console.log('🎤 [Voice] Ending voice session...');
+
+            const response = await api.endVoiceSession(this.activeVoiceSession.sessionId);
+
+            const duration = Math.floor((Date.now() - this.activeVoiceSession.startTime) / 1000);
+            console.log(`✅ [Voice] Session ended. Duration: ${duration}s`);
+
+            this.activeVoiceSession = null;
+            this.showNotification('Voice Session', 'Voice session ended', 'info');
+
+            return response;
+        } catch (error) {
+            console.error('❌ [Voice] Failed to end voice session:', error);
+            this.showNotification('Voice Error', 'Failed to end voice session', 'error');
+            throw error;
+        }
+    }
+
+    // Auto-cleanup voice session on page unload
+    setupVoiceSessionCleanup() {
+        window.addEventListener('beforeunload', () => {
+            if (this.activeVoiceSession) {
+                // Use sendBeacon for guaranteed delivery even when page is closing
+                const payload = JSON.stringify({
+                    sessionId: this.activeVoiceSession.sessionId
+                });
+                navigator.sendBeacon(
+                    `${this.baseURL}/ios/voice/session/end`,
+                    new Blob([payload], { type: 'application/json' })
+                );
+            }
+        });
     }
 }
 
 // INIT
 const jarvisEngine = new JARVISEngine();
 window.jarvisEngine = jarvisEngine;
+window.JARVIS = jarvisEngine; // Orchestrator compatibility
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => jarvisEngine.init());
