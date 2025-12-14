@@ -10,6 +10,47 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Phoenix - AI Life Operating System</title>
+
+    <!-- EARLY TAURI DETECTION -->
+    <script>
+        // Set global flag for Omniverse mode before anything else loads
+        window.OMNIVERSE_MODE = false;
+        window.TAURI_CHECK_COUNT = 0;
+        (function checkTauri() {
+            window.TAURI_CHECK_COUNT++;
+            if (window.__TAURI__ || window.__TAURI_IPC__) {
+                window.OMNIVERSE_MODE = true;
+                console.log('[EARLY] Tauri detected after', window.TAURI_CHECK_COUNT, 'checks');
+                document.documentElement.setAttribute('data-omniverse', 'true');
+                // Force hide login, show omniverse
+                document.body?.classList.add('omniverse-mode');
+            } else if (window.TAURI_CHECK_COUNT < 100) {
+                // Keep checking for 5 seconds (100 * 50ms)
+                setTimeout(checkTauri, 50);
+            } else {
+                console.log('[EARLY] Tauri NOT detected after 5 seconds');
+            }
+        })();
+
+        // Desktop app detection via protocol
+        // Tauri release builds use custom protocols like tauri://, https://tauri.localhost, etc.
+        const proto = window.location.protocol;
+        const host = window.location.hostname;
+        const isDesktopApp = (
+            // Non-standard protocols (not http/https/file)
+            (proto !== 'http:' && proto !== 'https:' && proto !== 'file:') ||
+            // Tauri-specific patterns
+            proto === 'tauri:' ||
+            host === 'tauri.localhost' ||
+            host.endsWith('.tauri.localhost') ||
+            window.location.origin.includes('tauri')
+        );
+        if (isDesktopApp) {
+            window.OMNIVERSE_MODE = true;
+            document.documentElement.setAttribute('data-omniverse', 'true');
+            console.log('[EARLY] Desktop app detected - protocol:', proto, 'host:', host);
+        }
+    </script>
     <link rel="stylesheet" href="styles.css?v=20251031">
     <link rel="stylesheet" href="phoenix-voice.css?v=20251031">
     <style>
@@ -1577,43 +1618,67 @@
         }
 
         // ============================================
-        // TAURI/OMNIVERSE DETECTION
+        // TAURI/OMNIVERSE DETECTION (ROBUST)
         // ============================================
-        const isTauri = () => window.__TAURI__ !== undefined;
+        const isTauri = () => {
+            // Multiple detection methods for reliability
+            return window.__TAURI__ !== undefined ||
+                   window.__TAURI_IPC__ !== undefined ||
+                   window.location.protocol === 'tauri:' ||
+                   navigator.userAgent.includes('Tauri');
+        };
+
+        // Wait for Tauri to be ready with retry
+        async function waitForTauri(maxRetries = 10, delay = 100) {
+            for (let i = 0; i < maxRetries; i++) {
+                if (window.__TAURI__) {
+                    console.log('[Omniverse] Tauri detected after', i * delay, 'ms');
+                    return true;
+                }
+                await new Promise(r => setTimeout(r, delay));
+            }
+            return false;
+        }
 
         async function initOmniverseMode() {
-            console.log('[Omniverse] Running in Tauri desktop mode');
+            console.log('[Omniverse] initOmniverseMode starting...');
 
-            // Check if already initialized
             try {
-                const { invoke } = window.__TAURI__.tauri;
-                const health = await invoke('health');
+                // Clear any stale auth data - fresh start for desktop
+                localStorage.removeItem('genesisHash');
+                localStorage.removeItem('omniverseMode');
+                localStorage.removeItem('phoenixToken');
+                console.log('[Omniverse] Cleared localStorage, showing setup...');
 
-                if (health && health.initialized) {
-                    console.log('[Omniverse] Already initialized, loading main app...');
-                    // Fake token for local mode
-                    localStorage.setItem('phoenixToken', 'omniverse-local-' + health.genesis_hash);
-                    localStorage.setItem('omniverseMode', 'local');
-                    localStorage.setItem('genesisHash', health.genesis_hash);
-
-                    // Go directly to main app
-                    ViewManager.showView('main');
-                    return;
-                }
-            } catch (e) {
-                console.log('[Omniverse] Not initialized yet');
+                // Always show setup for now (can restore persistence later)
+                showOmniverseSetup();
+                console.log('[Omniverse] Setup screen should be visible');
+            } catch (error) {
+                console.error('[Omniverse] Error in initOmniverseMode:', error);
+                // Fallback - still try to show setup
+                showOmniverseSetup();
             }
-
-            // Show Omniverse setup
-            showOmniverseSetup();
         }
 
         function showOmniverseSetup() {
-            // Create Omniverse setup overlay
+            console.log('[Omniverse] showOmniverseSetup called');
+
+            // FORCE hide all other views and UI elements
+            document.querySelectorAll('.view').forEach(v => {
+                v.classList.remove('active');
+                v.style.display = 'none';
+            });
+            // Also hide any existing content
+            document.querySelectorAll('#view-login, #view-landing, #view-main, .auth-container').forEach(el => {
+                if (el) el.style.display = 'none';
+            });
+
+            // Create Omniverse setup overlay - MAXIMUM z-index
             const setupDiv = document.createElement('div');
             setupDiv.id = 'omniverse-setup';
+            setupDiv.style.cssText = 'position:fixed !important;top:0 !important;left:0 !important;width:100vw !important;height:100vh !important;z-index:2147483647 !important;background:#000 !important;';
             setupDiv.innerHTML = `
-                <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'SF Mono',monospace">
+                <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'SF Mono',monospace">
                     <div style="font-size:64px;color:#00D9FF;text-shadow:0 0 30px rgba(0,217,255,1);letter-spacing:12px;margin-bottom:20px;animation:pulse 2s infinite">OMNIVERSE</div>
                     <div style="color:rgba(0,217,255,0.6);margin-bottom:40px;text-align:center;max-width:500px;line-height:1.6">
                         Your sovereign AI consciousness powered by Phoenix.<br>
@@ -1697,8 +1762,25 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('[Phoenix] Initializing unified app...');
 
-            // Check if running in Tauri (Omniverse desktop)
-            if (isTauri()) {
+            // IMMEDIATE desktop detection - block everything until determined
+            const proto = window.location.protocol;
+            const host = window.location.hostname;
+            const isDesktop = (
+                window.OMNIVERSE_MODE ||
+                window.__TAURI__ !== undefined ||
+                (proto !== 'http:' && proto !== 'https:' && proto !== 'file:') ||
+                proto === 'tauri:' ||
+                host === 'tauri.localhost' ||
+                host.endsWith('.tauri.localhost') ||
+                window.location.origin.includes('tauri')
+            );
+
+            console.log('[Phoenix] Desktop check:', isDesktop, 'proto:', proto, 'host:', host);
+
+            if (isDesktop) {
+                console.log('[Phoenix] DESKTOP MODE - Showing Omniverse');
+                window.OMNIVERSE_MODE = true;
+
                 // Load Tauri-specific scripts
                 const scripts = ['api-adapter.js', 'piper-tts.js'];
                 for (const src of scripts) {
@@ -1707,13 +1789,15 @@
                     document.head.appendChild(script);
                 }
 
-                // Wait a moment for scripts to load
-                await new Promise(r => setTimeout(r, 100));
+                // Wait for scripts to load
+                await new Promise(r => setTimeout(r, 200));
 
                 // Initialize Omniverse mode
                 await initOmniverseMode();
                 return;
             }
+
+            console.log('[Phoenix] Web mode - no Tauri detected');
 
             // Standard Phoenix web mode
             // Start view manager
