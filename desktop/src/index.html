@@ -1755,18 +1755,19 @@
             console.log('[Omniverse] initOmniverseMode starting...');
 
             try {
-                // Clear any stale auth data - fresh start for desktop
-                localStorage.removeItem('genesisHash');
-                localStorage.removeItem('omniverseMode');
-                localStorage.removeItem('phoenixToken');
-                console.log('[Omniverse] Cleared localStorage, showing setup...');
+                // Check if already initialized
+                const storedHash = localStorage.getItem('genesisHash');
+                if (storedHash && localStorage.getItem('omniverseMode') === 'local') {
+                    console.log('[Omniverse] Already initialized, going to dashboard...');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
 
-                // Always show setup for now (can restore persistence later)
+                // Show setup for new users
+                console.log('[Omniverse] First launch, showing setup...');
                 showOmniverseSetup();
-                console.log('[Omniverse] Setup screen should be visible');
             } catch (error) {
                 console.error('[Omniverse] Error in initOmniverseMode:', error);
-                // Fallback - still try to show setup
                 showOmniverseSetup();
             }
         }
@@ -1853,16 +1854,8 @@
                         localStorage.setItem('omniverseMode', 'local');
                         localStorage.setItem('genesisHash', result.genesis_hash);
 
-                        // Remove setup overlay
-                        setupDiv.remove();
-
-                        // Initialize Piper TTS
-                        if (window.PiperTTS) {
-                            await window.PiperTTS.init();
-                        }
-
-                        // Go to main app
-                        ViewManager.showView('main');
+                        // Go to Phoenix dashboard
+                        window.location.href = 'dashboard.html';
                     } else {
                         throw new Error(result?.message || 'Initialization failed');
                     }
