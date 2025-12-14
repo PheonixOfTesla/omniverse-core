@@ -2,430 +2,252 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omniverse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Omniverse - Phoenix Edition</title>
+
+    <!-- Phoenix Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="phoenix-voice.css">
+    <link rel="stylesheet" href="voice-mode.css">
+    <link rel="stylesheet" href="widget-styles.css">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-tertiary: #1a1a25;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0b0;
-            --accent: #6366f1;
-            --accent-hover: #818cf8;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --border: #2a2a3a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 24px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            -webkit-app-region: drag;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: var(--bg-tertiary);
-            border-radius: 20px;
-            font-size: 13px;
-            -webkit-app-region: no-drag;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--success);
-        }
-
-        .status-dot.offline {
-            background: var(--warning);
-        }
-
-        /* Main Content */
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            max-width: 900px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Setup Screen */
+        /* Omniverse Setup Styles */
         .setup-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 1;
             text-align: center;
+            transition: opacity 0.5s;
         }
 
-        .setup-screen h1 {
-            font-size: 32px;
-            margin-bottom: 12px;
+        .setup-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .setup-screen p {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            max-width: 500px;
+        .setup-logo {
+            font-size: 64px;
+            color: #00D9FF;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 1);
+            letter-spacing: 12px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
         }
 
         .setup-form {
             width: 100%;
             max-width: 400px;
+            padding: 20px;
         }
 
         .input-group {
             margin-bottom: 16px;
+            text-align: left;
         }
 
         .input-group label {
             display: block;
             margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-secondary);
+            font-size: 12px;
+            color: rgba(0, 217, 255, 0.7);
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .input-group input {
             width: 100%;
             padding: 12px 16px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
+            background: rgba(0, 10, 20, 0.9);
+            border: 2px solid rgba(0, 217, 255, 0.3);
             border-radius: 8px;
-            color: var(--text-primary);
+            color: #00D9FF;
             font-size: 16px;
+            font-family: inherit;
         }
 
         .input-group input:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: #00D9FF;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
         }
 
-        .btn {
+        .btn-primary {
             width: 100%;
             padding: 14px 24px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 2px solid #00D9FF;
+            color: #00D9FF;
+            font-family: inherit;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            border-radius: 8px;
+            letter-spacing: 2px;
+            transition: all 0.3s;
         }
 
-        .btn:hover {
-            background: var(--accent-hover);
+        .btn-primary:hover {
+            background: rgba(0, 217, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
         }
 
-        .btn:disabled {
+        .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* Chat Interface */
-        .chat-container {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .chat-container.active {
-            display: flex;
-        }
-
-        .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 0;
-        }
-
-        .message {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .message-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: var(--bg-tertiary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .message-avatar.ai {
-            background: linear-gradient(135deg, var(--accent), #a855f7);
-        }
-
-        .message-content {
-            flex: 1;
-        }
-
-        .message-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
-        }
-
-        .message-name {
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .message-meta {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .message-text {
+        .setup-subtitle {
+            color: rgba(0, 217, 255, 0.6);
+            margin-bottom: 40px;
+            max-width: 500px;
             line-height: 1.6;
-            color: var(--text-secondary);
         }
 
-        .message-text.user {
-            color: var(--text-primary);
-        }
-
-        /* Input Area */
-        .input-area {
-            padding: 16px 0;
-            border-top: 1px solid var(--border);
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 8px;
-        }
-
-        .input-wrapper input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 15px;
-            padding: 8px 12px;
-        }
-
-        .input-wrapper input:focus {
-            outline: none;
-        }
-
-        .send-btn {
-            padding: 10px 20px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .send-btn:hover {
-            background: var(--accent-hover);
-        }
-
-        /* Footer */
-        .footer {
-            padding: 12px 24px;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .genesis-hash {
-            font-family: monospace;
-            background: var(--bg-tertiary);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        /* Animations */
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
 
-        .loading {
-            animation: pulse 1.5s infinite;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body>
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">Ω</div>
-            <span class="logo-text">Omniverse</span>
-        </div>
-        <div class="status-badge">
-            <span class="status-dot" id="statusDot"></span>
-            <span id="statusText">Local Mode</span>
-        </div>
-    </header>
+<body data-mode="voice" style="background: #000000 !important;">
+    <!-- Setup Screen (shows on first run) -->
+    <div id="setupScreen" class="setup-screen">
+        <div class="setup-logo">OMNIVERSE</div>
+        <p class="setup-subtitle">
+            Your sovereign AI consciousness powered by Phoenix.<br>
+            All data encrypted and stored locally on this device.
+        </p>
 
-    <main class="main">
-        <!-- Setup Screen -->
-        <div class="setup-screen" id="setupScreen">
-            <h1>Welcome to Omniverse</h1>
-            <p>Your sovereign AI consciousness. All data stays on this device, encrypted with your passphrase.</p>
-
-            <form class="setup-form" id="setupForm">
-                <div class="input-group">
-                    <label for="passphrase">Encryption Passphrase</label>
-                    <input type="password" id="passphrase" placeholder="Enter a strong passphrase" required>
-                </div>
-                <div class="input-group">
-                    <label for="confirmPassphrase">Confirm Passphrase</label>
-                    <input type="password" id="confirmPassphrase" placeholder="Confirm your passphrase" required>
-                </div>
-                <button type="submit" class="btn" id="setupBtn">Initialize Omniverse</button>
-            </form>
-        </div>
-
-        <!-- Chat Interface -->
-        <div class="chat-container" id="chatContainer">
-            <div class="messages" id="messages">
-                <div class="message">
-                    <div class="message-avatar ai">Ω</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-name">Omniverse</span>
-                            <span class="message-meta">Local AI</span>
-                        </div>
-                        <div class="message-text">
-                            Welcome back. I'm running entirely on your device. Your data never leaves this machine. How can I help you today?
-                        </div>
-                    </div>
-                </div>
+        <form class="setup-form" id="setupForm">
+            <div class="input-group">
+                <label for="passphrase">Encryption Passphrase</label>
+                <input type="password" id="passphrase" placeholder="Enter a strong passphrase" required autocomplete="new-password">
             </div>
+            <div class="input-group">
+                <label for="confirmPassphrase">Confirm Passphrase</label>
+                <input type="password" id="confirmPassphrase" placeholder="Confirm your passphrase" required autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn-primary" id="setupBtn">Initialize Omniverse</button>
+        </form>
+    </div>
 
-            <div class="input-area">
-                <div class="input-wrapper">
-                    <input type="text" id="queryInput" placeholder="Ask anything..." autofocus>
-                    <button class="send-btn" id="sendBtn">Send</button>
-                </div>
+    <!-- Loading Screen -->
+    <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 1s">
+        <div style="font-size:64px;color:#00D9FF;text-shadow:0 0 30px rgba(0, 217, 255,1);letter-spacing:12px;margin-bottom:30px;animation:pulse 2s infinite">PHOENIX</div>
+        <div style="width:60px;height:60px;border:3px solid rgba(0, 217, 255,0.2);border-top-color:#00D9FF;border-radius:50%;animation:spin 1s linear infinite"></div>
+        <div style="margin-top:30px;color:rgba(0, 217, 255,0.7);font-size:14px;letter-spacing:2px">INITIALIZING AI SYSTEMS...</div>
+    </div>
+
+    <!-- Phoenix UI Container (hidden until initialized) -->
+    <div id="phoenixContainer" style="display: none;">
+        <!-- Voice Mode Toggle -->
+        <div id="mode-toggle-container" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10001;display:flex;gap:10px">
+            <button id="voice-mode-btn" class="mode-toggle-btn mode-toggle-btn-active">
+                VOICE
+            </button>
+            <button id="manual-mode-btn" class="mode-toggle-btn">
+                MANUAL
+            </button>
+        </div>
+
+        <!-- Greeting -->
+        <div id="greeting" style="position:fixed;top:20%;left:50%;transform:translateX(-50%);text-align:center;z-index:500;opacity:0;animation:fadeIn 1s 1s forwards;pointer-events:none">
+            <div class="greeting-main" style="font-size:36px;color:#00D9FF;margin-bottom:10px;text-shadow:0 0 20px rgba(0, 217, 255,1)">Welcome to Omniverse</div>
+            <div class="greeting-sub" style="font-size:14px;color:rgba(0, 217, 255,0.6)">Local AI • Sovereign Data • Phoenix Powered</div>
+        </div>
+
+        <!-- Phoenix Orb Container -->
+        <div id="phoenix-core-container" style="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);z-index:600">
+            <!-- Phoenix orb will be injected here by phoenix-orb.js -->
+        </div>
+
+        <!-- Widget Container -->
+        <div id="phoenix-widget-container"></div>
+
+        <!-- Voice Controls -->
+        <div class="voice-controls" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:12px;align-items:flex-end">
+            <div class="voice-status idle" id="voiceStatus">Offline</div>
+            <button class="voice-btn" id="voiceBtn" disabled>
+                <i class="fas fa-microphone"></i>
+                <span>Activate Voice</span>
+            </button>
+            <select class="voice-selector" id="voiceSelector">
+                <option value="nova">Phoenix (Nova)</option>
+                <option value="alloy">Alloy</option>
+                <option value="echo">Echo</option>
+                <option value="fable">Fable</option>
+                <option value="onyx">Onyx</option>
+                <option value="shimmer">Shimmer</option>
+            </select>
+        </div>
+
+        <!-- System Status (Bottom Left) -->
+        <div id="hud-bl" style="position:fixed;bottom:20px;left:20px;z-index:1000;padding:15px;background:rgba(0,10,20,0.9);border:1px solid rgba(0, 217, 255,0.3);backdrop-filter:blur(10px);border-radius:8px;min-width:200px">
+            <div style="font-size:9px;color:rgba(0, 217, 255,0.5);letter-spacing:1px">SYSTEM STATUS</div>
+            <div id="status-display" style="font-size:13px;color:#00D9FF;font-weight:bold;margin:5px 0;display:flex;align-items:center;gap:8px">
+                <span style="width:8px;height:8px;background:#00D9FF;border-radius:50%;box-shadow:0 0 10px #00D9FF;animation:pulse 2s infinite"></span>
+                ONLINE
+            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(0, 217, 255,0.2)">
+                <div style="font-size:9px;color:rgba(0, 217, 255,0.5);letter-spacing:1px;margin-bottom:8px">MODE</div>
+                <div id="backend-mode" style="font-size:11px;color:#00D9FF;font-family:monospace">LOCAL</div>
             </div>
         </div>
-    </main>
 
-    <footer class="footer">
-        <div>
-            Build: <span class="genesis-hash" id="genesisHash">Loading...</span>
+        <!-- Genesis Hash (Bottom Right) -->
+        <div style="position:fixed;bottom:20px;right:240px;z-index:1000;padding:12px 16px;background:rgba(0,10,20,0.9);border:1px solid rgba(0, 217, 255,0.3);backdrop-filter:blur(10px);border-radius:8px;font-size:10px;color:rgba(0, 217, 255,0.7);font-family:monospace">
+            <span style="opacity:0.5">GENESIS:</span> <span id="genesisHash">...</span>
         </div>
-        <div>
-            <a href="#" id="verifyLink">Verify Build</a> ·
-            <a href="#" id="exportLink">Export Data</a>
-        </div>
-    </footer>
+    </div>
 
-    <script type="module">
-        const { invoke } = window.__TAURI__.tauri;
+    <!-- Scripts -->
+    <script src="api-adapter.js"></script>
+    <script src="config.js"></script>
 
-        // Elements
-        const setupScreen = document.getElementById('setupScreen');
-        const chatContainer = document.getElementById('chatContainer');
-        const setupForm = document.getElementById('setupForm');
-        const setupBtn = document.getElementById('setupBtn');
-        const passphrase = document.getElementById('passphrase');
-        const confirmPassphrase = document.getElementById('confirmPassphrase');
-        const messages = document.getElementById('messages');
-        const queryInput = document.getElementById('queryInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const genesisHash = document.getElementById('genesisHash');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-
-        // Check initial state
-        async function checkHealth() {
-            try {
-                const health = await invoke('health');
-                genesisHash.textContent = health.genesis_hash || 'Not initialized';
-
-                if (health.initialized) {
-                    setupScreen.style.display = 'none';
-                    chatContainer.classList.add('active');
-                }
-            } catch (e) {
-                console.error('Health check failed:', e);
+    <script>
+        // Auto-hide greeting after 5 seconds
+        setTimeout(() => {
+            const greeting = document.getElementById('greeting');
+            if (greeting) {
+                greeting.style.transition = 'opacity 1s ease-out';
+                greeting.style.opacity = '0';
             }
-        }
+        }, 6000);
 
-        // Initialize
-        setupForm.addEventListener('submit', async (e) => {
+        // Setup form handler
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (passphrase.value !== confirmPassphrase.value) {
+            const passphrase = document.getElementById('passphrase').value;
+            const confirmPassphrase = document.getElementById('confirmPassphrase').value;
+            const setupBtn = document.getElementById('setupBtn');
+
+            if (passphrase !== confirmPassphrase) {
                 alert('Passphrases do not match');
+                return;
+            }
+
+            if (passphrase.length < 8) {
+                alert('Passphrase must be at least 8 characters');
                 return;
             }
 
@@ -433,112 +255,156 @@
             setupBtn.textContent = 'Initializing...';
 
             try {
-                const result = await invoke('initialize', { passphrase: passphrase.value });
+                // Initialize Omniverse via Tauri
+                if (window.__TAURI__) {
+                    const { invoke } = window.__TAURI__.tauri;
+                    const result = await invoke('initialize', { passphrase });
 
-                if (result.success) {
-                    setupScreen.style.display = 'none';
-                    chatContainer.classList.add('active');
-                    genesisHash.textContent = result.genesis_hash;
+                    if (result && result.success) {
+                        // Store genesis hash
+                        const genesisHash = result.genesis_hash;
+                        document.getElementById('genesisHash').textContent = genesisHash.substring(0, 12) + '...';
+
+                        // Hide setup, show loading
+                        document.getElementById('setupScreen').classList.add('hidden');
+                        document.getElementById('loading').style.display = 'flex';
+
+                        // Initialize Phoenix UI
+                        setTimeout(() => {
+                            initializePhoenix();
+                        }, 2000);
+                    } else {
+                        throw new Error(result?.message || 'Initialization failed');
+                    }
                 } else {
-                    alert('Initialization failed: ' + result.message);
+                    // Browser mode - skip Tauri init
+                    document.getElementById('setupScreen').classList.add('hidden');
+                    document.getElementById('loading').style.display = 'flex';
+
+                    setTimeout(() => {
+                        initializePhoenix();
+                    }, 2000);
                 }
-            } catch (e) {
-                alert('Error: ' + e);
-            } finally {
+            } catch (error) {
+                console.error('Setup error:', error);
+                alert('Error: ' + error.message);
                 setupBtn.disabled = false;
                 setupBtn.textContent = 'Initialize Omniverse';
             }
         });
 
-        // Send query
-        async function sendQuery() {
-            const query = queryInput.value.trim();
-            if (!query) return;
-
-            // Add user message
-            addMessage('You', query, false);
-            queryInput.value = '';
-
-            // Add loading message
-            const loadingId = addMessage('Omniverse', 'Thinking...', true, true);
-
+        // Check if already initialized
+        async function checkInitialized() {
             try {
-                const result = await invoke('query', { prompt: query });
+                if (window.__TAURI__) {
+                    const { invoke } = window.__TAURI__.tauri;
+                    const health = await invoke('health');
 
-                // Remove loading and add response
-                document.getElementById(loadingId)?.remove();
-                addMessage('Omniverse', result.response, true, false, `${result.latency_ms}ms · ${result.model}`);
-            } catch (e) {
-                document.getElementById(loadingId)?.remove();
-                addMessage('Omniverse', 'Error: ' + e, true);
-            }
-        }
+                    if (health && health.initialized) {
+                        // Already initialized - skip setup
+                        document.getElementById('setupScreen').classList.add('hidden');
+                        document.getElementById('loading').style.display = 'flex';
 
-        function addMessage(name, text, isAI, isLoading = false, meta = '') {
-            const id = 'msg-' + Date.now();
-            const html = `
-                <div class="message" id="${id}">
-                    <div class="message-avatar ${isAI ? 'ai' : ''}">${isAI ? 'Ω' : 'Y'}</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-name">${name}</span>
-                            <span class="message-meta">${meta || (isAI ? 'Local AI' : '')}</span>
-                        </div>
-                        <div class="message-text ${isLoading ? 'loading' : ''} ${!isAI ? 'user' : ''}">${text}</div>
-                    </div>
-                </div>
-            `;
-            messages.insertAdjacentHTML('beforeend', html);
-            messages.scrollTop = messages.scrollHeight;
-            return id;
-        }
+                        if (health.genesis_hash) {
+                            document.getElementById('genesisHash').textContent =
+                                health.genesis_hash.substring(0, 12) + '...';
+                        }
 
-        sendBtn.addEventListener('click', sendQuery);
-        queryInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendQuery();
-        });
+                        setTimeout(() => {
+                            initializePhoenix();
+                        }, 1000);
 
-        // Verify link
-        document.getElementById('verifyLink').addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                const result = await invoke('verify_genesis');
-                alert(result.valid ? '✅ Genesis verified!' : '❌ Verification failed!');
-            } catch (e) {
-                alert('Error: ' + e);
-            }
-        });
-
-        // Export link
-        document.getElementById('exportLink').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const { save } = window.__TAURI__.dialog;
-            const path = await save({
-                filters: [{ name: 'JSON', extensions: ['json'] }]
-            });
-            if (path) {
-                try {
-                    const result = await invoke('export_data', { path });
-                    alert(result);
-                } catch (e) {
-                    alert('Error: ' + e);
+                        return true;
+                    }
                 }
+            } catch (error) {
+                console.log('Not initialized yet:', error);
             }
-        });
-
-        // Get genesis hash
-        async function loadGenesisHash() {
-            try {
-                const hash = await invoke('get_genesis_hash');
-                genesisHash.textContent = hash;
-            } catch (e) {
-                console.error(e);
-            }
+            return false;
         }
 
-        // Init
-        checkHealth();
-        loadGenesisHash();
+        // Initialize Phoenix UI
+        function initializePhoenix() {
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+
+            // Show Phoenix container
+            document.getElementById('phoenixContainer').style.display = 'block';
+
+            // Update backend mode indicator
+            const backendMode = document.getElementById('backend-mode');
+            if (window.__TAURI__) {
+                backendMode.textContent = 'LOCAL (Tauri)';
+            } else {
+                backendMode.textContent = 'CLOUD';
+            }
+
+            // Load Phoenix modules
+            loadPhoenixModules();
+        }
+
+        // Load Phoenix JavaScript modules
+        function loadPhoenixModules() {
+            const scripts = [
+                'phoenix-orb.js',
+                'widget-manager.js',
+                'voice-controller.js',
+                'phoenix-voice-commands.js',
+                'orchestrator.js',
+                'jarvis.js'
+            ];
+
+            let loaded = 0;
+
+            scripts.forEach(src => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    loaded++;
+                    console.log(`[Omniverse] Loaded: ${src} (${loaded}/${scripts.length})`);
+
+                    if (loaded === scripts.length) {
+                        console.log('[Omniverse] All Phoenix modules loaded');
+                        // Initialize voice button
+                        const voiceBtn = document.getElementById('voiceBtn');
+                        const voiceStatus = document.getElementById('voiceStatus');
+                        if (voiceBtn) {
+                            voiceBtn.disabled = false;
+                            voiceStatus.textContent = 'Ready';
+                            voiceStatus.classList.remove('idle');
+                        }
+                    }
+                };
+                script.onerror = () => {
+                    console.error(`[Omniverse] Failed to load: ${src}`);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Mode toggle functions
+        function switchToVoiceMode() {
+            document.body.setAttribute('data-mode', 'voice');
+            document.getElementById('voice-mode-btn').classList.add('mode-toggle-btn-active');
+            document.getElementById('manual-mode-btn').classList.remove('mode-toggle-btn-active');
+            localStorage.setItem('omniverse_ui_mode', 'voice');
+        }
+
+        function switchToManualMode() {
+            document.body.setAttribute('data-mode', 'manual');
+            document.getElementById('manual-mode-btn').classList.add('mode-toggle-btn-active');
+            document.getElementById('voice-mode-btn').classList.remove('mode-toggle-btn-active');
+            localStorage.setItem('omniverse_ui_mode', 'manual');
+        }
+
+        // Attach mode toggle handlers
+        document.getElementById('voice-mode-btn')?.addEventListener('click', switchToVoiceMode);
+        document.getElementById('manual-mode-btn')?.addEventListener('click', switchToManualMode);
+
+        // Check initialization on load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkInitialized();
+        });
     </script>
 </body>
 </html>

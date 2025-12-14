@@ -1,0 +1,232 @@
+/* ============================================
+   VOICE/MANUAL MODE STYLES
+   Voice Mode: Minimal UI - only center orb + optimization ring + mode toggle
+   Manual Mode: Full dashboard UI with all HUD elements
+   ============================================ */
+
+/* ============================================
+   VOICE MODE - Hide ALL dashboard elements except orb + mode toggle
+   ============================================ */
+body[data-mode="voice"] #hud-tl,
+body[data-mode="voice"] #hud-bl,
+body[data-mode="voice"] #hud-tr,
+body[data-mode="voice"] #hud-br,
+body[data-mode="voice"] #jarvis-orb,
+body[data-mode="voice"] #quick-actions-orb,
+body[data-mode="voice"] #settings-orb,
+body[data-mode="voice"] #jarvis-quick-menu,
+body[data-mode="voice"] #quick-actions-menu,
+body[data-mode="voice"] #settings-menu,
+body[data-mode="voice"] #planet-nav-tab,
+body[data-mode="voice"] #planet-selection-panel,
+body[data-mode="voice"] .hud-frame,
+body[data-mode="voice"] .corner-bracket,
+body[data-mode="voice"] #greeting,
+body[data-mode="voice"] #holographic-hub,
+body[data-mode="voice"] #holo-nav-container,
+body[data-mode="voice"] #holo-core,
+body[data-mode="voice"] #holo-nav-ring,
+body[data-mode="voice"] #phoenix-widget-container,
+body[data-mode="voice"] .phoenix-widget,
+body[data-mode="voice"] #sync-panel,
+body[data-mode="voice"] #weather-widget,
+body[data-mode="voice"] #weather-display,
+body[data-mode="voice"] #system-status,
+body[data-mode="voice"] #time-display,
+body[data-mode="voice"] #date-display,
+body[data-mode="voice"] #location-display,
+body[data-mode="voice"] button[onclick="window.history.back()"] {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    transition: opacity 0.5s ease-out;
+    display: none !important;
+}
+
+/* Keep center Phoenix orb visible and prominent in voice mode */
+body[data-mode="voice"] #phoenix-core-container {
+    transform: translate(-50%, -50%) scale(1.2) !important;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Keep optimization ring visible in voice mode */
+body[data-mode="voice"] #optimization-indicator {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Keep mode toggle always visible AND centered above orb */
+body[data-mode="voice"] #mode-toggle-container {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: fixed !important;
+    top: 15% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10001 !important;
+    visibility: visible !important;
+    display: flex !important;
+}
+
+/* Hide BACK button in voice mode */
+body[data-mode="voice"] button[onclick="window.history.back()"] {
+    display: none !important;
+}
+
+/* Voice mode - emphasize orb glow */
+body[data-mode="voice"] #phoenix-core-container {
+    filter: drop-shadow(0 0 60px rgba(0, 217, 255, 0.8)) !important;
+}
+
+/* ============================================
+   MANUAL MODE - Show all UI elements
+   ============================================ */
+body[data-mode="manual"] #hud-tl,
+body[data-mode="manual"] #hud-bl,
+body[data-mode="manual"] #jarvis-orb,
+body[data-mode="manual"] #quick-actions-orb,
+body[data-mode="manual"] #settings-orb,
+body[data-mode="manual"] #planet-nav-tab,
+body[data-mode="manual"] .hud-frame,
+body[data-mode="manual"] .corner-bracket {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: opacity 0.5s ease-in;
+}
+
+/* Reset Phoenix orb scale in manual mode */
+body[data-mode="manual"] #phoenix-core-container {
+    transform: translate(-50%, -50%) scale(1) !important;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: none !important;
+}
+
+/* ============================================
+   MODE TOGGLE BUTTON STATES
+   ============================================ */
+/* Voice mode button active state */
+body[data-mode="voice"] #voice-mode-btn {
+    background: rgba(0, 217, 255, 0.3) !important;
+    color: #00ff88 !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5), inset 0 0 15px rgba(0, 217, 255, 0.3) !important;
+}
+
+body[data-mode="voice"] #manual-mode-btn {
+    background: transparent !important;
+    color: rgba(0, 217, 255, 0.5) !important;
+    box-shadow: none !important;
+}
+
+/* Manual mode button active state */
+body[data-mode="manual"] #manual-mode-btn {
+    background: rgba(0, 217, 255, 0.3) !important;
+    color: #00ff88 !important;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5), inset 0 0 15px rgba(0, 217, 255, 0.3) !important;
+}
+
+body[data-mode="manual"] #voice-mode-btn {
+    background: transparent !important;
+    color: rgba(0, 217, 255, 0.5) !important;
+    box-shadow: none !important;
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS FOR ALL MODE CHANGES
+   ============================================ */
+#hud-tl,
+#hud-bl,
+#jarvis-orb,
+#quick-actions-orb,
+#settings-orb,
+#planet-nav-tab,
+.hud-frame,
+.corner-bracket,
+#phoenix-core-container,
+#optimization-indicator {
+    transition: all 0.5s ease-in-out;
+}
+
+/* ============================================
+   HOVER EFFECTS FOR MODE BUTTONS
+   ============================================ */
+#voice-mode-btn:hover,
+#manual-mode-btn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+/* ============================================
+   ACCESSIBILITY - KEYBOARD SHORTCUTS HINT
+   ============================================ */
+#mode-toggle-container::after {
+    content: 'Press V for Voice | M for Manual';
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: rgba(0, 217, 255, 0.4);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+#mode-toggle-container:hover::after {
+    opacity: 1;
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 768px) {
+    #mode-toggle-container {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%) scale(0.9);
+    }
+
+    /* Override voice mode positioning on mobile for better visibility */
+    body[data-mode="voice"] #mode-toggle-container {
+        top: 80px !important;
+    }
+
+    #mode-toggle-container::after {
+        display: none;
+    }
+
+    body[data-mode="voice"] #phoenix-core-container {
+        transform: translate(-50%, -50%) scale(1.5) !important;
+    }
+}
+
+/* ============================================
+   LOADING STATE - Keep mode toggle visible
+   ============================================ */
+#loading ~ #mode-toggle-container {
+    z-index: 10002 !important;
+}
+
+/* ============================================
+   REMOVE HORIZONTAL BAR & JARVIS MODE TEXT
+   ============================================ */
+#hud-tr {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+#mode-toggle-container {
+    max-width: fit-content !important;
+}
+
+#mode-toggle-container::before,
+#mode-toggle-container::after {
+    display: none !important;
+}
+
+body::before,
+body::after {
+    display: none !important;
+}

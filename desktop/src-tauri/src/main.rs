@@ -8,9 +8,14 @@
     windows_subsystem = "windows"
 )]
 
+mod ollama;
+
 use serde::{Deserialize, Serialize};
-use tauri::{Manager, State};
+use tauri::State;
 use std::sync::Mutex;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+use ollama::OllamaClient;
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
@@ -57,9 +62,17 @@ async fn initialize(
     // Create directory if needed
     std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
 
-    // TODO: Initialize actual omniverse core here
-    // For now, simulate initialization
-    let genesis_hash = "abc123..."; // Would come from core
+    // Generate genesis hash from passphrase + timestamp
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+
+    let mut hasher = DefaultHasher::new();
+    passphrase.hash(&mut hasher);
+    timestamp.hash(&mut hasher);
+    let hash_value = hasher.finish();
+    let genesis_hash = format!("0x{:016x}", hash_value);
 
     // Update state
     let mut app_state = state.lock().map_err(|e| e.to_string())?;
@@ -86,28 +99,58 @@ struct QueryResult {
 #[tauri::command]
 async fn query(
     prompt: String,
+    model: Option<String>,
     state: State<'_, Mutex<AppState>>,
+    window: tauri::Window,
 ) -> Result<QueryResult, String> {
-    let app_state = state.lock().map_err(|e| e.to_string())?;
-
-    if !app_state.initialized {
-        return Err("Omniverse not initialized. Please set up first.".to_string());
-    }
+    // Check initialization - drop the lock before any async operations
+    {
+        let app_state = state.lock().map_err(|e| e.to_string())?;
+        if !app_state.initialized {
+            return Err("Omniverse not initialized. Please set up first.".to_string());
+        }
+    } // MutexGuard dropped here
 
     let start = std::time::Instant::now();
 
-    // TODO: Call actual omniverse core
-    // For now, simulate response
-    let response = format!(
-        "I understand you're asking about: '{}'. \
-        This response is generated locally on your device. \
-        Your data never leaves this machine.",
-        prompt
-    );
+    // Create Ollama client
+    let client = OllamaClient::new();
+
+    // Check if Ollama is running
+    if !client.is_running().await {
+        if !OllamaClient::is_installed() {
+            return Err(ollama::get_install_instructions());
+        } else {
+            return Err(
+                "Ollama is installed but not running.\n\n\
+                Start it with: ollama serve\n\
+                Or ensure the Ollama app is running."
+                    .to_string(),
+            );
+        }
+    }
+
+    // Use provided model or default
+    let model_name = model.unwrap_or_else(|| "llama2".to_string());
+
+    // Generate response with streaming
+    let tokens = client
+        .generate(&model_name, &prompt)
+        .await
+        .map_err(|e| format!("Ollama error: {}", e))?;
+
+    // Emit tokens to frontend as they arrive
+    let mut full_response = String::new();
+    for token in tokens {
+        full_response.push_str(&token);
+
+        // Emit each token to frontend
+        let _ = window.emit("ai-token", &token);
+    }
 
     Ok(QueryResult {
-        response,
-        model: "local".to_string(),
+        response: full_response,
+        model: model_name,
         latency_ms: start.elapsed().as_millis() as u64,
         cached: false,
     })
@@ -170,6 +213,64 @@ fn get_genesis_hash() -> String {
     "0x1234...abcd".to_string()
 }
 
+#[derive(Serialize, Deserialize)]
+struct OllamaStatus {
+    installed: bool,
+    running: bool,
+    message: String,
+}
+
+/// Check Ollama installation and status
+#[tauri::command]
+async fn check_ollama() -> Result<OllamaStatus, String> {
+    let installed = OllamaClient::is_installed();
+
+    if !installed {
+        return Ok(OllamaStatus {
+            installed: false,
+            running: false,
+            message: ollama::get_install_instructions(),
+        });
+    }
+
+    let client = OllamaClient::new();
+    let running = client.is_running().await;
+
+    let message = if running {
+        "Ollama is installed and running".to_string()
+    } else {
+        "Ollama is installed but not running. Start it with: ollama serve".to_string()
+    };
+
+    Ok(OllamaStatus {
+        installed,
+        running,
+        message,
+    })
+}
+
+#[derive(Serialize, Deserialize)]
+struct ModelsResult {
+    models: Vec<String>,
+}
+
+/// List available Ollama models
+#[tauri::command]
+async fn list_models() -> Result<ModelsResult, String> {
+    let client = OllamaClient::new();
+
+    if !client.is_running().await {
+        return Err("Ollama is not running".to_string());
+    }
+
+    let models = client
+        .list_models()
+        .await
+        .map_err(|e| format!("Failed to list models: {}", e))?;
+
+    Ok(ModelsResult { models })
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN
 // ═══════════════════════════════════════════════════════════════
@@ -184,8 +285,10 @@ fn main() {
             verify_genesis,
             export_data,
             get_genesis_hash,
+            check_ollama,
+            list_models,
         ])
-        .setup(|app| {
+        .setup(|_app| {
             // Print startup banner
             println!("╔═══════════════════════════════════════════════════════════════╗");
             println!("║                      OMNIVERSE DESKTOP                        ║");

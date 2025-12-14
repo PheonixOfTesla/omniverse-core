@@ -16,6 +16,8 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1.35", features = ["full"] }
 dirs = "5.0"
+reqwest = { version = "0.12", features = ["json", "stream"] }
+futures = "0.3"
 
 # Link to omniverse core
 omniverse = { path = "../../core" }
