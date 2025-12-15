@@ -32,6 +32,14 @@ body[data-mode="voice"] #phoenix-orb-wrapper #phoenix-core-container {
     pointer-events: auto !important;
 }
 
+/* Make sure ALL orb children are visible */
+body[data-mode="voice"] #phoenix-orb-wrapper *,
+body[data-mode="voice"] #phoenix-core-container *,
+body[data-mode="voice"] #phoenix-sphere {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
 /* Additional specific elements that might escape the above rule */
 body[data-mode="voice"] #hud-tl,
 body[data-mode="voice"] #hud-bl,
