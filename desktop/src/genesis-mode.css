@@ -56,17 +56,28 @@ body[data-mode="genesis"] #phoenix-core-container {
     pointer-events: none !important;
 }
 
-/* Keep mode toggle always visible and centered */
+/* Keep mode toggle always visible - positioned at TOP for space */
 body[data-mode="genesis"] #mode-toggle-container {
     opacity: 1 !important;
     pointer-events: auto !important;
     position: fixed !important;
-    top: 40px !important;
+    top: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     z-index: 10001 !important;
     visibility: visible !important;
     display: flex !important;
+}
+
+/* Hide dock in genesis mode */
+body[data-mode="genesis"] .phoenix-dock,
+body[data-mode="genesis"] .dock-items-container,
+body[data-mode="genesis"] .dock-toggle,
+body[data-mode="genesis"] #optimization-indicator {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    display: none !important;
 }
 
 /* Show Genesis panel when in Genesis mode */

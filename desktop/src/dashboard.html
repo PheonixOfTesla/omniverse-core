@@ -67,6 +67,38 @@
 
         console.log(`🎤 UI Mode: ${finalMode} (${savedMode ? 'saved preference' : 'default'})`);
         console.log(isMobile ? '📱 Mobile device detected - VOICE MODE ONLY' : '🖥️ Desktop device - all modes available');
+
+        // EARLY MODE SWITCHING FUNCTIONS - Available before voice-controller.js loads
+        // These are simple inline versions; voice-controller.js will override them with enhanced versions
+        window.switchToVoiceMode = window.switchToVoiceMode || function() {
+            console.log('🎤 Switching to VOICE mode (early handler)...');
+            document.body.setAttribute('data-mode', 'voice');
+            localStorage.setItem('phoenix_ui_mode', 'voice');
+        };
+
+        window.switchToManualMode = window.switchToManualMode || function() {
+            if (localStorage.getItem('phoenix_is_mobile') === 'true') {
+                console.log('📱 Manual mode not available on mobile');
+                return;
+            }
+            console.log('👆 Switching to MANUAL mode (early handler)...');
+            document.body.setAttribute('data-mode', 'manual');
+            localStorage.setItem('phoenix_ui_mode', 'manual');
+        };
+
+        window.switchToGenesisMode = window.switchToGenesisMode || function() {
+            console.log('🧬 Switching to GENESIS mode (early handler)...');
+            document.body.setAttribute('data-mode', 'genesis');
+            localStorage.setItem('phoenix_ui_mode', 'genesis');
+        };
+
+        window.openPhoenixDesk = window.openPhoenixDesk || function() {
+            console.log('💼 Opening Phoenix Desk (early handler)...');
+            window.location.href = 'desk.html';
+        };
+
+        // Auto-bypass sync prompt for development - remove this for production
+        localStorage.setItem('phoenixHasSeenSync', 'true');
     </script>
     <!-- ============================================ -->
     <!-- BACK BUTTON FOR NAVIGATION -->
@@ -79,16 +111,16 @@
     <!-- VOICE/MANUAL MODE TOGGLE -->
     <!-- ============================================ -->
     <div id="mode-toggle-container" class="mode-toggle-container">
-        <button id="voice-mode-btn" onclick="if(typeof switchToVoiceMode === 'function') switchToVoiceMode(); else console.warn('switchToVoiceMode not loaded yet')" class="mode-toggle-btn mode-toggle-btn-active" data-i18n="dashboard.voiceMode">
+        <button id="voice-mode-btn" onclick="switchToVoiceMode()" class="mode-toggle-btn mode-toggle-btn-active" data-i18n="dashboard.voiceMode">
             VOICE
         </button>
-        <button id="manual-mode-btn" onclick="if(typeof switchToManualMode === 'function') switchToManualMode(); else console.warn('switchToManualMode not loaded yet')" class="mode-toggle-btn mode-hide-mobile" data-i18n="dashboard.manualMode">
+        <button id="manual-mode-btn" onclick="switchToManualMode()" class="mode-toggle-btn mode-hide-mobile" data-i18n="dashboard.manualMode">
             MANUAL
         </button>
-        <button id="desk-btn" onclick="if(typeof openPhoenixDesk === 'function') openPhoenixDesk(); else window.location.href='desk.html'" class="mode-toggle-btn mode-toggle-btn-desk">
+        <button id="desk-btn" onclick="openPhoenixDesk()" class="mode-toggle-btn mode-toggle-btn-desk">
             DESK
         </button>
-        <button id="genesis-mode-btn" onclick="if(typeof switchToGenesisMode === 'function') switchToGenesisMode(); else console.warn('switchToGenesisMode not loaded yet')" class="mode-toggle-btn">
+        <button id="genesis-mode-btn" onclick="switchToGenesisMode()" class="mode-toggle-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle;">
                 <!-- DNA Double Helix -->
                 <path d="M4 2 L4 22 M20 2 L20 22" stroke="currentColor" stroke-width="1.5" fill="none"/>
@@ -1150,7 +1182,7 @@
     <!-- ============================================ -->
     <!-- PHOENIX CORE - CENTER SPHERE -->
     <!-- ============================================ -->
-    <div style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:500;perspective:2000px;perspective-origin:center center;pointer-events:none">
+    <div id="phoenix-orb-wrapper" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:500;perspective:2000px;perspective-origin:center center;pointer-events:none">
         <div id="phoenix-core-container" onclick="if(window.startPhoenixVoiceCommand){window.startPhoenixVoiceCommand()}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;pointer-events:auto;cursor:pointer;transform-style:preserve-3d">
         <!-- Orbital Rings -->
         <div style="position:absolute;top:0;left:0;width:100%;height:100%">

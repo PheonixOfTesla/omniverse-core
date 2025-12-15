@@ -11,9 +11,10 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -45%); /* Slightly lower to give mode toggle space */
     width: 90%;
-    max-width: 800px;
+    max-width: 700px; /* Slightly narrower for cleaner look */
+    max-height: 80vh; /* Prevent overflow */
     z-index: 10000;
     opacity: 0;
     pointer-events: none;
@@ -21,8 +22,10 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 30px;
+    justify-content: flex-start;
+    gap: 20px; /* Tighter spacing */
+    padding: 20px;
+    overflow-y: auto;
     transition: opacity 0.5s ease;
 }
 

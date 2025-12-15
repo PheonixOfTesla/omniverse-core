@@ -1,12 +1,38 @@
 /* ============================================
    VOICE/MANUAL MODE STYLES
-   Voice Mode: Minimal UI - only center orb + optimization ring + mode toggle
+   Voice Mode: PURE BLACK + ORB ONLY - Nothing else
    Manual Mode: Full dashboard UI with all HUD elements
    ============================================ */
 
 /* ============================================
-   VOICE MODE - Hide ALL dashboard elements except orb + mode toggle
+   VOICE MODE - NUCLEAR OPTION: HIDE EVERYTHING
+   THE VOID - Pure black, breathing orb, nothing else
    ============================================ */
+
+/* HIDE ALL DIRECT CHILDREN OF BODY EXCEPT ORB AND MODE TOGGLE */
+body[data-mode="voice"] > *:not(#phoenix-orb-wrapper):not(#phoenix-core-container):not(#mode-toggle-container):not(#loading):not(script):not(style):not(link) {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    display: none !important;
+}
+
+/* ENSURE ORB WRAPPER AND ORB ARE VISIBLE */
+body[data-mode="voice"] #phoenix-orb-wrapper {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: none !important;
+}
+
+body[data-mode="voice"] #phoenix-orb-wrapper #phoenix-core-container {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Additional specific elements that might escape the above rule */
 body[data-mode="voice"] #hud-tl,
 body[data-mode="voice"] #hud-bl,
 body[data-mode="voice"] #hud-tr,
@@ -29,18 +55,72 @@ body[data-mode="voice"] #holo-nav-ring,
 body[data-mode="voice"] #phoenix-widget-container,
 body[data-mode="voice"] .phoenix-widget,
 body[data-mode="voice"] #sync-panel,
+body[data-mode="voice"] #sync-prompt,
 body[data-mode="voice"] #weather-widget,
 body[data-mode="voice"] #weather-display,
 body[data-mode="voice"] #system-status,
 body[data-mode="voice"] #time-display,
 body[data-mode="voice"] #date-display,
 body[data-mode="voice"] #location-display,
-body[data-mode="voice"] button[onclick="window.history.back()"] {
+body[data-mode="voice"] button[onclick="window.history.back()"],
+body[data-mode="voice"] #dashboard-content,
+body[data-mode="voice"] #phoenixOrbContainer,
+/* DOCK - Hide completely in voice mode */
+body[data-mode="voice"] .phoenix-dock,
+body[data-mode="voice"] .dock-items-container,
+body[data-mode="voice"] .dock-toggle,
+body[data-mode="voice"] .planet-bubbles-menu,
+/* OPTIMIZATION INDICATOR - Hide in voice mode for pure void */
+body[data-mode="voice"] #optimization-indicator,
+/* GRID & OVERLAYS - Hide for pure black */
+body[data-mode="voice"] .grid-underlay,
+body[data-mode="voice"] .vhs-overlay,
+/* GENESIS ELEMENTS */
+body[data-mode="voice"] #genesis-panel,
+body[data-mode="voice"] .genesis-dock,
+/* CAPTIONS AND TEXT OVERLAYS */
+body[data-mode="voice"] #phoenix-captions,
+body[data-mode="voice"] .caption-container,
+body[data-mode="voice"] #consciousness-display,
+body[data-mode="voice"] .consciousness-container {
     opacity: 0 !important;
     pointer-events: none !important;
     visibility: hidden !important;
     transition: opacity 0.5s ease-out;
     display: none !important;
+}
+
+/* ============================================
+   VOICE MODE - FORCE HIDE DOCK & OPTIMIZATION
+   These have high specificity so need !important
+   ============================================ */
+body[data-mode="voice"] .phoenix-dock {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(200px) !important;
+}
+
+body[data-mode="voice"] #optimization-indicator {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body[data-mode="voice"] .grid-underlay {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+/* Keep the voice status indicator visible (Listening...) */
+body[data-mode="voice"] #voice-status,
+body[data-mode="voice"] .voice-indicator,
+body[data-mode="voice"] .listening-indicator {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 /* Keep center Phoenix orb visible and prominent in voice mode */
@@ -49,11 +129,8 @@ body[data-mode="voice"] #phoenix-core-container {
     transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Keep optimization ring visible in voice mode */
-body[data-mode="voice"] #optimization-indicator {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-}
+/* Optimization indicator HIDDEN in voice mode - pure void */
+/* (Rule above hides it - this comment for clarity) */
 
 /* Keep mode toggle always visible AND centered above orb */
 body[data-mode="voice"] #mode-toggle-container {
