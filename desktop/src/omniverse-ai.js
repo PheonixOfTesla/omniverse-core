@@ -122,11 +122,17 @@ async function query(prompt, options = {}) {
     const { invoke } = window.__TAURI__.tauri;
     const model = options.model || ollamaStatus.currentModel;
 
+    // Prepend system prompt if provided (Ollama accepts this format)
+    let fullPrompt = prompt;
+    if (options.system) {
+        fullPrompt = `[SYSTEM]\n${options.system}\n[/SYSTEM]\n\n[USER]\n${prompt}\n[/USER]`;
+    }
+
     const start = Date.now();
 
     try {
         const result = await invoke('query', {
-            prompt: prompt,
+            prompt: fullPrompt,
             model: model
         });
 

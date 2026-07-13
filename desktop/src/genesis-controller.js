@@ -365,9 +365,17 @@ Genesis embeds ANYTHING - YouTube, Spotify, websites, or custom widgets."></text
     }
 
     /**
-     * Generate blueprint with GPT-5.2 apex intelligence
+     * Generate enhanced blueprint using AI
+     * In Omniverse/sovereign mode: uses local Ollama (zero network)
+     * Otherwise: falls back to cloud API
      */
     async generateWithGPT52(userInput, parsedData) {
+        // SOVEREIGN MODE: Use local Ollama when available
+        if (window.PhoenixConfig?.isOmniverse && window.OmniverseAI?.isReady()) {
+            return this.generateWithLocalOllama(userInput, parsedData);
+        }
+
+        // CLOUD MODE: Use backend API (requires network)
         try {
             const token = localStorage.getItem('phoenixToken');
             if (!token) {
@@ -385,11 +393,11 @@ Genesis embeds ANYTHING - YouTube, Spotify, websites, or custom widgets."></text
                     userInput: userInput,
                     parsedData: parsedData
                 }),
-                timeout: 10000 // 10 second timeout
+                timeout: 10000
             });
 
             if (!response.ok) {
-                this.log('⚠️ GPT-5.2 unavailable, using local generation');
+                this.log('⚠️ Cloud API unavailable, using local generation');
                 return null;
             }
 
@@ -397,9 +405,197 @@ Genesis embeds ANYTHING - YouTube, Spotify, websites, or custom widgets."></text
             return data?.blueprint || null;
 
         } catch (error) {
-            this.log('⚠️ GPT-5.2 error, using local generation:', error.message);
+            this.log('⚠️ Cloud API error, using local generation:', error.message);
             return null;
         }
+    }
+
+    /**
+     * Generate blueprint enhancement using local Ollama (SOVEREIGN MODE)
+     * Zero network calls - all inference runs on device
+     */
+    async generateWithLocalOllama(userInput, parsedData) {
+        try {
+            this.log('🔒 SOVEREIGN MODE: Using local Ollama for blueprint generation');
+
+            const prompt = `You are Genesis, a widget generation AI. Given this user request, enhance the widget specification.
+
+User Request: "${userInput}"
+
+Parsed Data:
+- Widget Type: ${parsedData.widgetType}
+- Styling: border color ${parsedData.styling?.border || 'default'}, accent ${parsedData.styling?.accentColor || 'cyan'}
+- Size: ${parsedData.size || 'medium'}
+
+Generate a JSON blueprint enhancement with these fields only:
+{
+  "name": "Human-readable widget name",
+  "description": "One sentence describing the widget",
+  "enhancedStyling": {
+    "accentColor": "#hexcolor",
+    "backgroundColor": "rgba(r,g,b,a)",
+    "borderGlow": "shadow CSS value"
+  },
+  "suggestedFeatures": ["feature1", "feature2"]
+}
+
+Respond with ONLY the JSON, no explanation.`;
+
+            const result = await window.OmniverseAI.query(prompt);
+
+            if (!result || !result.response) {
+                this.log('⚠️ Local Ollama returned empty, using fallback');
+                return null;
+            }
+
+            // Parse the JSON from Ollama's response
+            const jsonMatch = result.response.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                this.log('⚠️ Could not parse JSON from Ollama response');
+                return null;
+            }
+
+            const enhancement = JSON.parse(jsonMatch[0]);
+            this.log('✅ Local Ollama enhancement:', enhancement);
+
+            // Merge enhancement with base blueprint
+            const baseBlueprintGen = new GenesisBlueprint();
+            const baseBlueprint = baseBlueprintGen.generate(parsedData);
+
+            return {
+                ...baseBlueprint,
+                name: enhancement.name || baseBlueprint.name,
+                description: enhancement.description,
+                styling: {
+                    ...baseBlueprint.styling,
+                    accentColor: enhancement.enhancedStyling?.accentColor || baseBlueprint.styling.accentColor,
+                    backgroundColor: enhancement.enhancedStyling?.backgroundColor || baseBlueprint.styling.backgroundColor,
+                    shadow: enhancement.enhancedStyling?.borderGlow || baseBlueprint.styling.shadow
+                },
+                suggestedFeatures: enhancement.suggestedFeatures || [],
+                generatedBy: 'local-ollama',
+                model: result.model
+            };
+
+        } catch (error) {
+            this.log('⚠️ Local Ollama error:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * GENESIS SYSTEM PROMPT - Forces self-contained vanilla HTML output
+     * This is the exact prompt that makes small models reliably produce renderable artifacts
+     */
+    static GENESIS_SYSTEM_PROMPT = `You are a code generator. Output ONLY raw HTML code.
+RULES:
+- Return ONE complete self-contained HTML document
+- All CSS must be in a <style> tag inside <head>
+- All JavaScript must be in a <script> tag before </body>
+- NO external resources, NO CDN links, NO imports, NO fetch calls
+- NO markdown fences, NO code blocks, NO explanations
+- Start your response with <!DOCTYPE html>
+- The widget must be fully functional with ONLY the code you provide`;
+
+    /**
+     * Generate self-contained HTML artifact using local Ollama (SOVEREIGN ARTIFACTS)
+     * Like Claude Artifacts but 100% local - renders in sandboxed iframe
+     */
+    async generateHtmlArtifact(description) {
+        try {
+            this.log('🔒 SOVEREIGN ARTIFACTS: Generating self-contained HTML locally');
+
+            const prompt = `${description}
+
+Requirements:
+- Self-contained HTML document with inline <style> and <script>
+- No external dependencies
+- Fully functional and interactive
+- Modern, clean design
+
+Start with <!DOCTYPE html>`;
+
+            const result = await window.OmniverseAI.query(prompt, {
+                system: GenesisController.GENESIS_SYSTEM_PROMPT
+            });
+
+            if (!result || !result.response) {
+                throw new Error('Empty response from local model');
+            }
+
+            // Clean model output - strip markdown fences and extract HTML
+            const cleanHtml = this.cleanModelOutput(result.response);
+
+            return {
+                html: cleanHtml,
+                model: result.model,
+                mode: 'local',
+                latency: result.latency,
+                generatedAt: new Date().toISOString()
+            };
+
+        } catch (error) {
+            this.error('Artifact generation error:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Clean model output - handles markdown fences and extracts raw HTML
+     * Critical for reliability: models often wrap output in ```html blocks
+     */
+    cleanModelOutput(raw) {
+        let html = raw.trim();
+
+        // Strip markdown code fences (```html ... ``` or ``` ... ```)
+        const fenceMatch = html.match(/```(?:html)?\s*([\s\S]*?)```/);
+        if (fenceMatch) {
+            html = fenceMatch[1].trim();
+        }
+
+        // If it doesn't start with doctype/html, try to find it
+        if (!html.toLowerCase().startsWith('<!doctype') && !html.toLowerCase().startsWith('<html')) {
+            const doctypeMatch = html.match(/(<!DOCTYPE[\s\S]*)/i);
+            if (doctypeMatch) {
+                html = doctypeMatch[1];
+            }
+        }
+
+        // Validate basic HTML structure
+        if (!html.includes('<html') || !html.includes('</html>')) {
+            this.log('⚠️ Generated HTML may be incomplete');
+        }
+
+        return html;
+    }
+
+    /**
+     * Render HTML artifact in sandboxed iframe
+     * Sandbox restricts dangerous actions while allowing scripts to run
+     */
+    renderArtifactInIframe(html, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            this.error('Container not found:', containerId);
+            return null;
+        }
+
+        // Create sandboxed iframe - allow-scripts lets JS run, restrict everything else
+        const iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-scripts';
+        iframe.style.cssText = 'width: 100%; height: 100%; border: none; border-radius: 8px;';
+
+        container.innerHTML = '';
+        container.appendChild(iframe);
+
+        // Write the generated HTML into the iframe
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(html);
+        doc.close();
+
+        this.log('✅ Artifact rendered in sandboxed iframe');
+        return iframe;
     }
 
     /**
