@@ -1,21 +1,16 @@
 /* ============================================
    MANUAL MODE - FULL CONSCIOUSNESS DASHBOARD
    Real-time WebSocket updates, complete control
+   DECLUTTERED: Only essential HUD elements shown
    ============================================ */
 
-/* Show all dashboard elements in manual mode */
+/* Show ESSENTIAL dashboard elements in manual mode */
+/* NOTE: #hud-tr and #hud-br hidden by default for cleaner UI */
 body[data-mode="manual"] #hud-tl,
 body[data-mode="manual"] #hud-bl,
-body[data-mode="manual"] #jarvis-orb,
-body[data-mode="manual"] #quick-actions-orb,
 body[data-mode="manual"] #settings-orb,
-body[data-mode="manual"] #planet-nav-tab,
-body[data-mode="manual"] #planet-selection-panel,
 body[data-mode="manual"] .hud-frame,
-body[data-mode="manual"] .corner-bracket,
 body[data-mode="manual"] #greeting,
-body[data-mode="manual"] #holographic-hub,
-body[data-mode="manual"] #holo-nav-container,
 body[data-mode="manual"] #phoenix-widget-container,
 body[data-mode="manual"] #weather-widget,
 body[data-mode="manual"] #system-status,
@@ -26,6 +21,56 @@ body[data-mode="manual"] button[onclick="window.history.back()"] {
     display: block !important;
     transform: translateZ(0) scale(1) !important;
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* DECLUTTER: Hide top-right and bottom-right HUD corners by default
+   These are non-essential and create visual noise.
+   Keep #hud-tl (time/date) and #hud-bl (status) visible */
+body[data-mode="manual"] #hud-tr,
+body[data-mode="manual"] #hud-br {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* DECLUTTER: Hide non-essential orbs in manual mode */
+body[data-mode="manual"] #jarvis-orb,
+body[data-mode="manual"] #quick-actions-orb {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* DECLUTTER: Hide corner brackets - they add visual noise */
+body[data-mode="manual"] .corner-bracket.top-right,
+body[data-mode="manual"] .corner-bracket.bottom-right {
+    opacity: 0 !important;
+}
+
+/* Keep only top-left and bottom-left corner brackets */
+body[data-mode="manual"] .corner-bracket.top-left,
+body[data-mode="manual"] .corner-bracket.bottom-left {
+    opacity: 0.3 !important;
+}
+
+/* Hide holographic elements on mobile to reduce clutter */
+@media (max-width: 768px) {
+    body[data-mode="manual"] #holographic-hub,
+    body[data-mode="manual"] #holo-nav-container {
+        display: none !important;
+    }
+}
+
+/* DECLUTTER: Show planet nav only when needed (hover/tap to reveal) */
+body[data-mode="manual"] #planet-nav-tab,
+body[data-mode="manual"] #planet-selection-panel {
+    opacity: 0.3 !important;
+    transition: opacity 0.3s ease;
+}
+
+body[data-mode="manual"] #planet-nav-tab:hover,
+body[data-mode="manual"] #planet-selection-panel:hover {
+    opacity: 1 !important;
 }
 
 /* Phoenix orb scales down to make room for dashboard */

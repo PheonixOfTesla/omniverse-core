@@ -4,7 +4,7 @@
 const translations = {
   en: {
     // Phase titles
-    'phase.init': 'PHOENIX INITIALIZE',
+    'phase.init': 'OMNIVERSE INITIALIZE',
     'phase.language': 'SELECT LANGUAGE',
     'phase.voice': 'SELECT VOICE',
     'phase.persona': 'SELECT PERSONALITY',
@@ -26,7 +26,7 @@ const translations = {
     'phase.launch.subtitle': 'YOUR AI IS READY',
 
     // Phase 0 intro text
-    'intro.companion': 'I\'M PHOENIX, YOUR PERSONAL AI COMPANION.',
+    'intro.companion': 'I\'M OMNIVERSE, YOUR PERSONAL AI COMPANION.',
     'intro.help': 'I\'LL HELP YOU OPTIMIZE YOUR HEALTH, FITNESS, PRODUCTIVITY, AND LIFE DECISIONS.',
     'intro.setup': 'LET\'S GET YOU SET UP. THIS WILL TAKE APPROXIMATELY 180 SECONDS.',
 
@@ -109,20 +109,20 @@ const translations = {
     'dashboard.welcomeBack': 'Welcome Back',
     'dashboard.allSystemsOperational': 'All systems operational',
     'dashboard.syncYourLife': 'SYNC YOUR LIFE',
-    'dashboard.syncDescription': 'Connect your devices, calendars, banks, and goals to unlock Phoenix\'s full potential. The more data I have, the smarter I become.',
+    'dashboard.syncDescription': 'Connect your devices, calendars, banks, and goals to unlock Omniverse\'s full potential. The more data I have, the smarter I become.',
     'dashboard.startSync': 'START SYNC',
     'dashboard.skipForNow': 'SKIP FOR NOW',
 
     // Misc
     'voice.status': 'VOICE STANDBY',
     'goals.placeholder': 'Type your goals here (e.g., "I want to lose 10kg and run a marathon")',
-    'goals.ai_note': '✨ Phoenix AI will analyze and structure your goals automatically',
+    'goals.ai_note': 'Omniverse AI will analyze and structure your goals automatically',
     'voice.loading': 'Loading available voices...',
   },
 
   es: {
     // Phase titles
-    'phase.init': 'INICIALIZAR PHOENIX',
+    'phase.init': 'INICIALIZAR OMNIVERSE',
     'phase.language': 'SELECCIONAR IDIOMA',
     'phase.voice': 'SELECCIONAR VOZ',
     'phase.persona': 'SELECCIONAR PERSONALIDAD',
@@ -144,7 +144,7 @@ const translations = {
     'phase.launch.subtitle': 'TU IA ESTÁ LISTA',
 
     // Phase 0 intro text
-    'intro.companion': 'SOY PHOENIX, TU COMPAÑERO DE IA PERSONAL.',
+    'intro.companion': 'SOY OMNIVERSE, TU COMPANERO DE IA PERSONAL.',
     'intro.help': 'TE AYUDARÉ A OPTIMIZAR TU SALUD, FITNESS, PRODUCTIVIDAD Y DECISIONES DE VIDA.',
     'intro.setup': 'VAMOS A CONFIGURARTE. ESTO TOMARÁ APROXIMADAMENTE 180 SEGUNDOS.',
 
@@ -212,12 +212,12 @@ const translations = {
     'dashboard.welcomeBack': 'Bienvenido de Nuevo',
     'dashboard.allSystemsOperational': 'Todos los sistemas operativos',
     'dashboard.syncYourLife': 'SINCRONIZA TU VIDA',
-    'dashboard.syncDescription': 'Conecta tus dispositivos, calendarios, bancos y objetivos para desbloquear todo el potencial de Phoenix. Cuantos más datos tenga, más inteligente me vuelvo.',
+    'dashboard.syncDescription': 'Conecta tus dispositivos, calendarios, bancos y objetivos para desbloquear todo el potencial de Omniverse. Cuantos más datos tenga, más inteligente me vuelvo.',
     'dashboard.startSync': 'INICIAR SINCRONIZACIÓN',
     'dashboard.skipForNow': 'OMITIR POR AHORA',
 
     'goals.placeholder': 'Escribe tus objetivos aquí (ej: "Quiero perder 10kg y correr un maratón")',
-    'goals.ai_note': '✨ Phoenix AI analizará y estructurará tus objetivos automáticamente',
+    'goals.ai_note': ' Omniverse AI analizara y estructurará tus objetivos automáticamente',
     'voice.loading': 'Cargando voces disponibles...',
   },
 
@@ -313,12 +313,12 @@ const translations = {
     'dashboard.welcomeBack': 'Bon Retour',
     'dashboard.allSystemsOperational': 'Tous les systèmes opérationnels',
     'dashboard.syncYourLife': 'SYNCHRONISEZ VOTRE VIE',
-    'dashboard.syncDescription': 'Connectez vos appareils, calendriers, banques et objectifs pour débloquer tout le potentiel de Phoenix. Plus j\'ai de données, plus je deviens intelligent.',
+    'dashboard.syncDescription': 'Connectez vos appareils, calendriers, banques et objectifs pour débloquer tout le potentiel de Omniverse. Plus j\'ai de données, plus je deviens intelligent.',
     'dashboard.startSync': 'COMMENCER LA SYNCHRONISATION',
     'dashboard.skipForNow': 'PASSER POUR LE MOMENT',
 
     'goals.placeholder': 'Écrivez vos objectifs ici (ex: "Je veux perdre 10kg et courir un marathon")',
-    'goals.ai_note': '✨ Phoenix AI analysera et structurera automatiquement vos objectifs',
+    'goals.ai_note': ' Omniverse AI analysera et structurera automatiquement vos objectifs',
     'voice.loading': 'Chargement des voix disponibles...',
   },
 
@@ -413,12 +413,12 @@ const translations = {
     'dashboard.welcomeBack': 'Willkommen Zurück',
     'dashboard.allSystemsOperational': 'Alle Systeme betriebsbereit',
     'dashboard.syncYourLife': 'SYNCHRONISIEREN SIE IHR LEBEN',
-    'dashboard.syncDescription': 'Verbinden Sie Ihre Geräte, Kalender, Banken und Ziele, um das volle Potenzial von Phoenix freizuschalten. Je mehr Daten ich habe, desto intelligenter werde ich.',
+    'dashboard.syncDescription': 'Verbinden Sie Ihre Geräte, Kalender, Banken und Ziele, um das volle Potenzial von Omniverse freizuschalten. Je mehr Daten ich habe, desto intelligenter werde ich.',
     'dashboard.startSync': 'SYNCHRONISATION STARTEN',
     'dashboard.skipForNow': 'VORERST ÜBERSPRINGEN',
 
     'goals.placeholder': 'Schreiben Sie hier Ihre Ziele (z.B. "Ich möchte 10kg abnehmen und einen Marathon laufen")',
-    'goals.ai_note': '✨ Phoenix AI wird Ihre Ziele automatisch analysieren und strukturieren',
+    'goals.ai_note': ' Omniverse AI wird Ihre Ziele automatisch analysieren und strukturieren',
     'voice.loading': 'Verfügbare Stimmen werden geladen...',
   },
 
@@ -513,18 +513,18 @@ const translations = {
     'dashboard.welcomeBack': 'Bentornato',
     'dashboard.allSystemsOperational': 'Tutti i sistemi operativi',
     'dashboard.syncYourLife': 'SINCRONIZZA LA TUA VITA',
-    'dashboard.syncDescription': 'Connetti i tuoi dispositivi, calendari, banche e obiettivi per sbloccare il pieno potenziale di Phoenix. Più dati ho, più divento intelligente.',
+    'dashboard.syncDescription': 'Connetti i tuoi dispositivi, calendari, banche e obiettivi per sbloccare il pieno potenziale di Omniverse. Più dati ho, più divento intelligente.',
     'dashboard.startSync': 'AVVIA SINCRONIZZAZIONE',
     'dashboard.skipForNow': 'SALTA PER ORA',
 
     'goals.placeholder': 'Scrivi qui i tuoi obiettivi (es: "Voglio perdere 10kg e correre una maratona")',
-    'goals.ai_note': '✨ Phoenix AI analizzerà e strutturerà automaticamente i tuoi obiettivi',
+    'goals.ai_note': ' Omniverse AI analizzera e strutturerà automaticamente i tuoi obiettivi',
     'voice.loading': 'Caricamento voci disponibili...',
   },
 
   pt: {
     // Phase titles
-    'phase.init': 'INICIALIZAR PHOENIX',
+    'phase.init': 'INICIALIZAR OMNIVERSE',
     'phase.language': 'SELECIONAR IDIOMA',
     'phase.voice': 'SELECIONAR VOZ',
     'phase.persona': 'SELECIONAR PERSONALIDADE',
@@ -613,12 +613,12 @@ const translations = {
     'dashboard.welcomeBack': 'Bem-vindo de Volta',
     'dashboard.allSystemsOperational': 'Todos os sistemas operacionais',
     'dashboard.syncYourLife': 'SINCRONIZE SUA VIDA',
-    'dashboard.syncDescription': 'Conecte seus dispositivos, calendários, bancos e objetivos para desbloquear todo o potencial do Phoenix. Quanto mais dados eu tiver, mais inteligente eu me torno.',
+    'dashboard.syncDescription': 'Conecte seus dispositivos, calendários, bancos e objetivos para desbloquear todo o potencial do Omniverse. Quanto mais dados eu tiver, mais inteligente eu me torno.',
     'dashboard.startSync': 'INICIAR SINCRONIZAÇÃO',
     'dashboard.skipForNow': 'PULAR POR ENQUANTO',
 
     'goals.placeholder': 'Digite seus objetivos aqui (ex: "Quero perder 10kg e correr uma maratona")',
-    'goals.ai_note': '✨ Phoenix AI analisará e estruturará seus objetivos automaticamente',
+    'goals.ai_note': ' Omniverse AI analisara e estruturará seus objetivos automaticamente',
     'voice.loading': 'Carregando vozes disponíveis...',
   },
 
@@ -713,12 +713,12 @@ const translations = {
     'dashboard.welcomeBack': 'Welkom Terug',
     'dashboard.allSystemsOperational': 'Alle systemen operationeel',
     'dashboard.syncYourLife': 'SYNCHRONISEER UW LEVEN',
-    'dashboard.syncDescription': 'Verbind uw apparaten, agenda\'s, banken en doelen om het volledige potentieel van Phoenix te ontsluiten. Hoe meer gegevens ik heb, hoe slimmer ik word.',
+    'dashboard.syncDescription': 'Verbind uw apparaten, agenda\'s, banken en doelen om het volledige potentieel van Omniverse te ontsluiten. Hoe meer gegevens ik heb, hoe slimmer ik word.',
     'dashboard.startSync': 'START SYNCHRONISATIE',
     'dashboard.skipForNow': 'NU OVERSLAAN',
 
     'goals.placeholder': 'Typ hier je doelen (bijv. "Ik wil 10kg afvallen en een marathon lopen")',
-    'goals.ai_note': '✨ Phoenix AI zal je doelen automatisch analyseren en structureren',
+    'goals.ai_note': ' Omniverse AI zal je doelen automatisch analyseren en structureren',
     'voice.loading': 'Beschikbare stemmen laden...',
   },
 
@@ -813,12 +813,12 @@ const translations = {
     'dashboard.welcomeBack': 'Witaj Ponownie',
     'dashboard.allSystemsOperational': 'Wszystkie systemy działają',
     'dashboard.syncYourLife': 'ZSYNCHRONIZUJ SWOJE ŻYCIE',
-    'dashboard.syncDescription': 'Połącz swoje urządzenia, kalendarze, banki i cele, aby odblokować pełny potencjał Phoenix. Im więcej danych mam, tym bardziej staję się inteligentny.',
+    'dashboard.syncDescription': 'Połącz swoje urządzenia, kalendarze, banki i cele, aby odblokować pelny potencjal Omniverse. Im więcej danych mam, tym bardziej staję się inteligentny.',
     'dashboard.startSync': 'ROZPOCZNIJ SYNCHRONIZACJĘ',
     'dashboard.skipForNow': 'POMIŃ NA RAZIE',
 
     'goals.placeholder': 'Wpisz tutaj swoje cele (np. "Chcę schudnąć 10kg i przebiec maraton")',
-    'goals.ai_note': '✨ Phoenix AI automatycznie przeanalizuje i uporządkuje Twoje cele',
+    'goals.ai_note': ' Omniverse AI automatycznie przeanalizuje i uporządkuje Twoje cele',
     'voice.loading': 'Ładowanie dostępnych głosów...',
   },
 
@@ -913,12 +913,12 @@ const translations = {
     'dashboard.welcomeBack': 'С Возвращением',
     'dashboard.allSystemsOperational': 'Все системы в норме',
     'dashboard.syncYourLife': 'СИНХРОНИЗИРУЙТЕ СВОЮ ЖИЗНЬ',
-    'dashboard.syncDescription': 'Подключите свои устройства, календари, банки и цели, чтобы раскрыть весь потенциал Phoenix. Чем больше данных у меня есть, тем умнее я становлюсь.',
+    'dashboard.syncDescription': 'Подключите свои устройства, календари, банки и цели, чтобы раскрыть ves' potencial Omniverse. Чем больше данных у меня есть, тем умнее я становлюсь.',
     'dashboard.startSync': 'НАЧАТЬ СИНХРОНИЗАЦИЮ',
     'dashboard.skipForNow': 'ПРОПУСТИТЬ ПОКА',
 
     'goals.placeholder': 'Введите здесь свои цели (напр. "Я хочу похудеть на 10кг и пробежать марафон")',
-    'goals.ai_note': '✨ Phoenix AI автоматически проанализирует и структурирует ваши цели',
+    'goals.ai_note': ' Omniverse AI avtomaticheski проанализирует и структурирует ваши цели',
     'voice.loading': 'Загрузка доступных голосов...',
   },
 
@@ -1013,12 +1013,12 @@ const translations = {
     'dashboard.welcomeBack': 'おかえりなさい',
     'dashboard.allSystemsOperational': 'すべてのシステムが正常に動作しています',
     'dashboard.syncYourLife': '生活を同期する',
-    'dashboard.syncDescription': 'デバイス、カレンダー、銀行、目標を接続して、Phoenixの全機能を解放しましょう。データが多ければ多いほど、私はより賢くなります。',
+    'dashboard.syncDescription': 'デバイス、カレンダー、銀行、目標を接続して、Omniverse no zen kinouを解放しましょう。データが多ければ多いほど、私はより賢くなります。',
     'dashboard.startSync': '同期を開始',
     'dashboard.skipForNow': '今はスキップ',
 
     'goals.placeholder': 'ここに目標を入力してください（例：「10kg痩せてマラソンを走りたい」）',
-    'goals.ai_note': '✨ Phoenix AIが目標を自動的に分析して構造化します',
+    'goals.ai_note': ' Omniverse AI ga mokuhyou wo jidouteki ni bunseki shite kouzou ka shimasu',
     'voice.loading': '利用可能な音声を読み込んでいます...',
   },
 
@@ -1113,12 +1113,12 @@ const translations = {
     'dashboard.welcomeBack': '欢迎回来',
     'dashboard.allSystemsOperational': '所有系统运行正常',
     'dashboard.syncYourLife': '同步您的生活',
-    'dashboard.syncDescription': '连接您的设备、日历、银行和目标，以解锁Phoenix的全部潜力。我拥有的数据越多，我就变得越聪明。',
+    'dashboard.syncDescription': '连接您的设备、日历、银行和目标，以jiesuo Omniverse de quanbu qianli。我拥有的数据越多，我就变得越聪明。',
     'dashboard.startSync': '开始同步',
     'dashboard.skipForNow': '暂时跳过',
 
     'goals.placeholder': '在此输入您的目标（例如："我想减掉10公斤并跑马拉松"）',
-    'goals.ai_note': '✨ Phoenix AI将自动分析和构建您的目标',
+    'goals.ai_note': ' Omniverse AI jiang zidong fenxi he goujian nin de mubiao',
     'voice.loading': '正在加载可用语音...',
   },
 };

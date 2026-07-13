@@ -21,6 +21,7 @@ class GenesisWidgetBuilder {
 
     /**
      * Create base widget HTML structure
+     * Now includes sovereignty tag for transparency
      */
     createWidgetStructure(blueprint) {
         const widget = document.createElement('div');
@@ -28,15 +29,101 @@ class GenesisWidgetBuilder {
         widget.id = blueprint.id;
         widget.setAttribute('data-type', blueprint.type);
 
+        // Get sovereignty classification
+        const sovereignty = this.getSovereigntyInfo(blueprint);
+
         widget.innerHTML = `
             <div class="widget-header">
                 <div class="widget-title">${blueprint.name}</div>
+                ${this.renderSovereigntyTag(sovereignty)}
                 <div class="widget-controls"></div>
             </div>
             <div class="widget-content"></div>
         `;
 
         return widget;
+    }
+
+    /**
+     * Get sovereignty classification for a widget
+     * Uses GenesisParser if available, otherwise determines from type
+     */
+    getSovereigntyInfo(blueprint) {
+        // If sovereignty info is already in blueprint, use it
+        if (blueprint.sovereignty) {
+            return blueprint.sovereignty;
+        }
+
+        // Use GenesisParser if available
+        if (window.GenesisParser) {
+            const parser = new window.GenesisParser();
+            return parser.classifySovereignty(blueprint.type);
+        }
+
+        // Fallback classification
+        return this.classifySovereigntyFallback(blueprint.type);
+    }
+
+    /**
+     * Fallback sovereignty classification
+     * Used when GenesisParser is not available
+     */
+    classifySovereigntyFallback(widgetType) {
+        const embedTypes = [
+            'music-player', 'video-widget', 'weather-widget',
+            'news-widget', 'email-widget', 'maps-widget',
+            'browser-panel', 'social-media-panel', 'finance-widget',
+            'workout-tracker', 'health-dashboard'
+        ];
+
+        const serviceMap = {
+            'music-player': 'Spotify',
+            'video-widget': 'YouTube',
+            'weather-widget': 'OpenWeatherMap',
+            'news-widget': 'Google News',
+            'email-widget': 'Gmail',
+            'maps-widget': 'Google Maps',
+            'browser-panel': 'External Web',
+            'social-media-panel': 'Social APIs',
+            'finance-widget': 'Bank APIs',
+            'workout-tracker': 'Fitness APIs',
+            'health-dashboard': 'Health APIs'
+        };
+
+        if (embedTypes.includes(widgetType)) {
+            const service = serviceMap[widgetType] || 'External';
+            return {
+                isLocal: false,
+                service: service,
+                label: `\u2298 Embed: ${service}`,
+                description: `Connects to ${service} when used`
+            };
+        }
+
+        return {
+            isLocal: true,
+            service: null,
+            label: '\u2299 Local',
+            description: 'Runs entirely offline, no network'
+        };
+    }
+
+    /**
+     * Render the sovereignty tag HTML
+     * @param {Object} sovereignty - Sovereignty info object
+     * @returns {string} HTML string for the sovereignty tag
+     */
+    renderSovereigntyTag(sovereignty) {
+        const tagClass = sovereignty.isLocal ? 'sovereignty-local' : 'sovereignty-embed';
+        const displayLabel = sovereignty.isLocal ? 'Local' : sovereignty.service || 'Embed';
+
+        return `
+            <span class="widget-sovereignty-tag ${tagClass}"
+                  data-tooltip="${sovereignty.description}"
+                  title="${sovereignty.description}">
+                ${displayLabel}
+            </span>
+        `;
     }
 
     /**

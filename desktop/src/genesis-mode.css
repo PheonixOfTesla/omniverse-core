@@ -101,33 +101,33 @@ body[data-mode="genesis"] .genesis-widget {
    ============================================ */
 
 #genesis-mode-btn {
-    background: rgba(255, 215, 0, 0.1);
-    border: 2px solid rgba(255, 215, 0, 0.3);
-    color: rgba(255, 215, 0, 0.8);
+    background: rgba(0, 217, 255, 0.1);
+    border: 2px solid rgba(0, 217, 255, 0.3);
+    color: rgba(0, 217, 255, 0.8);
     transition: all 0.3s ease;
 }
 
 #genesis-mode-btn:hover {
-    background: rgba(255, 215, 0, 0.2);
-    border-color: rgba(255, 215, 0, 0.6);
-    color: #FFD700;
+    background: rgba(0, 217, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.6);
+    color: #00d9ff;
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
 }
 
 /* Active state when in Genesis mode */
 body[data-mode="genesis"] #genesis-mode-btn {
-    background: rgba(255, 215, 0, 0.3) !important;
-    border-color: #FFD700 !important;
-    color: #FFD700 !important;
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
-                inset 0 0 20px rgba(255, 215, 0, 0.3) !important;
-    animation: genesisPulse 2s infinite;
+    background: rgba(0, 217, 255, 0.3) !important;
+    border-color: #00d9ff !important;
+    color: #00d9ff !important;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.6),
+                inset 0 0 20px rgba(0, 217, 255, 0.3) !important;
+    animation: genesisPulse 1s infinite;
 }
 
-/* DNA Helix icon animation */
+/* DNA Helix icon - static (animation removed for cleaner UI) */
 body[data-mode="genesis"] #genesis-mode-btn svg {
-    animation: dnaRotate 4s linear infinite;
+    /* animation: dnaRotate 4s linear infinite; - REMOVED */
 }
 
 /* Other mode buttons when Genesis is active */
@@ -146,12 +146,12 @@ body[data-mode="genesis"] #desk-btn {
 
 @keyframes genesisPulse {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
-                    inset 0 0 15px rgba(255, 215, 0, 0.2);
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.4),
+                    inset 0 0 15px rgba(0, 217, 255, 0.2);
     }
     50% {
-        box-shadow: 0 0 40px rgba(255, 215, 0, 0.8),
-                    inset 0 0 30px rgba(255, 215, 0, 0.4);
+        box-shadow: 0 0 40px rgba(0, 217, 255, 0.8),
+                    inset 0 0 30px rgba(0, 217, 255, 0.4);
     }
 }
 

@@ -160,7 +160,7 @@ class JARVISEngine {
         // Greeting responses
         if (msg.match(/\b(hi|hello|hey|greetings)\b/)) {
             return {
-                response: "Hello! I'm JARVIS, your Phoenix AI assistant. I can help you track workouts, log meals, analyze your health data, and answer questions about your optimization journey. What would you like to know?",
+                response: "Hello! I'm JARVIS, your Omniverse AI assistant. I can help you track workouts, log meals, analyze your health data, and answer questions about your optimization journey. What would you like to know?",
                 fallback: true
             };
         }
@@ -709,7 +709,7 @@ class JARVISEngine {
 
         // ⚡ ANIMATED TYPING DOTS (feels alive!)
         bubble.innerHTML = `
-            <span style="font-style:italic">Phoenix is thinking</span>
+            <span style="font-style:italic">Omniverse is thinking</span>
             <span class="typing-dots">
                 <span style="animation: typingDot 1.4s infinite; animation-delay: 0s">.</span>
                 <span style="animation: typingDot 1.4s infinite; animation-delay: 0.2s">.</span>

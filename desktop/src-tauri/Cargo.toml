@@ -27,6 +27,21 @@ base64 = "0.21"
 # Link to omniverse core
 omniverse = { path = "../../core" }
 
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID generation
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Hex encoding for debugging
+hex = "0.4"
+
+# SQLCipher (for tests)
+rusqlite = { version = "0.31", features = ["bundled-sqlcipher"] }
+
+[dev-dependencies]
+tempfile = "3.8"
+
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]

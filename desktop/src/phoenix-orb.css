@@ -21,7 +21,7 @@
     box-shadow: 0 0 30px var(--planet-color-glow);
     cursor: pointer;
     transition: all 0.3s ease;
-    animation: orbPulse 2s ease-in-out infinite;
+    animation: orbPulse 1s ease-in-out infinite;
     position: relative;
     display: flex;
     align-items: center;
@@ -64,13 +64,13 @@
 
 /* Active/Listening State */
 .phoenix-orb.listening {
-    animation: orbListening 1s ease-in-out infinite;
+    animation: orbListening 0.5s ease-in-out infinite;
     box-shadow: 0 0 60px var(--planet-color-glow);
 }
 
 /* Processing State */
 .phoenix-orb.processing {
-    animation: orbProcessing 1.5s linear infinite;
+    animation: orbProcessing 0.75s linear infinite;
 }
 
 /* Speaking State (like Siri) */
@@ -214,7 +214,7 @@
 }
 
 .phoenix-voice-button.listening {
-    animation: orbListening 1s ease-in-out infinite;
+    animation: orbListening 0.5s ease-in-out infinite;
 }
 
 /* Text Input */

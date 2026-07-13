@@ -766,7 +766,7 @@ class PhoenixVoiceCommands {
                 Voice Input: Text Mode
             </div>
             <div style="font-size: 12px; opacity: 0.8;">
-                Type your message below to interact with Phoenix.
+                Type your message below to interact with Omniverse.
                 Local voice is available for responses.
             </div>
         `;
@@ -918,8 +918,10 @@ class PhoenixVoiceCommands {
             this.requestInProgress = false; // Release lock on error
             this.setOrbState('idle');
 
-            // Show prominent error message
-            this.showErrorMessage(`Cannot start speech recognition: ${error.message}`);
+            // SOVEREIGN MODE: Graceful degradation instead of red error
+            // Voice may be unavailable in Tauri webview - that's expected
+            console.log('[Voice] Speech recognition unavailable - using text input mode');
+            this.showGracefulDegradation();
         }
     }
 
@@ -1095,7 +1097,7 @@ class PhoenixVoiceCommands {
 
             // ========== CAPABILITY QUESTIONS - SHOW PREVIEW WIDGETS ==========
             if (msg.match(/what can you do|what are your capabilities|help me|what do you do/)) {
-                const response = `I'm Phoenix, your personal AI butler. I can manage your workspace - emails, calendar, tasks, contacts, and files. I track your health metrics, help with goals, handle finances, and automate daily routines. Just ask me anything or say "show me my emails" to get started.`;
+                const response = `I'm Omniverse, your personal AI butler. I can manage your workspace - emails, calendar, tasks, contacts, and files. I track your health metrics, help with goals, handle finances, and automate daily routines. Just ask me anything or say "show me my emails" to get started.`;
 
                 // Show preview widgets orbiting around the orb
                 if (window.widgetManager && window.widgetManager.showOrbitalWidget) {

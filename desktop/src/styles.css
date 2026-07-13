@@ -7,25 +7,44 @@
    CSS VARIABLES - DESIGN TOKENS
    ============================================ */
 :root {
-    --primary-cyan: #00ff88;
+    /* ============================================
+       PRIMARY CYAN COLOR SYSTEM
+       ============================================ */
+    --primary-cyan: #00d9ff;
     --primary-cyan-glow: rgba(0, 217, 255, 1);
     --primary-cyan-dim: rgba(0, 217, 255, 0.6);
     --primary-cyan-border: rgba(0, 217, 255, 0.3);
     --primary-cyan-bg: rgba(0, 217, 255, 0.1);
-    
+
+    /* ============================================
+       BACKGROUND COLORS
+       ============================================ */
     --bg-dark: #000;
     --bg-panel: rgba(0, 10, 20, 0.9);
     --bg-card: rgba(0, 10, 20, 0.8);
     --bg-overlay: rgba(0, 0, 0, 0.98);
-    
+
+    /* ============================================
+       SEMANTIC COLORS
+       ============================================ */
     --error-red: #ff4444;
     --error-red-border: rgba(255, 68, 68, 0.5);
     --error-red-bg: rgba(255, 68, 68, 0.1);
-    
+
     --success-green: #00ff88;
     --warning-orange: #ffaa00;
-    
+
+    /* ============================================
+       TYPOGRAPHY SCALE
+       ============================================ */
     --font-primary: 'Courier New', 'Consolas', monospace;
+    --font-xs: 10px;
+    --font-sm: 12px;
+    --font-md: 14px;
+    --font-lg: 16px;
+    --font-xl: 20px;
+    --font-2xl: 24px;
+    /* Legacy sizes for backwards compatibility */
     --font-size-xs: 10px;
     --font-size-sm: 11px;
     --font-size-md: 12px;
@@ -34,26 +53,118 @@
     --font-size-2xl: 24px;
     --font-size-3xl: 36px;
     --font-size-4xl: 48px;
-    
+
+    /* ============================================
+       8PX SPACING SCALE
+       ============================================ */
+    --space-1: 8px;
+    --space-2: 16px;
+    --space-3: 24px;
+    --space-4: 32px;
+    --space-5: 40px;
+    --space-6: 48px;
+    /* Legacy spacing for backwards compatibility */
     --spacing-xs: 5px;
     --spacing-sm: 10px;
     --spacing-md: 15px;
     --spacing-lg: 20px;
     --spacing-xl: 30px;
     --spacing-2xl: 40px;
-    
+
+    /* ============================================
+       BORDER RADIUS
+       ============================================ */
     --border-radius-sm: 4px;
     --border-radius-md: 6px;
     --border-radius-lg: 8px;
     --border-radius-full: 50%;
-    
+
+    /* ============================================
+       TRANSITIONS
+       ============================================ */
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
-    
+
+    /* ============================================
+       SHADOWS
+       ============================================ */
     --shadow-glow-cyan: 0 0 20px rgba(0, 217, 255, 0.4);
     --shadow-glow-cyan-strong: 0 0 30px rgba(0, 217, 255, 0.8);
     --shadow-glow-red: 0 0 20px rgba(255, 68, 68, 0.4);
+
+    /* ============================================
+       Z-INDEX HIERARCHY
+       ============================================ */
+    --z-base: 0;
+    --z-panels: 100;
+    --z-modals: 200;
+    --z-orb: 300;
+    --z-overlays: 400;
+}
+
+/* ============================================
+   UNIFIED BUTTON STYLES
+   Use .btn-primary for main actions
+   Use .btn-secondary for secondary actions
+   ============================================ */
+.btn-primary {
+    padding: var(--space-2) var(--space-3);
+    background: var(--primary-cyan-bg);
+    border: 2px solid var(--primary-cyan);
+    border-radius: var(--border-radius-lg);
+    color: var(--primary-cyan);
+    font-family: var(--font-primary);
+    font-size: var(--font-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+    background: rgba(0, 217, 255, 0.3);
+    box-shadow: var(--shadow-glow-cyan-strong);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: 1px solid var(--primary-cyan-border);
+    border-radius: var(--border-radius-lg);
+    color: var(--primary-cyan);
+    font-family: var(--font-primary);
+    font-size: var(--font-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    letter-spacing: 1px;
+}
+
+.btn-secondary:hover {
+    background: var(--primary-cyan-bg);
+    border-color: var(--primary-cyan-dim);
+    box-shadow: var(--shadow-glow-cyan);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ============================================
@@ -113,51 +224,9 @@ body {
 
 /* ============================================
    GRID UNDERLAY & VHS OVERLAY
+   REMOVED - Visual noise with no function
    ============================================ */
-.grid-underlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        linear-gradient(var(--primary-cyan-border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--primary-cyan-border) 1px, transparent 1px);
-    background-size: 50px 50px;
-    opacity: 0.1;
-    pointer-events: none;
-    z-index: 0;
-    animation: gridMove 60s linear infinite;
-}
-
-@keyframes gridMove {
-    0% { background-position: 0 0; }
-    100% { background-position: 50px 50px; }
-}
-
-.vhs-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.1) 2px,
-        rgba(0, 0, 0, 0.1) 4px
-    );
-    pointer-events: none;
-    z-index: 3;
-    opacity: 0.3;
-    animation: vhsScan 8s linear infinite;
-}
-
-@keyframes vhsScan {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 100vh; }
-}
+/* .grid-underlay and .vhs-overlay removed for cleaner UI */
 
 /* ============================================
    HUD FRAME & CORNER BRACKETS
@@ -236,7 +305,7 @@ body {
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.2), transparent);
-    animation: metricScan 3s infinite;
+    animation: metricScan 1.5s infinite;
 }
 
 @keyframes metricScan {
@@ -697,7 +766,7 @@ body {
     gap: var(--spacing-md);
     z-index: 6000;
     opacity: 0;
-    animation: fadeIn 1s 2s forwards;
+    animation: fadeIn 0.5s 1s forwards;
 }
 
 #quick-actions button {
@@ -758,7 +827,7 @@ body {
     text-align: center;
     z-index: 500;
     opacity: 0;
-    animation: fadeIn 1s 1s forwards;
+    animation: fadeIn 0.5s 0.5s forwards;
 }
 
 .greeting-main {
@@ -968,7 +1037,7 @@ body {
 }
 
 .voice-button.active {
-    animation: pulse 1.5s ease-in-out infinite;
+    animation: pulse 0.75s ease-in-out infinite;
 }
 
 /* ============================================
@@ -1181,19 +1250,36 @@ body {
         min-height: 44px;
     }
 
-    /* Smaller optimization indicator */
+    /* Smaller optimization indicator - moved to avoid dock overlap */
     #optimization-indicator {
-        width: 70px !important;
-        height: 70px !important;
-        bottom: 10px !important;
+        width: 60px !important;
+        height: 60px !important;
+        bottom: 90px !important; /* Above dock */
         right: 10px !important;
     }
 
     /* Reduce HUD panel widths */
     #hud-tl, #hud-bl {
-        min-width: 180px !important;
+        min-width: 160px !important;
+        max-width: 45vw !important;
+        padding: 8px !important;
+        font-size: 10px !important;
     }
-}
+
+    /* HUD corners: prevent overlap with mode toggle */
+    #hud-tr {
+        top: 70px !important; /* Below mode toggle */
+        right: 10px !important;
+    }
+
+    /* Voice button: position to avoid dock and optimization orb */
+    .voice-button {
+        width: 50px !important;
+        height: 50px !important;
+        bottom: 90px !important; /* Above dock */
+        right: 80px !important; /* Left of optimization indicator */
+        font-size: 20px;
+    }
 
     /* Planet cards mobile optimization */
     .planet-cards-grid {
@@ -1201,23 +1287,12 @@ body {
         gap: 16px;
     }
 
-    /* Floating elements mobile optimization */
-    #optimization-indicator {
-        width: 80px !important;
-        height: 80px !important;
-        bottom: 15px !important;
-        right: 15px !important;
-    }
-
-    #optimization-indicator #opt-percentage {
-        font-size: 20px !important;
-    }
-
+    /* Settings orb: move below back button */
     #settings-orb {
-        width: 50px !important;
-        height: 50px !important;
-        top: 80px !important;
-        right: 15px !important;
+        width: 44px !important;
+        height: 44px !important;
+        top: 70px !important;
+        right: 10px !important;
     }
 
     /* Hide PLANETS sidebar on mobile */
@@ -1229,9 +1304,20 @@ body {
         display: none !important;
     }
 
+    /* Corner brackets: smaller and avoid collisions */
     .corner-bracket {
-        width: 30px;
-        height: 30px;
+        width: 20px;
+        height: 20px;
+    }
+
+    .corner-bracket.top-left,
+    .corner-bracket.top-right {
+        top: 80px; /* Below mode toggle */
+    }
+
+    .corner-bracket.bottom-left,
+    .corner-bracket.bottom-right {
+        bottom: 90px; /* Above dock */
     }
 
     #quick-actions button {
@@ -1239,10 +1325,100 @@ body {
         font-size: var(--font-size-sm);
     }
 
+    /* Mode toggle: more compact on small screens */
+    .mode-toggle-container {
+        padding: 3px !important;
+        gap: 3px !important;
+    }
+
+    /* Back button: smaller */
+    button[onclick="window.history.back()"] {
+        padding: 10px 14px !important;
+        font-size: 10px !important;
+        top: 10px !important;
+        right: 60px !important; /* Leave room for settings orb */
+    }
+}
+
+/* ============================================
+   768px FIXED OVERLAP PREVENTION
+   Prevent HUD, orb, dock, mode toggle collisions
+   ============================================ */
+@media (max-width: 768px) {
+    /* Stack elements vertically with clear spacing */
+
+    /* Mode toggle: top center, safe area aware */
+    .mode-toggle-container {
+        top: max(12px, env(safe-area-inset-top)) !important;
+        z-index: 10001 !important;
+    }
+
+    /* Back button: top right, below safe area */
+    button[onclick="window.history.back()"] {
+        top: max(12px, env(safe-area-inset-top)) !important;
+        right: 12px !important;
+        z-index: 10000 !important;
+    }
+
+    /* HUD top corners: below mode toggle area */
+    #hud-tl {
+        top: 70px !important;
+        left: 10px !important;
+    }
+
+    #hud-tr {
+        top: 70px !important;
+        right: 10px !important;
+    }
+
+    /* HUD bottom corners: above dock area */
+    #hud-bl {
+        bottom: 100px !important;
+        left: 10px !important;
+    }
+
+    #hud-br {
+        bottom: 100px !important;
+        right: 10px !important;
+    }
+
+    /* Voice button: above dock, not overlapping orb */
     .voice-button {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
+        bottom: 100px !important;
+        right: 15px !important;
+        z-index: 1000 !important;
+    }
+
+    /* Optimization indicator: above dock, left of voice button */
+    #optimization-indicator {
+        width: 70px !important;
+        height: 70px !important;
+        bottom: 100px !important;
+        right: 90px !important;
+    }
+
+    /* Settings orb: below back button */
+    #settings-orb {
+        top: 70px !important;
+        right: 12px !important;
+    }
+
+    /* Corner brackets: avoid mode toggle and dock */
+    .corner-bracket.top-left,
+    .corner-bracket.top-right {
+        top: 70px !important;
+    }
+
+    .corner-bracket.bottom-left,
+    .corner-bracket.bottom-right {
+        bottom: 100px !important;
+    }
+
+    /* Dock: ensure it's at the very bottom */
+    #genesis-dock,
+    .phoenix-dock {
+        bottom: 10px !important;
+        z-index: 9000 !important;
     }
 }
 

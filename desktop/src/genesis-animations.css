@@ -11,15 +11,16 @@
 @keyframes dnaGlow {
     0%, 100% {
         filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.6))
-                drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+                drop-shadow(0 0 20px rgba(0, 217, 255, 0.3));
     }
     50% {
         filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.9))
-                drop-shadow(0 0 40px rgba(255, 215, 0, 0.6));
+                drop-shadow(0 0 40px rgba(0, 217, 255, 0.6));
     }
 }
 
-/* DNA Helix Rotation */
+/* DNA Helix Rotation - DISABLED for static DNA icon */
+/*
 @keyframes dnaRotate {
     0% {
         transform: rotate(0deg);
@@ -28,8 +29,10 @@
         transform: rotate(360deg);
     }
 }
+*/
 
-/* DNA Helix Pulse */
+/* DNA Helix Pulse - REMOVED for cleaner UI */
+/*
 @keyframes dnaPulse {
     0%, 100% {
         transform: scale(1);
@@ -40,8 +43,10 @@
         opacity: 0.7;
     }
 }
+*/
 
-/* DNA Strand Wave */
+/* DNA Strand Wave - REMOVED for cleaner UI */
+/*
 @keyframes dnaWave {
     0%, 100% {
         transform: translateY(0);
@@ -50,6 +55,7 @@
         transform: translateY(-3px);
     }
 }
+*/
 
 /* ============================================
    GENESIS BUTTON ANIMATIONS
@@ -58,22 +64,22 @@
 /* Genesis Mode Button Pulse */
 @keyframes genesisPulse {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
-                    inset 0 0 15px rgba(255, 215, 0, 0.2);
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.4),
+                    inset 0 0 15px rgba(0, 217, 255, 0.2);
     }
     50% {
-        box-shadow: 0 0 40px rgba(255, 215, 0, 0.8),
-                    inset 0 0 30px rgba(255, 215, 0, 0.4);
+        box-shadow: 0 0 40px rgba(0, 217, 255, 0.8),
+                    inset 0 0 30px rgba(0, 217, 255, 0.4);
     }
 }
 
 /* Button Hover Glow */
 @keyframes buttonHoverGlow {
     0% {
-        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
     }
     100% {
-        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
     }
 }
 
@@ -96,11 +102,11 @@
 /* Title Glow */
 @keyframes titleGlow {
     0%, 100% {
-        text-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
+        text-shadow: 0 0 20px rgba(0, 217, 255, 0.6),
                      0 0 40px rgba(0, 217, 255, 0.3);
     }
     50% {
-        text-shadow: 0 0 40px rgba(255, 215, 0, 0.9),
+        text-shadow: 0 0 40px rgba(0, 217, 255, 0.9),
                      0 0 80px rgba(0, 217, 255, 0.5);
     }
 }
@@ -108,10 +114,10 @@
 /* Input Focus Glow */
 @keyframes inputFocusGlow {
     0%, 100% {
-        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
     }
     50% {
-        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
     }
 }
 
@@ -138,16 +144,17 @@
 /* Blueprint Border Glow */
 @keyframes blueprintBorderGlow {
     0%, 100% {
-        border-color: rgba(255, 215, 0, 0.4);
-        box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        border-color: rgba(0, 217, 255, 0.4);
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
     }
     50% {
-        border-color: rgba(255, 215, 0, 0.8);
-        box-shadow: 0 0 60px rgba(255, 215, 0, 0.6);
+        border-color: rgba(0, 217, 255, 0.8);
+        box-shadow: 0 0 60px rgba(0, 217, 255, 0.6);
     }
 }
 
-/* Section Highlight */
+/* Section Highlight - REMOVED for cleaner UI */
+/*
 @keyframes sectionHighlight {
     0% {
         background: rgba(0, 217, 255, 0.05);
@@ -159,6 +166,7 @@
         background: rgba(0, 217, 255, 0.05);
     }
 }
+*/
 
 /* ============================================
    BUILDING ANIMATION
@@ -174,7 +182,8 @@
     }
 }
 
-/* DNA Helix Spinner */
+/* DNA Helix Spinner - REMOVED for cleaner UI */
+/*
 @keyframes dnaSpinner {
     0% {
         transform: rotate(0deg) scale(1);
@@ -186,6 +195,7 @@
         transform: rotate(360deg) scale(1);
     }
 }
+*/
 
 /* Building Text Pulse */
 @keyframes buildingPulse {
@@ -209,7 +219,8 @@
     }
 }
 
-/* Particle Float */
+/* Particle Float - REMOVED for cleaner UI */
+/*
 @keyframes particleFloat {
     0% {
         transform: translateY(0) rotate(0deg);
@@ -223,6 +234,7 @@
         opacity: 0;
     }
 }
+*/
 
 /* ============================================
    WIDGET ANIMATIONS
@@ -281,7 +293,8 @@
     }
 }
 
-/* Widget Bounce */
+/* Widget Bounce - REMOVED for cleaner UI */
+/*
 @keyframes widgetBounce {
     0%, 100% {
         transform: translateY(0);
@@ -290,6 +303,7 @@
         transform: translateY(-10px);
     }
 }
+*/
 
 /* ============================================
    DOCK ANIMATIONS
@@ -307,7 +321,8 @@
     }
 }
 
-/* Docked Widget Pulse */
+/* Docked Widget Pulse - REMOVED for cleaner UI */
+/*
 @keyframes dockedPulse {
     0%, 100% {
         transform: scale(1);
@@ -316,6 +331,7 @@
         transform: scale(1.1);
     }
 }
+*/
 
 /* ============================================
    CONTROL BUTTON ANIMATIONS

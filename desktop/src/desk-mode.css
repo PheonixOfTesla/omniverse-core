@@ -328,7 +328,7 @@ body[data-mode="desk"] {
 }
 
 .desk-orb.listening {
-    animation: orbPulse 2s infinite;
+    animation: orbPulse 1s infinite;
     border-color: #00ff88;
 }
 

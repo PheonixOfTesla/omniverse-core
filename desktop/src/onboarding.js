@@ -42,7 +42,7 @@ class OnboardingEngine {
                 personality: 'Friendly and approachable',
                 gender: 'Female',
                 icon: '👩‍💼',
-                previewText: 'Hello. I\'m Phoenix, your AI companion. Ready to optimize your life?'
+                previewText: 'Hello. I\'m Omniverse, your AI companion. Ready to optimize your life?'
             },
             { 
                 id: 'alloy', 
@@ -51,7 +51,7 @@ class OnboardingEngine {
                 personality: 'Professional and clear',
                 gender: 'Neutral',
                 icon: '🎭',
-                previewText: 'Good evening. I\'m Phoenix. Let me show you what I can do.'
+                previewText: 'Good evening. I\'m Omniverse. Let me show you what I can do.'
             },
             { 
                 id: 'echo', 
@@ -60,7 +60,7 @@ class OnboardingEngine {
                 personality: 'Calm and reassuring',
                 gender: 'Male',
                 icon: '🧘‍♂️',
-                previewText: 'Welcome. I\'m Phoenix, your personal AI strategist.'
+                previewText: 'Welcome. I\'m Omniverse, your personal AI strategist.'
             },
             { 
                 id: 'fable', 
@@ -69,7 +69,7 @@ class OnboardingEngine {
                 personality: 'Expressive and engaging',
                 gender: 'Male',
                 icon: '🎪',
-                previewText: 'Hey there! I\'m Phoenix. Let\'s make some magic happen.'
+                previewText: 'Hey there! I\'m Omniverse. Let\'s make some magic happen.'
             },
             { 
                 id: 'onyx', 
@@ -78,7 +78,7 @@ class OnboardingEngine {
                 personality: 'Authoritative and powerful',
                 gender: 'Male',
                 icon: '👔',
-                previewText: 'I am Phoenix. Your AI chief of staff. Let\'s begin.'
+                previewText: 'I am Omniverse. Your AI chief of staff. Let\'s begin.'
             },
             { 
                 id: 'shimmer', 
@@ -87,7 +87,7 @@ class OnboardingEngine {
                 personality: 'Energetic and uplifting',
                 gender: 'Female',
                 icon: '✨',
-                previewText: 'Hi! I\'m Phoenix, and I\'m so excited to work with you!'
+                previewText: 'Hi! I\'m Omniverse, and I\'m so excited to work with you!'
             }
         ];
         
@@ -95,7 +95,7 @@ class OnboardingEngine {
         this.dialogues = {
             phase2: {
                 greeting: (name) => `Good evening, ${name}.`,
-                intro1: "I'm Phoenix. Your personal AI companion and chief of staff.",
+                intro1: "I'm Omniverse. Your personal AI companion and chief of staff.",
                 intro2: "I've already started learning about you.",
                 closing: "I know you're busy. That's why I'm here."
             },
@@ -199,7 +199,7 @@ class OnboardingEngine {
             <div class="setup-container">
                 <!-- HEADER -->
                 <div class="setup-header">
-                    <div class="phoenix-logo-large">PHOENIX</div>
+                    <div class="phoenix-logo-large">OMNIVERSE</div>
                     <div class="setup-subtitle">Personalize Your Experience</div>
                     <div class="setup-description">
                         Choose your language and voice before we begin your journey.
@@ -208,7 +208,7 @@ class OnboardingEngine {
 
                 <!-- LANGUAGE SELECTION -->
                 <div class="setup-section">
-                    <h3 class="section-title">🌍 Select Your Language</h3>
+                    <h3 class="section-title">Select Your Language</h3>
                     <div class="language-grid" id="language-grid">
                         ${this.renderLanguageCards()}
                     </div>
@@ -216,7 +216,7 @@ class OnboardingEngine {
 
                 <!-- VOICE SELECTION -->
                 <div class="setup-section">
-                    <h3 class="section-title">🎙️ Select Phoenix Voice</h3>
+                    <h3 class="section-title">Select Omniverse Voice</h3>
                     <div class="voice-grid" id="voice-grid">
                         ${this.renderVoiceCards()}
                     </div>
@@ -452,7 +452,7 @@ class OnboardingEngine {
             <div class="setup-container">
                 <!-- HEADER -->
                 <div class="setup-header">
-                    <div class="phoenix-logo-large">PHOENIX</div>
+                    <div class="phoenix-logo-large">OMNIVERSE</div>
                     <div class="setup-subtitle">Let's Get to Know You</div>
                     <div class="setup-description">
                         Tell me about yourself so I can personalize your experience.
@@ -500,42 +500,42 @@ class OnboardingEngine {
                             <label class="form-label">What are your primary goals? (Select all that apply)</label>
                             <div class="goals-grid">
                                 <div class="goal-card" data-goal="weight_loss">
-                                    <div class="goal-icon">⚖️</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">Lose Weight</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
                                 <div class="goal-card" data-goal="muscle_gain">
-                                    <div class="goal-icon">💪</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">Build Muscle</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
                                 <div class="goal-card" data-goal="fitness">
-                                    <div class="goal-icon">🏃</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">Improve Fitness</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
                                 <div class="goal-card" data-goal="sleep">
-                                    <div class="goal-icon">😴</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">Better Sleep</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
                                 <div class="goal-card" data-goal="productivity">
-                                    <div class="goal-icon">📈</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">Boost Productivity</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
                                 <div class="goal-card" data-goal="stress">
-                                    <div class="goal-icon">🧘</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">Reduce Stress</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
                                 <div class="goal-card" data-goal="health">
-                                    <div class="goal-icon">❤️</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">General Health</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
                                 <div class="goal-card" data-goal="performance">
-                                    <div class="goal-icon">🎯</div>
+                                    <div class="goal-icon"></div>
                                     <div class="goal-name">Peak Performance</div>
                                     <div class="goal-checkmark">✓</div>
                                 </div>
@@ -915,15 +915,15 @@ class OnboardingEngine {
         
         container.innerHTML = `
             <div class="info-item">
-                <div class="info-icon">📍</div>
+                <div class="info-icon"></div>
                 <div>You're in ${this.locationData.city}, ${this.locationData.region}</div>
             </div>
             <div class="info-item">
-                <div class="info-icon">🌡️</div>
+                <div class="info-icon"></div>
                 <div>It's ${weatherTemp}°F and ${weatherCondition.toLowerCase()}</div>
             </div>
             <div class="info-item">
-                <div class="info-icon">🌙</div>
+                <div class="info-icon"></div>
                 <div>I'm here to make your life easier</div>
             </div>
         `;
@@ -1099,7 +1099,7 @@ class OnboardingEngine {
                     <div class="orb-ring"></div>
                     <div class="orb-core"></div>
                 </div>
-                <div class="content-title">Initializing Phoenix...</div>
+                <div class="content-title">Initializing Omniverse...</div>
                 <div class="content-subtitle">
                     ${option === 'all-in' ? 'Connecting all systems. This will take a moment...' : 
                       option === 'simple' ? 'Setting up your first connection...' : 

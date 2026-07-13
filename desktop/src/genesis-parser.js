@@ -259,6 +259,87 @@ class GenesisParser {
         };
         return dimensions[size] || dimensions['medium'];
     }
+
+    /**
+     * SOVEREIGNTY CLASSIFICATION
+     * Classifies widgets as Local (offline) or Embed (external service)
+     * Critical for user transparency about data sovereignty
+     * @param {string} widgetType - The widget type from parsing
+     * @returns {Object} { isLocal: boolean, service: string|null, label: string }
+     */
+    classifySovereignty(widgetType) {
+        // LOCAL WIDGETS - Run entirely offline, no network calls
+        const localWidgets = [
+            'timer-widget',
+            'notes-panel',
+            'quote-display',
+            'dashboard-widget',
+            'todo-list',
+            'custom-widget',
+            'calendar-view',  // Local calendar display
+            'meditation-timer',
+            'habit-tracker',
+            'goal-tracker'
+        ];
+
+        // EMBED WIDGETS - Reach out to external services
+        const embedWidgets = {
+            'music-player': 'Spotify',
+            'video-widget': 'YouTube',
+            'weather-widget': 'OpenWeatherMap',
+            'news-widget': 'Google News',
+            'email-widget': 'Gmail',
+            'maps-widget': 'Google Maps',
+            'browser-panel': 'External Web',
+            'social-media-panel': 'Social APIs',
+            'finance-widget': 'Bank APIs',
+            'workout-tracker': 'Fitness APIs',
+            'health-dashboard': 'Health APIs'
+        };
+
+        // Check if it's a local widget
+        if (localWidgets.includes(widgetType)) {
+            return {
+                isLocal: true,
+                service: null,
+                label: '\u2299 Local', // Unicode: circled dot
+                description: 'Runs entirely offline, no network'
+            };
+        }
+
+        // Check if it's an embed widget
+        if (embedWidgets[widgetType]) {
+            return {
+                isLocal: false,
+                service: embedWidgets[widgetType],
+                label: `\u2298 Embed: ${embedWidgets[widgetType]}`, // Unicode: circled division slash
+                description: `Connects to ${embedWidgets[widgetType]} when used`
+            };
+        }
+
+        // Default: treat unknown widgets as local (conservative)
+        return {
+            isLocal: true,
+            service: null,
+            label: '\u2299 Local',
+            description: 'Runs entirely offline, no network'
+        };
+    }
+
+    /**
+     * Enhanced parse function with sovereignty classification
+     * @param {string} userInput - Natural language request
+     * @returns {Object} Parsed widget specification with sovereignty info
+     */
+    parseWithSovereignty(userInput) {
+        const baseSpec = this.parse(userInput);
+        const sovereignty = this.classifySovereignty(baseSpec.widgetType);
+
+        return {
+            ...baseSpec,
+            sovereignty: sovereignty
+        };
+    }
 }
 
 // Export for use in other modules

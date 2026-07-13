@@ -89,6 +89,10 @@ strip = true
 [profile.release.build-override]
 opt-level = 0
 
+[lib]
+name = "omniverse"
+path = "src/lib.rs"
+
 [[bin]]
 name = "omniverse"
 path = "src/main.rs"

@@ -138,8 +138,8 @@ class VoiceOnboarding {
         const html = `
             <div class="voice-onboarding">
                 <div class="onboarding-section">
-                    <h2 class="section-title">🎭 Choose Your Phoenix Personality</h2>
-                    <p class="section-subtitle">How should Phoenix sound and communicate with you?</p>
+                    <h2 class="section-title">Choose Your Omniverse Personality</h2>
+                    <p class="section-subtitle">How should Omniverse sound and communicate with you?</p>
 
                     <div class="personality-grid">
                         ${this.personalities.map(p => this.renderPersonalityCard(p)).join('')}
@@ -147,8 +147,8 @@ class VoiceOnboarding {
                 </div>
 
                 <div class="onboarding-section">
-                    <h2 class="section-title">🌍 Select Your Language</h2>
-                    <p class="section-subtitle">Phoenix speaks ${this.enumerator.getLanguages().length}+ languages natively</p>
+                    <h2 class="section-title">Select Your Language</h2>
+                    <p class="section-subtitle">Omniverse speaks ${this.enumerator.getLanguages().length}+ languages natively</p>
 
                     <div class="language-selector">
                         ${this.renderLanguageSelector()}
@@ -156,7 +156,7 @@ class VoiceOnboarding {
                 </div>
 
                 <div class="onboarding-section">
-                    <h2 class="section-title">🎤 Choose Your Voice</h2>
+                    <h2 class="section-title">Choose Your Voice</h2>
                     <p class="section-subtitle">Pick from ${this.availableVoices.length} FREE iOS voices</p>
 
                     <div class="voice-selector" id="voice-list">
@@ -166,7 +166,7 @@ class VoiceOnboarding {
 
                 <div class="onboarding-actions">
                     <button class="test-voice-btn" onclick="voiceOnboarding.testCurrentSelection()">
-                        🎧 Test Voice
+                        Test Voice
                     </button>
                     <button class="save-btn" onclick="voiceOnboarding.saveAndContinue()">
                         Save & Continue →
@@ -320,18 +320,18 @@ class VoiceOnboarding {
 
         const personality = this.personalities.find(p => p.id === this.selectedPersonality);
         const testMessages = {
-            'friendly_helpful': 'Hi there! I\'m Phoenix, your friendly AI companion. I\'m here to help you optimize your health and performance.',
-            'professional_serious': 'Good day. I\'m Phoenix, your performance optimization system. I analyze your data with precision.',
-            'british_refined': 'Good evening. I am Phoenix, your personal butler for health and performance optimization.',
-            'whimsical_storyteller': 'Welcome, dear friend! I\'m Phoenix, weaving the story of your health journey together.',
-            'gentle_nurturing': 'Hello, dear one. I\'m Phoenix, here to support you with care and compassion.',
-            'neutral_efficient': 'Phoenix online. Ready to optimize your performance metrics.',
-            'motivational_coach': 'Let\'s GO! I\'m Phoenix, and I\'m here to CRUSH your goals together!',
-            'zen_master': 'Peace, my friend. I am Phoenix, your guide to mindful optimization.',
-            'tech_genius': 'Greetings. Phoenix AI system initialized. All metrics nominal.',
-            'comedian': 'Hey there! Phoenix here, ready to make health optimization actually FUN.',
-            'therapist': 'Hello. I\'m Phoenix, here to support your journey with reflection and understanding.',
-            'commander': 'Attention! Phoenix here. Time to take ACTION and dominate your goals.'
+            'friendly_helpful': 'Hi there! I\'m Omniverse, your friendly AI companion. I\'m here to help you optimize your health and performance.',
+            'professional_serious': 'Good day. I\'m Omniverse, your performance optimization system. I analyze your data with precision.',
+            'british_refined': 'Good evening. I am Omniverse, your personal butler for health and performance optimization.',
+            'whimsical_storyteller': 'Welcome, dear friend! I\'m Omniverse, weaving the story of your health journey together.',
+            'gentle_nurturing': 'Hello, dear one. I\'m Omniverse, here to support you with care and compassion.',
+            'neutral_efficient': 'Omniverse online. Ready to optimize your performance metrics.',
+            'motivational_coach': 'Let\'s GO! I\'m Omniverse, and I\'m here to CRUSH your goals together!',
+            'zen_master': 'Peace, my friend. I am Omniverse, your guide to mindful optimization.',
+            'tech_genius': 'Greetings. Omniverse AI system initialized. All metrics nominal.',
+            'comedian': 'Hey there! Omniverse here, ready to make health optimization actually FUN.',
+            'therapist': 'Hello. I\'m Omniverse, here to support your journey with reflection and understanding.',
+            'commander': 'Attention! Omniverse here. Time to take ACTION and dominate your goals.'
         };
 
         const message = testMessages[this.selectedPersonality] || testMessages['friendly_helpful'];

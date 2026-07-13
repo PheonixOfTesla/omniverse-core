@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phoenix Voice Interface</title>
+    <title>Omniverse Voice Interface</title>
     <style>
         * {
             margin: 0;
@@ -148,7 +148,7 @@
         <div id="voiceOrb" class="voice-orb" onclick="toggleListening()"></div>
 
         <div class="voice-prompt">
-            <span id="promptText">Click orb or say "Phoenix"</span>
+            <span id="promptText">Click orb or say "Omniverse"</span>
         </div>
 
         <div class="voice-transcript">
@@ -160,10 +160,10 @@
         </div>
 
         <div class="command-examples">
-            <h3>🌟 UNIVERSAL AI - TRY ANY COMMAND:</h3>
+            <h3>UNIVERSAL AI - TRY ANY COMMAND:</h3>
 
             <div class="example-category">
-                <h4>♀️ VENUS - Fitness & Nutrition</h4>
+                <h4>VENUS - Fitness & Nutrition</h4>
                 <ul>
                     <li onclick="simulateCommand(this)">"I want a fat ass"</li>
                     <li onclick="simulateCommand(this)">"Generate a chest workout"</li>
@@ -173,7 +173,7 @@
             </div>
 
             <div class="example-category">
-                <h4>☿️ MERCURY - Health & Biometrics</h4>
+                <h4>MERCURY - Health & Biometrics</h4>
                 <ul>
                     <li onclick="simulateCommand(this)">"What's my recovery score?"</li>
                     <li onclick="simulateCommand(this)">"How's my sleep?"</li>
@@ -183,7 +183,7 @@
             </div>
 
             <div class="example-category">
-                <h4>♂️ MARS - Goals & Habits</h4>
+                <h4>MARS - Goals & Habits</h4>
                 <ul>
                     <li onclick="simulateCommand(this)">"Show my progress"</li>
                     <li onclick="simulateCommand(this)">"Help me wake up at 6am"</li>
@@ -210,7 +210,7 @@
             </div>
 
             <div class="example-category">
-                <h4>🔥 PHOENIX - AI & Automation</h4>
+                <h4>OMNIVERSE - AI & Automation</h4>
                 <ul>
                     <li onclick="simulateCommand(this)">"What patterns do you see?"</li>
                     <li onclick="simulateCommand(this)">"Order me a smoothie from Smoothie King"</li>
@@ -281,7 +281,7 @@
             recognition.stop();
             isListening = false;
             document.getElementById('voiceOrb').classList.remove('listening');
-            document.getElementById('promptText').textContent = 'Click orb or say "Phoenix"';
+            document.getElementById('promptText').textContent = 'Click orb or say "Omniverse"';
         }
 
         function simulateCommand(element) {

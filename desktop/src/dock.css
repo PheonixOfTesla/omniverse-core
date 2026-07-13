@@ -1,0 +1,664 @@
+/* ============================================
+   UNIFIED DOCK STYLES
+   Combined Genesis Dock + Phoenix Dock
+   Single component for all modes
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES FOR DOCK THEMING
+   ============================================ */
+:root {
+    --dock-bg: rgba(0, 10, 20, 0.95);
+    --dock-border: rgba(0, 217, 255, 0.4);
+    --dock-glow: rgba(0, 217, 255, 0.3);
+    --dock-accent: #00d9ff;
+    --dock-text: rgba(0, 217, 255, 0.8);
+    --dock-radius: 25px;
+}
+
+/* ============================================
+   DOCK CONTAINER (Base)
+   Shared positioning for both Genesis & Phoenix docks
+   ============================================ */
+
+#genesis-dock,
+.phoenix-dock,
+.dock-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--dock-bg);
+    border: 2px solid var(--dock-border);
+    border-radius: var(--dock-radius);
+    padding: 12px 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5),
+                0 0 30px var(--dock-glow);
+    transition: all 0.3s ease;
+}
+
+/* Genesis dock specific: hidden by default */
+#genesis-dock {
+    display: none;
+}
+
+#genesis-dock.visible {
+    display: flex;
+}
+
+/* Show genesis dock in Genesis mode */
+body[data-mode="genesis"] #genesis-dock {
+    display: flex;
+}
+
+/* Phoenix dock: column layout with toggle */
+.phoenix-dock {
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 10px;
+    bottom: 0;
+}
+
+/* ============================================
+   DOCK HOVER EFFECTS
+   ============================================ */
+
+#genesis-dock:hover,
+.phoenix-dock:hover,
+.dock-container:hover {
+    transform: translateX(-50%) translateY(-5px);
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6),
+                0 0 40px var(--dock-glow);
+}
+
+/* Phoenix dock hover (no Y transform due to bottom:0) */
+.phoenix-dock:hover {
+    transform: translateX(-50%);
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6),
+                0 0 40px var(--dock-glow);
+}
+
+/* ============================================
+   DOCK TOGGLE (Phoenix Dock)
+   ============================================ */
+
+.dock-toggle {
+    width: 50px;
+    height: 30px;
+    background: var(--dock-bg);
+    border: 1px solid var(--dock-border);
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--dock-accent);
+}
+
+.dock-toggle:hover {
+    background: rgba(0, 10, 20, 0.98);
+    border-color: rgba(0, 217, 255, 0.6);
+    box-shadow: 0 0 15px var(--dock-glow);
+}
+
+.dock-toggle svg {
+    transition: transform 0.3s;
+}
+
+/* ============================================
+   DOCK ITEMS CONTAINER
+   ============================================ */
+
+.dock-icons,
+.dock-items-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dock-items-container {
+    padding: 12px 20px;
+    background: rgba(0, 10, 20, 0.85);
+    border: 2px solid var(--dock-border);
+    border-radius: var(--dock-radius);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 30px var(--dock-glow);
+    max-height: 80px;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   DOCK ICONS (Genesis Style)
+   ============================================ */
+
+.genesis-dock-icon {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    padding: 10px;
+    background: rgba(0, 217, 255, 0.05);
+    border: 2px solid rgba(0, 217, 255, 0.2);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.genesis-dock-icon:hover {
+    background: rgba(0, 217, 255, 0.1);
+    border-color: rgba(0, 217, 255, 0.4);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 5px 20px var(--dock-glow);
+}
+
+.genesis-dock-icon.active {
+    background: rgba(0, 217, 255, 0.15);
+    border-color: rgba(0, 217, 255, 0.6);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+}
+
+/* Dock icon (Font Awesome) */
+.dock-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: rgba(0, 217, 255, 0.9);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+}
+
+.genesis-dock-icon:hover .dock-icon {
+    color: var(--dock-accent);
+    transform: scale(1.1);
+}
+
+.genesis-dock-icon.active .dock-icon {
+    color: rgba(0, 217, 255, 0.95);
+}
+
+/* Icon label */
+.icon-label {
+    font-size: 10px;
+    color: var(--dock-text);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.genesis-dock-icon.active .icon-label {
+    color: rgba(0, 217, 255, 0.9);
+}
+
+/* ============================================
+   DOCK ITEMS (Phoenix Style)
+   ============================================ */
+
+.dock-item {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--dock-accent);
+}
+
+.dock-item:hover {
+    transform: translateY(-8px) scale(1.1);
+    background: rgba(0, 217, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.6);
+    box-shadow: 0 8px 20px rgba(0, 217, 255, 0.4);
+}
+
+.dock-item svg {
+    width: 28px;
+    height: 28px;
+}
+
+/* Dock Item Label (tooltip on hover) */
+.dock-item-label {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dock-bg);
+    border: 1px solid rgba(0, 217, 255, 0.5);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--dock-accent);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.dock-item:hover .dock-item-label {
+    opacity: 1;
+}
+
+/* Planets Dock Item (special styling) */
+.dock-item-planets {
+    background: radial-gradient(circle, rgba(0, 217, 255, 0.2), rgba(0, 10, 20, 0.8));
+    border-color: rgba(0, 217, 255, 0.5);
+}
+
+.dock-item-planets:hover {
+    box-shadow: 0 8px 30px rgba(0, 217, 255, 0.6),
+                0 0 40px var(--dock-glow);
+}
+
+/* Widget Dock Items */
+.dock-item-widget {
+    width: 50px;
+    height: 50px;
+}
+
+.dock-widget-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Widgets Section */
+.dock-widgets-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Divider */
+.dock-divider {
+    width: 2px;
+    height: 40px;
+    background: rgba(0, 217, 255, 0.3);
+    margin: 0 8px;
+}
+
+/* ============================================
+   READY ARROW (Blinking notification)
+   ============================================ */
+
+.ready-arrow {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 217, 255, 0.95);
+    color: #000;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+    transition: opacity 0.3s ease;
+}
+
+/* Arrow tail */
+.ready-arrow::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(0, 217, 255, 0.95);
+}
+
+/* Show arrow when ready */
+.genesis-dock-icon.ready-blink .ready-arrow {
+    opacity: 1;
+    animation: arrowBlink 1s ease-in-out infinite;
+}
+
+@keyframes arrowBlink {
+    0%, 100% {
+        opacity: 1;
+        transform: translateX(-50%) translateX(0);
+    }
+    50% {
+        opacity: 0.4;
+        transform: translateX(-50%) translateX(-5px);
+    }
+}
+
+/* ============================================
+   ADD WIDGET BUTTON
+   ============================================ */
+
+.dock-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background: rgba(0, 217, 255, 0.1);
+    border: 2px solid rgba(0, 217, 255, 0.4);
+    border-radius: 50%;
+    color: rgba(0, 217, 255, 0.9);
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 8px;
+}
+
+.dock-add-btn:hover {
+    background: rgba(0, 217, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.7);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+}
+
+.dock-add-btn i {
+    display: block;
+    line-height: 1;
+    font-size: 20px;
+}
+
+/* ============================================
+   PLANET BUBBLES MENU
+   ============================================ */
+
+.planet-bubbles-menu {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--dock-bg);
+    border: 2px solid rgba(0, 217, 255, 0.5);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7),
+                0 0 50px var(--dock-glow);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9500;
+}
+
+.planet-bubbles-menu.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.planet-bubbles-title {
+    font-size: 14px;
+    color: var(--dock-accent);
+    text-align: center;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.planet-bubbles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.planet-bubble {
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 10, 20, 0.8);
+    border: 2px solid var(--planet-color, #00d9ff);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--planet-color, #00d9ff);
+}
+
+.planet-bubble:hover {
+    transform: scale(1.1);
+    background: rgba(0, 10, 20, 0.95);
+    box-shadow: 0 0 25px var(--planet-color);
+}
+
+.planet-bubble-icon {
+    font-size: 28px;
+}
+
+.planet-bubble-name {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   WIDGET POP-IN/OUT ANIMATIONS
+   ============================================ */
+
+.genesis-widget-pop-in {
+    animation: widgetPopIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.genesis-widget-pop-out {
+    animation: widgetPopOut 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes widgetPopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(100px);
+    }
+    50% {
+        transform: scale(1.05) translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes widgetPopOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3) translateY(100px);
+    }
+}
+
+/* ============================================
+   DOCK PULSE (When new widget added)
+   ============================================ */
+
+@keyframes dockPulse {
+    0%, 100% {
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5),
+                    0 0 30px var(--dock-glow);
+    }
+    50% {
+        box-shadow: 0 12px 60px rgba(0, 0, 0, 0.6),
+                    0 0 50px rgba(0, 217, 255, 0.5);
+    }
+}
+
+#genesis-dock.pulse,
+.phoenix-dock.pulse {
+    animation: dockPulse 1s ease-in-out 3;
+}
+
+/* ============================================
+   DOCK ITEM ANIMATIONS
+   ============================================ */
+
+@keyframes dockItemBounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.05);
+    }
+}
+
+.dock-item.active {
+    animation: dockItemBounce 0.6s ease-in-out;
+}
+
+/* ============================================
+   SMOOTH SCROLLING FOR DOCK (Mobile)
+   ============================================ */
+
+.dock-icons::-webkit-scrollbar,
+.dock-items-container::-webkit-scrollbar {
+    display: none;
+}
+
+.dock-icons,
+.dock-items-container {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE
+   ============================================ */
+
+@media (max-width: 768px) {
+    #genesis-dock {
+        bottom: 10px;
+        padding: 10px 15px;
+        max-width: 95vw;
+        overflow-x: auto;
+    }
+
+    .genesis-dock-icon {
+        min-width: 60px;
+        padding: 8px;
+    }
+
+    .dock-icon {
+        font-size: 24px;
+    }
+
+    .icon-label {
+        font-size: 9px;
+    }
+
+    .ready-arrow {
+        font-size: 10px;
+        padding: 5px 10px;
+    }
+
+    .phoenix-dock {
+        left: 0;
+        right: 0;
+        transform: none;
+        width: 100%;
+    }
+
+    .dock-items-container {
+        width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        justify-content: center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dock-toggle {
+        border-radius: 15px 15px 0 0;
+    }
+
+    .planet-bubbles-menu {
+        left: 10px;
+        right: 10px;
+        transform: translateY(20px);
+        width: calc(100% - 20px);
+        bottom: 100px;
+    }
+
+    .planet-bubbles-menu.show {
+        transform: translateY(0);
+    }
+
+    .planet-bubbles-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .planet-bubble {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+/* ============================================
+   375px SCREENS (Small phones)
+   ============================================ */
+
+@media (max-width: 375px) {
+    #genesis-dock {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+
+    .genesis-dock-icon {
+        min-width: 50px;
+        padding: 6px;
+    }
+
+    .dock-icon {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .icon-label {
+        font-size: 8px;
+    }
+
+    .dock-item {
+        width: 42px;
+        height: 42px;
+    }
+
+    .dock-add-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 20px;
+    }
+}
+
+/* ============================================
+   END OF UNIFIED DOCK STYLES
+   ============================================ */

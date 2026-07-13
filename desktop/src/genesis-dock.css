@@ -16,11 +16,11 @@
     align-items: center;
     gap: 10px;
     background: rgba(0, 10, 20, 0.95);
-    border: 2px solid rgba(255, 215, 0, 0.5);
+    border: 2px solid rgba(0, 217, 255, 0.5);
     border-radius: 25px;
     padding: 12px 20px;
     backdrop-filter: blur(20px);
-    box-shadow: 0 8px 40px rgba(255, 215, 0, 0.3),
+    box-shadow: 0 8px 40px rgba(0, 217, 255, 0.3),
                 0 0 30px rgba(0, 217, 255, 0.2);
     z-index: 9999;
     transition: all 0.3s ease;
@@ -38,7 +38,7 @@ body[data-mode="genesis"] #genesis-dock {
 /* Dock hover effect */
 #genesis-dock:hover {
     transform: translateX(-50%) translateY(-5px);
-    box-shadow: 0 12px 50px rgba(255, 215, 0, 0.4),
+    box-shadow: 0 12px 50px rgba(0, 217, 255, 0.4),
                 0 0 40px rgba(0, 217, 255, 0.3);
 }
 
@@ -80,9 +80,9 @@ body[data-mode="genesis"] #genesis-dock {
 }
 
 .genesis-dock-icon.active {
-    background: rgba(255, 215, 0, 0.15);
-    border-color: rgba(255, 215, 0, 0.6);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    background: rgba(0, 217, 255, 0.15);
+    border-color: rgba(0, 217, 255, 0.6);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
 }
 
 /* Dock icon (Font Awesome) */
@@ -100,7 +100,7 @@ body[data-mode="genesis"] #genesis-dock {
 }
 
 .genesis-dock-icon.active .dock-icon {
-    color: rgba(255, 215, 0, 0.95);
+    color: rgba(0, 217, 255, 0.95);
 }
 
 /* Icon label */
@@ -113,7 +113,7 @@ body[data-mode="genesis"] #genesis-dock {
 }
 
 .genesis-dock-icon.active .icon-label {
-    color: rgba(255, 215, 0, 0.9);
+    color: rgba(0, 217, 255, 0.9);
 }
 
 /* ========================================
@@ -125,7 +125,7 @@ body[data-mode="genesis"] #genesis-dock {
     top: -35px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255, 215, 0, 0.95);
+    background: rgba(0, 217, 255, 0.95);
     color: #000;
     font-size: 11px;
     font-weight: bold;
@@ -134,7 +134,7 @@ body[data-mode="genesis"] #genesis-dock {
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
     transition: opacity 0.3s ease;
 }
 
@@ -149,7 +149,7 @@ body[data-mode="genesis"] #genesis-dock {
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid rgba(255, 215, 0, 0.95);
+    border-top: 6px solid rgba(0, 217, 255, 0.95);
 }
 
 /* Show arrow when ready */
@@ -179,10 +179,10 @@ body[data-mode="genesis"] #genesis-dock {
     justify-content: center;
     width: 45px;
     height: 45px;
-    background: rgba(255, 215, 0, 0.1);
-    border: 2px solid rgba(255, 215, 0, 0.4);
+    background: rgba(0, 217, 255, 0.1);
+    border: 2px solid rgba(0, 217, 255, 0.4);
     border-radius: 50%;
-    color: rgba(255, 215, 0, 0.9);
+    color: rgba(0, 217, 255, 0.9);
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
@@ -191,10 +191,10 @@ body[data-mode="genesis"] #genesis-dock {
 }
 
 .dock-add-btn:hover {
-    background: rgba(255, 215, 0, 0.2);
-    border-color: rgba(255, 215, 0, 0.7);
+    background: rgba(0, 217, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.7);
     transform: rotate(90deg) scale(1.1);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
 }
 
 .dock-add-btn i {
@@ -277,11 +277,11 @@ body[data-mode="genesis"] #genesis-dock {
 
 @keyframes dockPulse {
     0%, 100% {
-        box-shadow: 0 8px 40px rgba(255, 215, 0, 0.3),
+        box-shadow: 0 8px 40px rgba(0, 217, 255, 0.3),
                     0 0 30px rgba(0, 217, 255, 0.2);
     }
     50% {
-        box-shadow: 0 12px 60px rgba(255, 215, 0, 0.5),
+        box-shadow: 0 12px 60px rgba(0, 217, 255, 0.5),
                     0 0 50px rgba(0, 217, 255, 0.4);
     }
 }

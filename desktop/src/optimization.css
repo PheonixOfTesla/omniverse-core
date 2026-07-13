@@ -50,7 +50,7 @@
     text-shadow: 0 0 30px rgba(0, 217, 255, 1);
     letter-spacing: 6px;
     margin-bottom: 15px;
-    animation: titlePulse 3s infinite;
+    animation: titlePulse 1.5s infinite;
 }
 
 .optimization-subtitle {
