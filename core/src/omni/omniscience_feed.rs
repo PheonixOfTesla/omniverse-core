@@ -7,7 +7,7 @@
 use anyhow::Result;
 use ndarray::{Array1, Array2};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, Datelike};
 use serde::{Deserialize, Serialize};
 use tracing::{info, debug};
 
@@ -35,7 +35,7 @@ pub enum ItemType {
     Opportunity,  // Something to consider
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Domain {
     Mercury,   // Health
     Venus,     // Fitness

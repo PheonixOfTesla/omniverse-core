@@ -15,7 +15,7 @@ use tracing::{info, debug, warn};
 const MAX_INFERENCE_MS: u64 = 40;
 
 /// Model types available
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ModelType {
     /// Text embedding model (384 dims)
     TextEmbedding,
@@ -185,22 +185,28 @@ impl ModelRunner {
     }
 
     /// Run inference on text input
+    /// NOTE: This is a FALLBACK template system, not real ML inference.
+    /// For actual AI responses, use Ollama via the Tauri commands.
+    /// This exists only for intent classification and quick responses
+    /// when Ollama is unavailable.
     pub fn infer(&self, text: &str) -> Result<String> {
         let start = std::time::Instant::now();
+
+        warn!("Using fallback template responses (not real ML). For AI, use Ollama.");
 
         // Tokenize
         let tokens = self.tokenize(text);
         debug!("Tokenized to {} tokens", tokens.len());
 
-        // Classify intent
+        // Classify intent using keyword matching (NOT ML)
         let intent = if let Some(model) = self.models.get(&ModelType::Intent) {
             self.classify_intent(&tokens, model)?
         } else {
             "general_query".to_string()
         };
 
-        // Generate response based on intent
-        let response = self.generate_response(text, &intent);
+        // Generate template response (NOT AI-generated)
+        let response = self.generate_template_response(text, &intent);
 
         let elapsed = start.elapsed().as_millis() as u64;
         if elapsed > MAX_INFERENCE_MS {
@@ -245,33 +251,36 @@ impl ModelRunner {
         Ok(intents[intent_idx].to_string())
     }
 
-    /// Generate response based on intent
-    fn generate_response(&self, query: &str, intent: &str) -> String {
+    /// Generate template response based on intent
+    /// NOTE: These are CANNED RESPONSES, not AI-generated.
+    /// For real AI responses, queries should go through Ollama.
+    fn generate_template_response(&self, query: &str, intent: &str) -> String {
+        let prefix = "[Template Response - Install Ollama for real AI] ";
         match intent {
             "schedule_event" => format!(
-                "I can help you schedule that. Based on your calendar patterns, \
-                the best time would be tomorrow morning. Shall I create the event?"
+                "{}I can help you schedule that. Based on your calendar patterns, \
+                the best time would be tomorrow morning. Shall I create the event?",
+                prefix
             ),
             "check_health" => format!(
-                "Looking at your health data: Your sleep quality was 85% last night, \
-                HRV is trending upward, and you're on track for your step goal."
+                "{}Your health dashboard is available in the Mercury section.",
+                prefix
             ),
             "track_workout" => format!(
-                "Ready to log your workout! What type of exercise did you do? \
-                I can pull from your Apple Watch data if you prefer."
+                "{}Ready to log your workout! Use the Venus section for fitness tracking.",
+                prefix
             ),
             "set_goal" => format!(
-                "Let's set a SMART goal. What would you like to achieve? \
-                I'll help break it down into actionable milestones."
+                "{}Set your goals in the Mars section for milestone tracking.",
+                prefix
             ),
             "check_finances" => format!(
-                "Your financial summary: This month you're 15% under budget. \
-                Your investment portfolio is up 2.3% from last month."
+                "{}Your financial data is in the Jupiter section.",
+                prefix
             ),
             _ => format!(
-                "I understand you're asking about: '{}'. Let me process that locally. \
-                All your data stays on this device.",
-                query
+                "{}To answer '{}' with real AI, please install Ollama: ollama.ai/download",
+                prefix, query
             ),
         }
     }

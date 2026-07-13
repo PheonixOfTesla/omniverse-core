@@ -42,7 +42,7 @@ pub struct Location {
     pub confidence: f32,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum PlaceType {
     Home,
     Work,
@@ -73,7 +73,7 @@ pub struct ContextState {
     pub likely_active: bool,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum TimeOfDay {
     EarlyMorning,  // 5-8
     Morning,       // 8-12
@@ -116,7 +116,7 @@ pub struct ActivityState {
     pub duration_minutes: u32,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Activity {
     Sleeping,
     Working,

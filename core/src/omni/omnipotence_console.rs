@@ -49,7 +49,7 @@ pub enum ActionType {
     Integrate,   // Connect external service
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Domain {
     Mercury,   // Health
     Venus,     // Fitness
@@ -251,11 +251,15 @@ impl OmnipotenceConsole {
         self.update_rate_counter(user_id);
 
         // Store in history
+        let (success, result_val, error_val) = match result {
+            Ok(val) => (true, Some(val), None),
+            Err(e) => (false, None, Some(e.to_string())),
+        };
         let action_result = ActionResult {
             action_id: action.id.clone(),
-            success: result.is_ok(),
-            result: result.ok(),
-            error: result.err().map(|e| e.to_string()),
+            success,
+            result: result_val,
+            error: error_val,
             execution_time_ms: execution_time,
             constraints_checked: constraint_results,
             side_effects,

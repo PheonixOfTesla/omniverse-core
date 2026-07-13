@@ -63,3 +63,8 @@ tmp/
 temp/
 *.tmp
 desktop/src-tauri/target/
+
+# Build artifacts
+core/target/
+desktop/src-tauri/target/
+

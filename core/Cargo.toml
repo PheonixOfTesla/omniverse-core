@@ -31,8 +31,7 @@ rusqlite = { version = "0.31", features = ["bundled-sqlcipher"] }
 ort = { version = "2.0.0-rc.10", default-features = false }
 ndarray = "0.15"
 
-# IPFS
-ipfs-api-backend-hyper = "0.6"
+# IPFS - using custom implementation (see net/ipfs_publisher.rs)
 
 # Protobuf
 prost = "0.12"

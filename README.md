@@ -1,8 +1,26 @@
 # Omniverse Core
 
-**Encrypted audit logging framework with SQLCipher storage, SHA-256 hash chaining, and Ed25519 signature verification.**
+**Sovereign local AI with encrypted audit logging, SQLCipher storage, SHA-256 hash chaining, and Ed25519 signature verification.**
 
-> **Strongest proof**: `core/src/ethics/conscience_ledger.rs` — 415 lines implementing tamper-evident cryptographic chaining.
+> **"Your AI, your device, no cloud required."**
+
+---
+
+## Sovereign Mode (make-sovereign branch)
+
+This branch implements **true local-first AI inference**:
+
+- **DEFAULT**: All AI queries route through local Ollama - ZERO network calls
+- **Cloud is opt-in**: User must explicitly enable cloud fallback
+- **Visible indicator**: LOCAL (green) / CLOUD (orange) badge always visible
+- **Honest about capabilities**: No fake ML responses - either real Ollama inference or clear guidance to install
+
+### Requirements for Sovereign Mode
+
+1. Install Ollama: https://ollama.ai/download
+2. Pull a model: `ollama pull llama2`
+3. Start server: `ollama serve`
+4. Launch Omniverse desktop app
 
 ---
 
@@ -16,18 +34,15 @@
 | Genesis hash verification at startup | Working | `core/src/main.rs` |
 | TABLE_OF_LAW enforcement | Working | `TABLE_OF_LAW.md` |
 | Tauri desktop wrapper | Working | `desktop/` |
-| Ollama integration (if user installs) | Working | `desktop/src-tauri/src/main.rs` |
+| **Local Ollama inference** | **Working** | `desktop/src-tauri/src/ollama.rs` |
+| **Sovereign mode (no cloud by default)** | **Working** | `desktop/src/config.js`, `omniverse-ai.js` |
+| **LOCAL/CLOUD status indicator** | **Working** | `desktop/src/omniverse-ai.js` |
 
 ## What's Scaffolded
 
-- ONNX ML inference: skeleton exists, creates random weights (see `core/src/ml/onnx_runner.rs:135` — "In production, this would use ort::Session")
+- ONNX ML inference: Returns template responses with clear "[Install Ollama]" guidance
 - Multi-device sync: API endpoints defined, no backend
 - Blockchain ledger: `/ledger/solidity/` is empty
-- "Intelligent ranking": hardcoded keyword matching, not ML
-
-## Cloud Dependency Note
-
-The router (`router/src/index.js`) defaults to OpenRouter.ai APIs (Kimi K2, Gemini, Claude). Despite "offline-first" framing, AI queries require network unless Ollama is running locally.
 
 ---
 
@@ -36,17 +51,22 @@ The router (`router/src/index.js`) defaults to OpenRouter.ai APIs (Kimi K2, Gemi
 - **Core**: Rust (tokio, rusqlite, SQLCipher)
 - **Crypto**: Ed25519, SHA-256, PBKDF2
 - **Desktop**: Tauri
-- **Local AI**: Ollama (optional, user-installed)
-- **Cloud AI**: OpenRouter.ai (default fallback)
+- **Local AI**: Ollama (required for sovereign mode)
+- **Cloud AI**: OpenRouter.ai (explicit opt-in only)
 
 ---
 
 ## Build
 
 ```bash
+# Core
 cd core
 cargo build --release
-./target/release/omniverse --help
+
+# Desktop (Tauri)
+cd desktop
+npm install
+npm run tauri build
 ```
 
 ---
@@ -58,13 +78,32 @@ core/src/
   ethics/conscience_ledger.rs  # Hash-chained audit
   crypto/                       # Signatures, verification
   storage/                      # SQLCipher
-  ml/                          # ONNX skeleton (not functional)
-router/src/
-  index.js                     # AI query routing (cloud-dependent)
+  ml/                          # Template fallbacks (not real ML)
+
 desktop/
-  src-tauri/                   # Tauri wrapper
+  src-tauri/src/
+    ollama.rs                  # Local Ollama client
+    main.rs                    # Tauri commands (local-first)
+  src/
+    config.js                  # Sovereign config (cloud disabled)
+    omniverse-ai.js            # Local AI bridge + status indicator
 ```
 
 ---
 
-*Strong encryption and audit infrastructure. The "sovereign AI" claim exceeds current implementation — AI queries use cloud APIs.*
+## Offline Test
+
+To verify sovereign mode works offline:
+
+1. Install Ollama and pull a model
+2. Start `ollama serve`
+3. Launch the desktop app
+4. Turn on Airplane Mode / disable WiFi
+5. Send a query - should respond 100% locally
+6. Check the status indicator shows "LOCAL" (green)
+
+If it works offline, Omniverse is sovereign.
+
+---
+
+*Branch: make-sovereign — True local-first AI. Cloud requires explicit consent.*
