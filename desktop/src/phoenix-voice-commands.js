@@ -414,16 +414,16 @@ class PhoenixVoiceCommands {
                     // Show platform-specific error message
                     let errorMessage;
                     if (typeof error === 'object' && error.platform) {
-                        // New format with platform info
                         errorMessage = error.message || error.error;
                         console.log(`[Voice] Error from ${error.platform}: ${error.error}`);
                     } else {
-                        // Legacy format (iOS native) or string
                         errorMessage = typeof error === 'string' ? error : error.message || 'Unknown error';
-                        console.log('[Voice] iOS native error (legacy format)');
+                        console.log('[Voice] Speech error:', errorMessage);
                     }
 
-                    this.showErrorMessage(errorMessage);
+                    // Graceful degradation instead of red error
+                    // Voice errors are expected in some environments
+                    this.showGracefulDegradation();
                 });
 
                 window.capacitorPlatform.onEnd(() => {
@@ -498,8 +498,19 @@ class PhoenixVoiceCommands {
             this.isListening = false;
             this.requestInProgress = false; // Clear lock on error
 
-            // Show prominent error message
-            this.showErrorMessage(`Web Speech Error: ${event.error}`);
+            // SOVEREIGN MODE: Degrade gracefully instead of showing red error
+            // Common in Tauri: "service-not-allowed" means Web Speech API unavailable
+            if (event.error === 'service-not-allowed' || event.error === 'not-allowed') {
+                console.log('[Voice] Web Speech unavailable - using text input mode');
+                this.showGracefulDegradation();
+            } else if (event.error === 'no-speech') {
+                // User just didn't say anything - not an error
+                console.log('[Voice] No speech detected');
+            } else {
+                // Other errors - still degrade gracefully
+                console.log('[Voice] Speech error:', event.error, '- using text input');
+                this.showGracefulDegradation();
+            }
         };
 
         this.recognition.onend = () => {
@@ -718,6 +729,134 @@ class PhoenixVoiceCommands {
         const dismiss = () => errorBox.remove();
         errorBox.addEventListener('click', dismiss);
         setTimeout(dismiss, 8000);
+    }
+
+    /**
+     * Show graceful degradation message instead of red error
+     * Used when voice features are unavailable (e.g., Tauri webview)
+     */
+    showGracefulDegradation() {
+        // Remove existing message
+        const existing = document.getElementById('phoenix-voice-notice');
+        if (existing) existing.remove();
+
+        // Create calm notification
+        const noticeBox = document.createElement('div');
+        noticeBox.id = 'phoenix-voice-notice';
+        noticeBox.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 20, 40, 0.95);
+            border: 1px solid rgba(0, 217, 255, 0.4);
+            border-radius: 12px;
+            padding: 16px 24px;
+            color: #00d9ff;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            z-index: 10000;
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.2);
+            text-align: center;
+            max-width: 350px;
+            animation: fadeInUp 0.3s ease;
+        `;
+        noticeBox.innerHTML = `
+            <div style="margin-bottom: 8px; font-weight: 600;">
+                Voice Input: Text Mode
+            </div>
+            <div style="font-size: 12px; opacity: 0.8;">
+                Type your message below to interact with Phoenix.
+                Local voice is available for responses.
+            </div>
+        `;
+
+        // Add animation styles
+        if (!document.getElementById('phoenix-notice-styles')) {
+            const style = document.createElement('style');
+            style.id = 'phoenix-notice-styles';
+            style.textContent = `
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        document.body.appendChild(noticeBox);
+
+        // Show text input if available
+        this.showTextInputFallback();
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => noticeBox.remove(), 5000);
+    }
+
+    /**
+     * Show text input as fallback when voice unavailable
+     */
+    showTextInputFallback() {
+        // Check if text input already exists
+        let textInput = document.getElementById('phoenix-text-input');
+        if (textInput) {
+            textInput.style.display = 'flex';
+            textInput.querySelector('input')?.focus();
+            return;
+        }
+
+        // Create text input container
+        textInput = document.createElement('div');
+        textInput.id = 'phoenix-text-input';
+        textInput.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10001;
+        `;
+        textInput.innerHTML = `
+            <input type="text" placeholder="Type your message..."
+                style="
+                    width: 300px;
+                    padding: 12px 20px;
+                    background: rgba(0, 20, 40, 0.95);
+                    border: 1px solid rgba(0, 217, 255, 0.4);
+                    border-radius: 25px;
+                    color: #fff;
+                    font-size: 14px;
+                    outline: none;
+                "
+                onkeydown="if(event.key==='Enter'){window.phoenixVoiceCommands?.processTextInput(this.value);this.value='';}"
+            >
+            <button
+                style="
+                    padding: 12px 20px;
+                    background: rgba(0, 217, 255, 0.2);
+                    border: 1px solid rgba(0, 217, 255, 0.4);
+                    border-radius: 25px;
+                    color: #00d9ff;
+                    font-weight: 600;
+                    cursor: pointer;
+                "
+                onclick="const input=this.previousElementSibling;window.phoenixVoiceCommands?.processTextInput(input.value);input.value='';"
+            >Send</button>
+        `;
+
+        document.body.appendChild(textInput);
+        textInput.querySelector('input').focus();
+    }
+
+    /**
+     * Process text input (when voice not available)
+     */
+    processTextInput(text) {
+        if (!text || text.trim() === '') return;
+
+        console.log('[Voice] Processing text input:', text);
+        this.processCommand(text.trim().toLowerCase());
     }
 
     /* ============================================
@@ -2001,9 +2140,13 @@ class PhoenixVoiceCommands {
     }
 
     async speak(text, skipStateChange = false) {
-        // ⏱️ TIMING: TTS Pipeline Start
+        // ═══════════════════════════════════════════════════════════════
+        // SOVEREIGN TTS - 100% LOCAL using Piper
+        // NO CLOUD CALLS - Everything runs on device
+        // ═══════════════════════════════════════════════════════════════
+
         const ttsStart = Date.now();
-        console.log(`[TTS_PIPELINE_START] ${ttsStart}`);
+        console.log(`[TTS] Sovereign TTS starting...`);
 
         // Strip JSON metadata before speaking
         text = text.replace(/\s*\{[\s\S]*?"confidence_score"[\s\S]*?\}\s*$/i, '').trim();
@@ -2011,37 +2154,38 @@ class PhoenixVoiceCommands {
         text = text.replace(/\s*\{[\s\S]*?"action_taken"[\s\S]*?\}\s*$/i, '').trim();
 
         // 🎤 TESLA VOICE SANITIZER - Convert UI formatting to natural speech
-        // Remove [BRACKETS] and formatting markers that shouldn't be spoken
-        text = text.replace(/\[.*?\]/g, ''); // Remove [PERSONAL OPTIMIZATION DASHBOARD], etc.
-        text = text.replace(/━+/g, ''); // Remove visual separators
-        text = text.replace(/▪️|•/g, ''); // Remove bullet points
+        text = text.replace(/\[.*?\]/g, '');    // Remove [BRACKETS]
+        text = text.replace(/━+/g, '');         // Remove visual separators
+        text = text.replace(/▪️|•/g, '');       // Remove bullet points
 
         // Convert CAPS_HEADERS to normal speech
         text = text.replace(/([A-Z_]{3,})/g, (match) => {
-            // Convert "CURRENT_STATUS" to "current status"
             return match.toLowerCase().replace(/_/g, ' ');
         });
 
-        // Remove common UI jargon that sounds robotic
+        // Remove common UI jargon
         text = text.replace(/PROTOCOL INITIATED/gi, '');
         text = text.replace(/USER ENGAGEMENT/gi, '');
         text = text.replace(/SYSTEM STATUS/gi, '');
         text = text.replace(/PRIMARY DOMAINS:/gi, '');
         text = text.replace(/CURRENT STATUS:/gi, '');
 
-        // Clean up multiple spaces/newlines created by removals
+        // Clean up whitespace
         text = text.replace(/\s+/g, ' ').trim();
 
-        // 🎯 OPTIMIZED: Allow full responses up to 150 words for natural conversation
-        // Only truncate extremely long responses to prevent TTS timeout
+        // Truncate very long responses
         const words = text.split(' ');
-        if (words.length > 150) {
-            // Take first 150 words and add period
-            text = words.slice(0, 150).join(' ') + '.';
-            console.log(`⚠️ Truncated to 150 words (was ${words.length})`);
+        if (words.length > 100) {
+            text = words.slice(0, 100).join(' ') + '.';
+            console.log(`[TTS] Truncated to 100 words`);
         }
 
-        console.log('🗣️ Speaking (sanitized):', text);
+        if (!text || text.trim() === '') {
+            console.log('[TTS] Empty text, skipping');
+            return;
+        }
+
+        console.log('🗣️ Speaking:', text.substring(0, 60) + '...');
 
         // Stop any current audio
         if (this.audioElement) {
@@ -2049,280 +2193,116 @@ class PhoenixVoiceCommands {
             this.audioElement = null;
         }
 
-        // CRITICAL FIX: Create Audio element IMMEDIATELY (during user gesture)
-        // This must happen synchronously, before any await, to preserve the user gesture
-        const audio = new Audio();
-        this.audioElement = audio;
-
-        // OPTIMIZATION: Skip state change if action is already executing
+        // Set speaking state
         if (!skipStateChange) {
             this.setOrbState('speaking');
             this.isSpeaking = true;
         }
 
         try {
-            // Use backend TTS endpoint for natural OpenAI voice
-            const baseUrl = (window.PhoenixConfig && window.PhoenixConfig.API_BASE_URL)
-                ? window.PhoenixConfig.API_BASE_URL
-                : 'https://pal-backend-production.up.railway.app/api';
+            // ═══════════════════════════════════════════════════════════════
+            // SOVEREIGN PATH: Try local Piper TTS first (via Tauri)
+            // ═══════════════════════════════════════════════════════════════
 
-            // ⏱️ TIMING: TTS Request Start
-            const ttsStart = Date.now();
-            console.log(`[TTS_REQUEST_SENT] ${ttsStart} (+${ttsStart - window.lastTtsStart || 0}ms)`);
+            if (window.__TAURI__ && window.PiperTTS) {
+                console.log('[TTS] Using local Piper TTS...');
 
-            // Request base64 format for iOS compatibility
-            const response = await fetch(`${baseUrl}/tts/generate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    text: text,
-                    voice: this.voice,      // Use user's voice preference
-                    speed: 1.0,             // Natural conversation pace (user feedback: 1.4 was too fast)
-                    language: this.language, // Use user's language preference
-                    model: 'gpt-4o-mini-tts',
-                    format: 'base64'        // iOS compatibility
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('TTS generation failed');
-            }
-
-            // ⏱️ TIMING: TTS Audio Received
-            const ttsReceived = Date.now();
-            console.log(`[TTS_AUDIO_RECEIVED] ${ttsReceived} (+${ttsReceived - ttsStart}ms)`);
-
-            // Convert base64 to blob for iOS compatibility
-            const data = await response.json();
-            const audioBase64 = data.audio;
-            const audioBytes = atob(audioBase64);
-            const arrayBuffer = new ArrayBuffer(audioBytes.length);
-            const uint8Array = new Uint8Array(arrayBuffer);
-            for (let i = 0; i < audioBytes.length; i++) {
-                uint8Array[i] = audioBytes.charCodeAt(i);
-            }
-            const audioBlob = new Blob([uint8Array], { type: 'audio/mpeg' });
-
-            // Load audio data into the pre-created element
-            const audioUrl = URL.createObjectURL(audioBlob);
-            audio.src = audioUrl;
-
-            audio.onended = () => {
-                URL.revokeObjectURL(audioUrl); // Clean up
-                this.isSpeaking = false;
-                this.audioElement = null;
-                this.requestInProgress = false; // Clear lock when audio completes
-                console.log('✅ Audio playback complete');
-                if (!this.isListening && !this.isProcessing) {
-                    this.setOrbState('idle');
-                }
-            };
-
-            audio.onerror = () => {
-                URL.revokeObjectURL(audioUrl);
-                this.isSpeaking = false;
-                this.audioElement = null;
-                this.requestInProgress = false; // Clear lock on audio error
-                this.setOrbState('idle');
-                console.error('❌ Audio playback error');
-            };
-
-            // CRITICAL: Call load() to prepare the audio, then play
-            // Safari requires this to maintain the user gesture context
-            console.log('[TTS] Loading audio blob, size:', audioBlob.size, 'bytes');
-            audio.load();
-
-            // 🔧 iOS FIX: Stop speech recognition before TTS playback
-            // iOS audio session can't handle simultaneous mic input + speaker output
-            const wasListening = this.isListening;
-            if (wasListening && this.recognition) {
                 try {
-                    this.recognition.stop();
-                    this.isListening = false;
-                    console.log('🎤 Paused speech recognition for TTS playback');
-                } catch (e) {
-                    // Already stopped
+                    const result = await window.PiperTTS.speak(text);
+                    console.log('[TTS] Piper spoke successfully:', result);
+
+                    // Audio plays through Tauri/rodio, no browser audio element needed
+                    const elapsed = Date.now() - ttsStart;
+                    console.log(`[TTS] Local TTS complete in ${elapsed}ms`);
+
+                    this.isSpeaking = false;
+                    if (!skipStateChange) {
+                        this.setOrbState('idle');
+                    }
+                    return; // Success with local TTS
+
+                } catch (piperError) {
+                    console.warn('[TTS] Piper error, trying fallback:', piperError);
+                    // Fall through to next option
                 }
             }
 
-            // FIX AUTOPLAY: Now play() is called on element created during user gesture
-            try {
-                console.log('[TTS] Audio element ready state:', audio.readyState);
-                console.log('[TTS] Audio element src:', audio.src ? audio.src.substring(0, 50) + '...' : 'NO SRC');
-                console.log('[TTS] Audio element duration:', audio.duration);
-                console.log('[TTS] Attempting to play audio...');
+            // ═══════════════════════════════════════════════════════════════
+            // FALLBACK: System TTS (macOS say command via Tauri)
+            // ═══════════════════════════════════════════════════════════════
 
-                const playPromise = audio.play();
-                console.log('[TTS] play() returned:', playPromise ? 'Promise' : 'undefined');
+            if (window.__TAURI__) {
+                try {
+                    const { invoke } = window.__TAURI__.tauri;
+                    await invoke('system_speak', { text });
+                    console.log('[TTS] System TTS spoke successfully');
 
-                if (playPromise !== undefined) {
-                    await playPromise;
-                    console.log('[TTS] play() promise resolved successfully');
-                }
-
-                // ⏱️ TIMING: Audio Playback Started
-                const playbackStart = Date.now();
-                console.log(`[AUDIO_PLAYBACK_START] ${playbackStart} (+${playbackStart - ttsReceived}ms)`);
-                console.log('✅ Audio playing via OpenAI TTS');
-
-                // 🔧 iOS FIX: Resume speech recognition after TTS completes
-                if (wasListening) {
-                    audio.addEventListener('ended', () => {
-                        setTimeout(() => {
-                            if (!this.isListening && this.recognition) {
-                                try {
-                                    this.recognition.start();
-                                    this.isListening = true;
-                                    console.log('🎤 Resumed speech recognition after TTS');
-                                } catch (e) {
-                                    // Handle restart error
-                                }
-                            }
-                        }, 300); // Small delay to ensure audio session is released
-                    });
-                }
-            } catch (playError) {
-                console.error('❌ [TTS] Audio play() failed:', playError);
-                console.error('   Error name:', playError.name);
-                console.error('   Error message:', playError.message);
-
-                // 🔧 iOS FIX: Resume speech recognition on playback error
-                if (wasListening && this.recognition) {
-                    try {
-                        this.recognition.start();
-                        this.isListening = true;
-                    } catch (e) {
-                        // Handle restart error
+                    this.isSpeaking = false;
+                    if (!skipStateChange) {
+                        this.setOrbState('idle');
                     }
+                    return; // Success with system TTS
+
+                } catch (sysError) {
+                    console.warn('[TTS] System TTS failed:', sysError);
+                    // Fall through to browser fallback
+                }
+            }
+
+            // ═══════════════════════════════════════════════════════════════
+            // LAST RESORT: Browser Web Speech API (only in browser, not Tauri)
+            // ═══════════════════════════════════════════════════════════════
+
+            if (!window.__TAURI__ && 'speechSynthesis' in window) {
+                console.log('[TTS] Using browser Web Speech API...');
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+
+                // Try to find a good voice
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = voices.find(v =>
+                    v.name.includes('Samantha') || v.name.includes('Karen') || v.lang.startsWith('en')
+                );
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
                 }
 
-                if (playError.name === 'NotAllowedError') {
-                    console.warn('⚠️ Autoplay blocked by browser - using fallback speech synthesis');
-                    this.showErrorMessage('Audio playback blocked. Click to enable sound.');
-                    // User hasn't interacted yet, fallback to Web Speech API
-                    throw playError; // Let outer catch handle fallback
-                }
-                throw playError;
+                utterance.onend = () => {
+                    this.isSpeaking = false;
+                    if (!skipStateChange) {
+                        this.setOrbState('idle');
+                    }
+                };
+
+                speechSynthesis.speak(utterance);
+                return; // Using browser TTS
+            }
+
+            // No TTS available - silent mode (text already shown)
+            console.log('[TTS] No TTS available - text mode only');
+            this.isSpeaking = false;
+            if (!skipStateChange) {
+                this.setOrbState('idle');
             }
 
         } catch (error) {
-            console.error('❌ TTS Error:', error);
-            console.error('   Error details:', error.message);
-            console.error('   Error stack:', error.stack);
+            console.error('[TTS] Error:', error.message);
             this.isSpeaking = false;
-            this.requestInProgress = false; // Clear lock on TTS error
+            this.requestInProgress = false;
             this.setOrbState('idle');
-
-            // No fallback - OpenAI TTS only
-            // If TTS fails, user will see error in console
+            // Silent failure - text is already displayed
         }
     }
 
     /* ============================================
-       ASYNC SPEAK - NON-BLOCKING TTS WITH STATUS
+       ASYNC SPEAK - NON-BLOCKING TTS (SOVEREIGN)
        ============================================ */
     async speakAsync(text, skipStateChange = false) {
-        console.log('🗣️ Speaking async:', text);
-
-        // Show "Generating voice..." indicator
-        this.showStatusMessage('Generating voice...');
-
-        // Stop any current audio
-        if (this.audioElement) {
-            this.audioElement.pause();
-            this.audioElement = null;
-        }
-
-        // CRITICAL FIX: Create Audio element IMMEDIATELY (during user gesture)
-        const audio = new Audio();
-        this.audioElement = audio;
-
-        // Set generating state
-        this.setOrbState('generating-voice');
-
-        try {
-            const baseUrl = (window.PhoenixConfig && window.PhoenixConfig.API_BASE_URL)
-                ? window.PhoenixConfig.API_BASE_URL
-                : 'https://pal-backend-production.up.railway.app/api';
-
-            // Request base64 format for iOS compatibility
-            const response = await fetch(`${baseUrl}/tts/generate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    text: text,
-                    voice: this.voice,
-                    speed: 1.0,
-                    language: this.language,
-                    model: 'gpt-4o-mini-tts',
-                    format: 'base64'        // iOS compatibility
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('TTS generation failed');
-            }
-
-            // Convert base64 to blob for iOS compatibility
-            const data = await response.json();
-            const audioBase64 = data.audio;
-            const audioBytes = atob(audioBase64);
-            const arrayBuffer = new ArrayBuffer(audioBytes.length);
-            const uint8Array = new Uint8Array(arrayBuffer);
-            for (let i = 0; i < audioBytes.length; i++) {
-                uint8Array[i] = audioBytes.charCodeAt(i);
-            }
-            const audioBlob = new Blob([uint8Array], { type: 'audio/mpeg' });
-
-            // Clear "Generating voice..." status
-            this.clearStatusMessage();
-
-            // Load and play audio
-            const audioUrl = URL.createObjectURL(audioBlob);
-            audio.src = audioUrl;
-
-            // Set speaking state
-            this.setOrbState('speaking');
-            this.isSpeaking = true;
-
-            audio.onended = () => {
-                URL.revokeObjectURL(audioUrl);
-                this.isSpeaking = false;
-                this.audioElement = null;
-                if (!this.isListening && !this.isProcessing) {
-                    this.setOrbState('idle');
-                }
-            };
-
-            audio.onerror = () => {
-                URL.revokeObjectURL(audioUrl);
-                this.isSpeaking = false;
-                this.audioElement = null;
-                this.setOrbState('idle');
-            };
-
-            audio.load();
-
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                await playPromise;
-            }
-
-        } catch (error) {
-            // Handle autoplay restrictions silently
-            if (error.name === 'NotAllowedError' || error.message?.includes('autoplay') || error.message?.includes('user agent')) {
-                // iOS/Safari autoplay block - completely normal, text already shown
-            } else {
-                console.error('TTS Error:', error.message);
-            }
-            this.clearStatusMessage();
-            this.isSpeaking = false;
-            this.setOrbState('idle');
-        }
+        // Just delegate to sovereign speak method
+        return this.speak(text, skipStateChange);
     }
 
     /* ============================================

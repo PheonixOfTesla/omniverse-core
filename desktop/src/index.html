@@ -1893,8 +1893,8 @@
                 console.log('[Phoenix] DESKTOP MODE - Showing Omniverse');
                 window.OMNIVERSE_MODE = true;
 
-                // Load Tauri-specific scripts
-                const scripts = ['api-adapter.js', 'piper-tts.js'];
+                // Load Tauri-specific scripts (sovereign voice system)
+                const scripts = ['api-adapter.js', 'piper-tts.js', 'sovereign-voice.js'];
                 for (const src of scripts) {
                     const script = document.createElement('script');
                     script.src = src;

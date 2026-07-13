@@ -451,6 +451,55 @@ async fn download_voices() -> Result<String, String> {
     Ok("Default voices downloaded: Ryan (male), Amy (female)".to_string())
 }
 
+/// System TTS fallback using macOS 'say' command
+/// 100% local - no network calls
+#[tauri::command]
+async fn system_speak(text: String) -> Result<String, String> {
+    use std::process::Command;
+
+    #[cfg(target_os = "macos")]
+    {
+        // Use macOS built-in 'say' command
+        let output = Command::new("say")
+            .arg(&text)
+            .output()
+            .map_err(|e| format!("Failed to run 'say': {}", e))?;
+
+        if output.status.success() {
+            Ok("Spoken via macOS say".to_string())
+        } else {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            Err(format!("Say command failed: {}", stderr))
+        }
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("System TTS only available on macOS".to_string())
+    }
+}
+
+/// Check if system TTS is available
+#[tauri::command]
+async fn check_system_tts() -> Result<serde_json::Value, String> {
+    #[cfg(target_os = "macos")]
+    {
+        // macOS always has 'say' command
+        Ok(serde_json::json!({
+            "available": true,
+            "engine": "macos-say"
+        }))
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        Ok(serde_json::json!({
+            "available": false,
+            "engine": "none"
+        }))
+    }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN
 // ═══════════════════════════════════════════════════════════════
@@ -475,6 +524,9 @@ fn main() {
             speak,
             synthesize,
             download_voices,
+            // System TTS fallback
+            system_speak,
+            check_system_tts,
         ])
         .setup(|_app| {
             // Print startup banner
