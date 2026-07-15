@@ -20,7 +20,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Mutex;
-use tauri::State;
+use tauri::{State, Manager};
 // Import from omniverse core
 use omniverse::{
     Action, ConscienceLedger, Document, Intent, QueryOptions,
@@ -195,6 +195,49 @@ async fn unlock(
         genesis_hash: passphrase_hash,
         message: "Omniverse unlocked successfully".to_string(),
         data_dir: data_dir.to_string_lossy().to_string(),
+    })
+}
+
+/// Change vault passphrase (requires current passphrase verification)
+#[tauri::command]
+async fn change_passphrase(
+    current_passphrase: String,
+    new_passphrase: String,
+    state: State<'_, Mutex<AppState>>,
+) -> Result<InitResult, String> {
+    let mut app_state = state.lock().map_err(|e| e.to_string())?;
+
+    if !app_state.initialized {
+        return Err("Vault not unlocked".to_string());
+    }
+
+    // Verify current passphrase matches
+    let current_hash = hash_passphrase(&current_passphrase);
+    if current_hash != app_state.passphrase_hash {
+        return Err("Current passphrase is incorrect".to_string());
+    }
+
+    // Change storage passphrase
+    if let Some(ref storage) = app_state.storage {
+        storage.change_passphrase(&new_passphrase)
+            .map_err(|e| format!("Failed to change storage passphrase: {}", e))?;
+    }
+
+    // Change ledger passphrase
+    if let Some(ref ledger) = app_state.ledger {
+        ledger.change_passphrase(&new_passphrase)
+            .map_err(|e| format!("Failed to change ledger passphrase: {}", e))?;
+    }
+
+    // Update stored hash
+    let new_hash = hash_passphrase(&new_passphrase);
+    app_state.passphrase_hash = new_hash.clone();
+
+    Ok(InitResult {
+        success: true,
+        genesis_hash: new_hash,
+        message: "Passphrase changed successfully".to_string(),
+        data_dir: app_state.data_dir.to_string_lossy().to_string(),
     })
 }
 
@@ -1213,6 +1256,7 @@ fn main() {
             initialize,
             check_initialized,
             unlock,
+            change_passphrase,
             // Persistence (A8)
             save_widget,
             load_widgets,
@@ -1252,7 +1296,7 @@ fn main() {
             system_speak,
             check_system_tts,
         ])
-        .setup(|_app| {
+        .setup(|app| {
             println!("=================================================================");
             println!("                      OMNIVERSE DESKTOP                          ");
             println!("              Sovereign AI Consciousness v{}               ", env!("CARGO_PKG_VERSION"));

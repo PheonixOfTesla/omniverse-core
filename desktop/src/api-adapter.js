@@ -15,7 +15,8 @@ const API_CONFIG = {
 };
 
 // Detect if running in Tauri
-const isTauri = () => {
+// Note: Using different name to avoid conflict with config.js which also defines isTauri
+const checkTauriEnv = () => {
     return typeof window !== 'undefined' && window.__TAURI__ !== undefined;
 };
 
@@ -39,11 +40,11 @@ const setBackendPreference = (preference) => {
  */
 async function apiRequest(endpoint, options = {}) {
     const preference = getPreferredBackend();
-    const useTauri = isTauri() && (preference === 'auto' || preference === 'local');
+    const useTauri = checkTauriEnv() && (preference === 'auto' || preference === 'local');
 
     if (API_CONFIG.DEBUG) {
         console.log(`[API Adapter] ${endpoint}`, {
-            isTauri: isTauri(),
+            isTauri: checkTauriEnv(),
             preference,
             useTauri,
             method: options.method || 'GET'
@@ -183,7 +184,7 @@ async function askPhoenix(prompt, options = {}) {
 
 async function streamPhoenix(prompt, onChunk, options = {}) {
     const preference = getPreferredBackend();
-    const useTauri = isTauri() && (preference === 'auto' || preference === 'local');
+    const useTauri = checkTauriEnv() && (preference === 'auto' || preference === 'local');
 
     if (useTauri) {
         // Tauri doesn't support streaming yet, use regular query
@@ -295,7 +296,7 @@ window.OmniverseAPI = {
     config: API_CONFIG,
     setBackendPreference,
     getPreferredBackend,
-    isTauri,
+    isTauri: checkTauriEnv,
 
     // Core
     request: apiRequest,
@@ -329,7 +330,7 @@ window.OmniverseAPI = {
 };
 
 console.log('[API Adapter] Initialized', {
-    isTauri: isTauri(),
+    isTauri: checkTauriEnv(),
     preference: getPreferredBackend(),
     cloudURL: API_CONFIG.CLOUD_BASE_URL
 });

@@ -368,15 +368,33 @@ impl SecureStorage {
         Ok(())
     }
 
-    /// Change passphrase
+    /// Change the encryption passphrase (rekey the database)
+    /// Requires the database to already be open with the current passphrase
     pub fn change_passphrase(&self, new_passphrase: &str) -> Result<()> {
+        info!("Changing vault passphrase...");
+
+        // Derive new key from new passphrase
         let new_key = Self::derive_key(new_passphrase);
-        self.conn.execute_batch(&format!("PRAGMA rekey = \"x'{}'\"", new_key))?;
-        info!("Passphrase changed successfully");
-        Ok(())
+
+        // Use SQLCipher's rekey to re-encrypt with new key
+        self.conn.execute_batch(&format!(
+            "PRAGMA rekey = \"x'{}'\";",
+            new_key
+        ))?;
+
+        // Verify the rekey worked by running a test query
+        match self.conn.query_row("SELECT count(*) FROM sqlite_master", [], |_| Ok(())) {
+            Ok(_) => {
+                info!("Passphrase changed successfully");
+                Ok(())
+            }
+            Err(e) => {
+                error!("Passphrase change verification failed: {}", e);
+                bail!("Failed to verify passphrase change")
+            }
+        }
     }
 
-    /// Get storage statistics
     pub fn stats(&self) -> Result<StorageStats> {
         let doc_count: i64 = self.conn.query_row(
             "SELECT COUNT(*) FROM documents",

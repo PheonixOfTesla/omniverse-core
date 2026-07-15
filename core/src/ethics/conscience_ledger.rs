@@ -368,6 +368,28 @@ impl ConscienceLedger {
             },
         })
     }
+
+    /// Change the encryption passphrase (rekey the database)
+    pub fn change_passphrase(&self, new_passphrase: &str) -> Result<()> {
+        info!("Changing conscience ledger passphrase...");
+
+        // Use SQLCipher's rekey to re-encrypt with new passphrase
+        self.conn.execute_batch(&format!(
+            "PRAGMA rekey = '{}';",
+            new_passphrase
+        ))?;
+
+        // Verify the rekey worked
+        match self.conn.query_row("SELECT count(*) FROM sqlite_master", [], |_| Ok(())) {
+            Ok(_) => {
+                info!("Conscience ledger passphrase changed successfully");
+                Ok(())
+            }
+            Err(e) => {
+                bail!("Failed to verify passphrase change: {}", e)
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
